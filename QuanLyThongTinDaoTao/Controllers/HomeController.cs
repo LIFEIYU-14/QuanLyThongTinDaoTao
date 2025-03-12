@@ -20,7 +20,7 @@ namespace QuanLyThongTinDaoTao.Controllers
 
         public ActionResult Contact()
         {
-            return View();
+            return View();// trả về view Contact
         }
     }
 }
