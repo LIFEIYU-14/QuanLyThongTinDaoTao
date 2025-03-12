@@ -15,7 +15,7 @@ namespace QuanLyThongTinDaoTao.Controllers
 
         public ActionResult About()
         {
-            return View();
+            return View(); // trả về view About
         }
 
         public ActionResult Contact()
