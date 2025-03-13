@@ -179,6 +179,10 @@
     <Compile Include="Migrations\202503130200124_Uo.Designer.cs">
       <DependentUpon>202503130200124_Uo.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202503130204299_EditDB.cs" />
+    <Compile Include="Migrations\202503130204299_EditDB.Designer.cs">
+      <DependentUpon>202503130204299_EditDB.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Admin.cs" />
     <Compile Include="Models\BuoiHoc.cs" />
@@ -483,6 +487,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202503130200124_Uo.resx">
       <DependentUpon>202503130200124_Uo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202503130204299_EditDB.resx">
+      <DependentUpon>202503130204299_EditDB.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

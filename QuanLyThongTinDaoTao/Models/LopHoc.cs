@@ -7,6 +7,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QuanLyThongTinDaoTao.Models
 {
+    [Table("LopHocs")]
+
     public class LopHoc
     {
         [Key]

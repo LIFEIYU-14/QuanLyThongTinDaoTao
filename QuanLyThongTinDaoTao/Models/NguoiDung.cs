@@ -6,6 +6,7 @@ using System.Web.Helpers;
 
 namespace QuanLyThongTinDaoTao.Models
 {
+    [Table("NguoiDungs")]
     public class NguoiDung
     {
         [Key]

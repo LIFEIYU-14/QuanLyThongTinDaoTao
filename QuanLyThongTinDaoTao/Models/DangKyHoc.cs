@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QuanLyThongTinDaoTao.Models
 {
-    [Table("DangKyHoc")]
+    [Table("DangKyHocs")]
     public class DangKyHoc
     {
         [Key]
