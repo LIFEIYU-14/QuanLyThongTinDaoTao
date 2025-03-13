@@ -11,9 +11,6 @@ namespace QuanLyThongTinDaoTao.Models
         [Key]
         public Guid NguoiDungId { get; set; } = Guid.NewGuid();
 
-        [Required, StringLength(50)]
-        public string TenDangNhap { get; set; }
-
         [Required(ErrorMessage = "Họ tên bắt buộc nhập")]
         public string HoVaTen { get; set; }
 

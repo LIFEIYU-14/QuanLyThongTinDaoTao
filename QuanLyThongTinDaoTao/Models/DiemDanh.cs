@@ -22,8 +22,9 @@ namespace QuanLyThongTinDaoTao.Models
         public enum TrangThaiDiemDanh
         {
             CoMat, // Có mặt
-            Vang,  // Vắng
-            Muon   // Muộn
+            VangCoPhep,  // Vắng có phép
+            VangKhongPhep,  // Vắng không phép
+            Muon,  // Muộn
         }
 
         [Required]
