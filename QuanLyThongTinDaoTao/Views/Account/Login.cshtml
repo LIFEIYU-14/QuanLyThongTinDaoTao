@@ -1,0 +1,63 @@
+﻿@model QuanLyThongTinDaoTao.ModelsService.LoginViewModel
+
+@{
+    ViewBag.Title = "Đăng nhập";
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+}
+
+<div class="container-fluid bg-primary py-5 mb-5">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-7">
+                <div class="bg-light rounded-4 p-4 p-sm-5 my-4 mx-3 border border-primary" style="border-radius:28px">
+                    <h3 class="text-center mb-4">CỔNG THÔNG TIN HỌC VIÊN</h3>
+
+                    @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "needs-validation", novalidate = "true" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <!-- Input Mã học viên -->
+                        <div class="form-group mb-4">
+                            @Html.TextBoxFor(m => m.MaHocVien, new { @class = "form-control border border-primary rounded-3", placeholder = "Nhập mã học viên" })
+                            @Html.ValidationMessageFor(m => m.MaHocVien, "", new { @class = "text-danger" })
+                        </div>
+
+                        <!-- Input Mật khẩu + Toggle Eye -->
+                        <div class="form-group mb-4">
+                            <div class="input-group border border-primary rounded-3">
+                                @Html.PasswordFor(m => m.MatKhau, new { @class = "form-control border border-primary rounded-start-3", placeholder = "Nhập mật khẩu", id = "password" })
+                                <span class="input-group-text bg-white border-0 rounded-end-3" onclick="togglePassword()">
+                                    <i class="fa fa-eye" id="eye-icon"></i>
+                                </span>
+                            </div>
+                            @Html.ValidationMessageFor(m => m.MatKhau, "", new { @class = "text-danger mt-2" })
+                        </div>
+
+                        <!-- Remember Me -->
+                        <div class="form-check mb-4">
+                            @Html.CheckBoxFor(m => m.RememberMe, new { @class = "form-check-input rounded-pill me-2" })
+                            @Html.LabelFor(m => m.RememberMe, new { @class = "form-check-label" })
+                        </div>
+
+                        <!-- Nút Đăng nhập -->
+                        <button type="submit" class="btn btn-primary w-100 py-2 rounded-pill mb-4">Đăng nhập</button>
+                    }
+
+                    <!-- Đăng ký / Quên mật khẩu -->
+                    <div class="text-center mt-4">
+                        <p class="mb-2">Chưa có tài khoản? <a href="@Url.Action("Register", "Account")">Đăng ký ngay</a></p>
+                        <p><a href="@Url.Action("ForgotPassword", "Account")">Quên mật khẩu?</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (TempData["LoginError"] != null)
+{
+    <script>
+    alert("@Html.Raw(TempData["LoginError"])");
+    </script>
+
+}

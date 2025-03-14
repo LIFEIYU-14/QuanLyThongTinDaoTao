@@ -362,3 +362,10 @@
     </div>
 </div>
 <!-- Testimonial End -->
+
+@if (TempData["LoginSuccess"] != null)
+{
+    <script>
+        alert("@Html.Raw(TempData["LoginSuccess"])");
+    </script>
+}

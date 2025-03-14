@@ -16,10 +16,16 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         {
             return View();
         }
-        public ActionResult KhoaHoc()
+        public ActionResult KhoaHoc(string searchString)
         {
-            var khoaHoc = db.KhoaHocs.ToList();
-            return View(khoaHoc);
+            var khoaHoc = db.KhoaHocs.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                khoaHoc = khoaHoc.Where(k => k.TenKhoaHoc.Contains(searchString));
+            }
+
+            return View(khoaHoc.ToList());
         }
     }
 }

@@ -16,6 +16,7 @@ namespace QuanLyThongTinDaoTao.Models
         public virtual HocVien HocVien { get; set; }
 
         public virtual LopHoc LopHoc { get; set; }
+        public virtual KhoaHoc KhoaHoc { get; set; }
 
         public DateTime NgayDangKy { get; set; } = DateTime.Now;
     }

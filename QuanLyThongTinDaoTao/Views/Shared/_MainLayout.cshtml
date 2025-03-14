@@ -1,4 +1,18 @@
-﻿<!DOCTYPE html>
+﻿@using System.Web.Security
+@{
+    var userData = "";
+    if (User.Identity.IsAuthenticated)
+    {
+        var authCookie = Request.Cookies[FormsAuthentication.FormsCookieName];
+        if (authCookie != null)
+        {
+            var authTicket = FormsAuthentication.Decrypt(authCookie.Value);
+            userData = authTicket?.UserData; // Đây chính là HoVaTen
+        }
+    }
+}
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -17,8 +31,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
 
     <!-- Icon Font Stylesheet -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Libraries Stylesheet -->
     <link href="~/Asset/lib/animate/animate.min.css" rel="stylesheet">
@@ -64,13 +78,29 @@
                 <a href="@Url.Action("Contact", "Home")" class="nav-item nav-link">Contact</a>
 
             </div>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <li class="navbar-nav nav-item dropdown ms-auto p-4 p-lg-0">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-user"></i> @userData
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="@Url.Action("Profile", "Account")"><i class="fa fa-user-circle"></i> Thông tin</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="@Url.Action("Logout", "Account")"><i class="fa fa-sign-out-alt"></i> Đăng xuất</a></li>
+                    </ul>
+                </li>
 
-            <a href="dang-ky.html" class="nav-item nav-link">
-                <i class="fa fa-user-plus"></i> Đăng ký
-            </a>
-            <a href="dang-nhap.html" class="nav-item nav-link">
-                <i class="fa fa-sign-in-alt"></i> Đăng nhập
-            </a>
+            }
+            else
+            {
+                <a href="@Url.Action("Register", "Account")" class="nav-item nav-link">
+                    <i class="fa fa-user-plus"></i> Đăng ký
+                </a>
+                <a href="@Url.Action("Login", "Account")" class="nav-item nav-link">
+                    <i class="fa fa-sign-in-alt"></i> Đăng nhập
+                </a>
+            }
 
         </div>
     </nav>
@@ -198,13 +228,14 @@
 
 
     <!-- JavaScript Libraries -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/Asset/lib/wow/wow.min.js"></script>
     <script src="~/Asset/lib/easing/easing.min.js"></script>
     <script src="~/Asset/lib/waypoints/waypoints.min.js"></script>
     <script src="~/Asset/lib/owlcarousel/owl.carousel.min.js"></script>
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
     <!-- Template Javascript -->
     <script src="~/Asset/js/main.js"></script>
 </body>

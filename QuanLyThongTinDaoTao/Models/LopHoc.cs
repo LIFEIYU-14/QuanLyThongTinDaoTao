@@ -37,7 +37,7 @@ namespace QuanLyThongTinDaoTao.Models
         public int SoLuongToiDa { get; set; }
         public DateTime NgayTao { get; set; } = DateTime.Now;
         public DateTime NgayCapNhat { get; set; } = DateTime.Now;
-        public virtual ICollection<HocVien> HocVien { get; set; }
+        public virtual ICollection<HocVien> HocViens { get; set; }
 
         public virtual ICollection<BuoiHoc> BuoiHocs  { get; set; }
 
