@@ -10,10 +10,10 @@ namespace QuanLyThongTinDaoTao.Models
         [Required]
         [StringLength(20)]
         public string MaHocVien { get; set; }
+        [Required]
+        [StringLength(255)]
+        public string CoQuanLamViec { get; set; }
         public virtual ICollection<LopHoc> LopHocs { get; set; }
         public virtual ICollection<ThongBao> ThongBaos { get; set; }
     }
-
-
-
 }

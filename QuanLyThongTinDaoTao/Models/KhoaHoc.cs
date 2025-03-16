@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Web;
 
 namespace QuanLyThongTinDaoTao.Models
 {
     [Table("KhoaHocs")]
-
     public class KhoaHoc
     {
         [Key]
@@ -19,14 +16,18 @@ namespace QuanLyThongTinDaoTao.Models
 
         [Required, StringLength(255)]
         public string MoTa { get; set; }
-        public string HinhAnh { get; set; }
 
         [Required]
-        public int ThoiLuong { get; set; } // Tính theo tiết // 45p = 1 tiết
-        public virtual ICollection<LopHoc> LopHocs { get; set; }
+        public int ThoiLuong { get; set; } // Số tiết học
+
+        [Required]
+        public string TaiLieuDinhKem { get; set; }
 
         public DateTime NgayTao { get; set; } = DateTime.Now;
         public DateTime NgayCapNhat { get; set; } = DateTime.Now;
-    }
 
+        public virtual ICollection<LopHoc> LopHocs { get; set; }
+        public virtual ICollection<TaiLieu> TaiLieus { get; set; }
+        public virtual ICollection<HinhAnh> HinhAnhs { get; set; }
+    }
 }

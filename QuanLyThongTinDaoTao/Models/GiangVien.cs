@@ -14,6 +14,10 @@ namespace QuanLyThongTinDaoTao.Models
         [StringLength(255)]
         public string ChuyenMon { get; set; }
 
+        [Required]
+        [StringLength(255)]
+        public string HocHam { get; set; }
+        public virtual ICollection<BuoiHoc> BuoiHocs { get; set; }
         public virtual ICollection<LopHoc> LopHocs { get; set; }
         public virtual ICollection<ThongBao> ThongBaos { get; set; }
     }
