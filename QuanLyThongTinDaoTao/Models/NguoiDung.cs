@@ -16,6 +16,7 @@ namespace QuanLyThongTinDaoTao.Models
         public string HoVaTen { get; set; }
 
         [Required(ErrorMessage = "Mật khẩu bắt buộc nhập")]
+        [MinLength(6, ErrorMessage = "Mật khẩu ít nhất 6 ký tự")]
         public string MatKhau { get; set; }
 
         [Required]
@@ -31,6 +32,7 @@ namespace QuanLyThongTinDaoTao.Models
         [StringLength(100)]
         [Required(ErrorMessage = "Email không được để trống")]
         [EmailAddress(ErrorMessage = "Email sai định dạng")]
+        [Index(IsUnique = true)]
         public string Email { get; set; }
 
         public DateTime NgayTao { get; set; } = DateTime.Now;

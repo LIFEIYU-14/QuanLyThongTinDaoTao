@@ -204,6 +204,14 @@
     <Compile Include="Migrations\202503160516313_16GV.Designer.cs">
       <DependentUpon>202503160516313_16GV.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202503160526405_d2qjej.cs" />
+    <Compile Include="Migrations\202503160526405_d2qjej.Designer.cs">
+      <DependentUpon>202503160526405_d2qjej.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202503160529403_d2qjejd.cs" />
+    <Compile Include="Migrations\202503160529403_d2qjejd.Designer.cs">
+      <DependentUpon>202503160529403_d2qjejd.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ModelsService\LoginViewModel.cs" />
     <Compile Include="ModelsService\RegisterViewModel.cs" />
@@ -2386,6 +2394,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202503160516313_16GV.resx">
       <DependentUpon>202503160516313_16GV.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202503160526405_d2qjej.resx">
+      <DependentUpon>202503160526405_d2qjej.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202503160529403_d2qjejd.resx">
+      <DependentUpon>202503160529403_d2qjejd.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

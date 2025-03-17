@@ -28,6 +28,7 @@ namespace QuanLyThongTinDaoTao.Models
 
         public virtual ICollection<LopHoc> LopHocs { get; set; }
         public virtual ICollection<TaiLieu> TaiLieus { get; set; }
-        public virtual ICollection<HinhAnh> HinhAnhs { get; set; }
+        public virtual ICollection<KhoaHocAttachment> KhoaHocAttachments { get; set; }
+
     }
 }

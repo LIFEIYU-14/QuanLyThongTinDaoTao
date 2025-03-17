@@ -32,11 +32,14 @@ namespace QuanLyThongTinDaoTao.Models
         [Required]
         public int SoLuongToiDa { get; set; }
 
+        // Nội dung mô tả lớp học (hỗ trợ nhập bằng CKEditor)
+        public string MoTa { get; set; }
         public DateTime NgayTao { get; set; } = DateTime.Now;
         public DateTime NgayCapNhat { get; set; } = DateTime.Now;
         public virtual KhoaHoc KhoaHoc { get; set; }
         public virtual ICollection<GiangVien> GiangViens { get; set; }
-        public virtual ICollection<HinhAnh> HinhAnhs { get; set; }
+        public virtual ICollection<LopHocAttachment> LopHocAttachments { get; set; }
+
 
     }
 }
