@@ -23,5 +23,10 @@ namespace QuanLyThongTinDaoTao.Models
         public DbSet<DiemDanh> DiemDanhs { get; set; }
         public DbSet<BuoiHoc> BuoiHocs { get; set; }
         public DbSet<ThongBao> ThongBaos { get; set; }
+        public DbSet<Attachment> Attachments { get; set; }
+        public DbSet<LopHocAttachment> LopHocAttachments { get; set; }
+        public DbSet<KhoaHocAttachment> KhoaHocAttachments { get; set; }
+        public DbSet<BuoiHocAttachment> BuoiHocAttachments { get; set; }
+        public DbSet<TaiLieu> TaiLieus { get; set; }
     }
 }
