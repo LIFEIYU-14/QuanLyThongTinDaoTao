@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -20,5 +21,8 @@ namespace QuanLyThongTinDaoTao.Models
         public string FilePath { get; set; } // Lưu đường dẫn file
 
         public DateTime UploadDate { get; set; } = DateTime.Now;
+        public virtual ICollection<KhoaHocAttachment> KhoaHocAttachments { get; set; }
+        public virtual ICollection<BuoiHocAttachment> BuoiHocAttachments { get; set; }
+        public virtual ICollection<LopHocAttachment> LopHocAttachments { get; set; }
     }
 }

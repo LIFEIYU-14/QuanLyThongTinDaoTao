@@ -13,8 +13,6 @@ namespace QuanLyThongTinDaoTao.Models
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
 
-        [ForeignKey("KhoaHoc")]
-
         public virtual KhoaHoc KhoaHoc { get; set; }
         public virtual Attachment Attachment { get; set; }
     }

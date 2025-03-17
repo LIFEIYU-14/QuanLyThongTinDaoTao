@@ -19,10 +19,6 @@ namespace QuanLyThongTinDaoTao.Models
 
         [Required]
         public int ThoiLuong { get; set; } // Số tiết học
-
-        [Required]
-        public string TaiLieuDinhKem { get; set; }
-
         public DateTime NgayTao { get; set; } = DateTime.Now;
         public DateTime NgayCapNhat { get; set; } = DateTime.Now;
 
