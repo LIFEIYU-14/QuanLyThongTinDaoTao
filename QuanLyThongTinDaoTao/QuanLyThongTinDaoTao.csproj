@@ -212,6 +212,10 @@
     <Compile Include="Migrations\202503160529403_d2qjejd.Designer.cs">
       <DependentUpon>202503160529403_d2qjejd.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202503170153535_7dad.cs" />
+    <Compile Include="Migrations\202503170153535_7dad.Designer.cs">
+      <DependentUpon>202503170153535_7dad.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ModelsService\LoginViewModel.cs" />
     <Compile Include="ModelsService\RegisterViewModel.cs" />
@@ -2403,6 +2407,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202503160529403_d2qjejd.resx">
       <DependentUpon>202503160529403_d2qjejd.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202503170153535_7dad.resx">
+      <DependentUpon>202503170153535_7dad.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
