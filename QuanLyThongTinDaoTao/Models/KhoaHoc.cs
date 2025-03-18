@@ -23,7 +23,6 @@ namespace QuanLyThongTinDaoTao.Models
         public DateTime NgayCapNhat { get; set; } = DateTime.Now;
 
         public virtual ICollection<LopHoc> LopHocs { get; set; }
-        public virtual ICollection<TaiLieu> TaiLieus { get; set; }
         public virtual ICollection<KhoaHocAttachment> KhoaHocAttachments { get; set; }
 
     }

@@ -15,7 +15,7 @@ namespace QuanLyThongTinDaoTao.Models
         [StringLength(255)]
         public string CoQuanLamViec { get; set; }
         [Required]
-        public string QRcode { get; set; } = Guid.NewGuid().ToString();
+        public string QR_Code_HV { get; set; } = Guid.NewGuid().ToString();
         public virtual ICollection<LopHoc> LopHocs { get; set; }
         public virtual ICollection<ThongBao> ThongBaos { get; set; }
     }

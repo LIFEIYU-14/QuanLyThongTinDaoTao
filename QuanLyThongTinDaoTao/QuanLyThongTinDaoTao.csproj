@@ -241,7 +241,6 @@
     <Compile Include="Models\LopHoc.cs" />
     <Compile Include="Models\LopHocAttachment.cs" />
     <Compile Include="Models\NguoiDung.cs" />
-    <Compile Include="Models\TaiLieu.cs" />
     <Compile Include="Models\ThongBao.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\EmailService.cs" />
