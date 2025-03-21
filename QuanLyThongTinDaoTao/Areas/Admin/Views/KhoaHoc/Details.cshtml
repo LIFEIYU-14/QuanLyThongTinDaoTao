@@ -1,0 +1,86 @@
+﻿@model QuanLyThongTinDaoTao.Models.KhoaHoc
+@{
+    ViewBag.Title = "Chi Tiết Khóa Học";
+    Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
+}
+
+<div class="container py-5">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-primary text-white text-center rounded-top-4">
+            <h2 class="mb-0">Chi Tiết Khóa Học: @Model.TenKhoaHoc</h2>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Hình Đại Diện -->
+                <div class="col-lg-6 mb-4">
+                    @if (Model.KhoaHocAttachments != null && Model.KhoaHocAttachments.Any(a => a.Attachment.FileType.ToLower().Contains("jpg") || a.Attachment.FileType.ToLower().Contains("png")))
+                    {
+                        var imageAttachment = Model.KhoaHocAttachments.FirstOrDefault(a => a.Attachment.FileType.ToLower().Contains("jpg") || a.Attachment.FileType.ToLower().Contains("png"))?.Attachment;
+                        <img src="@Url.Content(imageAttachment.FilePath)" class="img-fluid rounded-4 shadow-sm" alt="@Model.TenKhoaHoc" style="max-height: 400px; width: 100%; object-fit: cover;" />
+                    }
+                    else
+                    {
+                        <img src="@Url.Content("~/Upload/KhoaHoc/default.png")" class="img-fluid rounded-4 shadow-sm" alt="Default Image" style="max-height: 400px; width: 100%; object-fit: cover;" />
+                    }
+                </div>
+
+                <!-- Thông Tin Khóa Học -->
+                <div class="col-lg-6">
+                    <h4 class="mb-3 text-primary">Thông Tin Khóa Học</h4>
+                    <p><strong>Mô Tả:</strong> @Html.Raw(Model.MoTa)</p>
+                    <p><strong>Thời Lượng:</strong> @Model.ThoiLuong tiết</p>
+                    <p><strong>Ngày Tạo:</strong> @Model.NgayTao.ToString("dd/MM/yyyy")</p>
+                    <p><strong>Ngày Cập Nhật:</strong> @Model.NgayCapNhat.ToString("dd/MM/yyyy")</p>
+                </div>
+            </div>
+
+            <!-- Tệp Đính Kèm -->
+            @if (Model.KhoaHocAttachments != null && Model.KhoaHocAttachments.Any())
+            {
+                <h4 class="mt-5 mb-3 text-primary">Tệp Đính Kèm</h4>
+                <ul class="list-group">
+                    @foreach (var attachment in Model.KhoaHocAttachments)
+                    {
+                        string fileType = attachment?.Attachment?.FileType?.ToLower();
+                        string iconClass = "fa-file";
+
+                        switch (fileType)
+                        {
+                            case "pdf":
+                                iconClass = "fa-file-pdf text-danger";
+                                break;
+                            case "docx":
+                            case "doc":
+                                iconClass = "fa-file-word text-primary";
+                                break;
+                            case "txt":
+                                iconClass = "fa-file-alt text-secondary";
+                                break;
+                            case "xlsx":
+                            case "xls":
+                                iconClass = "fa-file-excel text-success";
+                                break;
+                            default:
+                                iconClass = "fa-file text-muted";
+                                break;
+                        }
+
+                        <div>
+                            <i class="fas @iconClass  fa-lg me-2"></i>
+                            <a href="@Url.Content(attachment.Attachment.FilePath)" target="_blank">@attachment.Attachment.FileName</a>
+                        </div>
+                    }
+                </ul>
+            }
+
+            <!-- Nút Hành Động -->
+            <div class="mt-5 d-flex justify-content-center gap-2">
+                <a href="@Url.Action("Index")" class="btn btn-secondary btn-lg"><i class="fas fa-arrow-left me-1"></i> Quay Lại</a>
+                <a href="@Url.Action("Edit", new { id = Model.KhoaHocId })" class="btn btn-primary btn-lg"><i class="fas fa-edit me-1"></i> Chỉnh Sửa</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Font Awesome -->
+<script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>

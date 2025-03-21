@@ -1,4 +1,4 @@
-/********** Template CSS **********/
+﻿/********** Template CSS **********/
 :root {
     --primary: #06BBCC;
     --light: #F0FBFC;
@@ -76,6 +76,68 @@
 }
 
 
+/*** Responsive adjustments for small screens (4 inch and up) ***/
+@media (max-width: 480px) {
+    /* Điều chỉnh Navbar */
+    .navbar-light .navbar-nav .nav-link {
+        font-size: 14px; /* Giảm kích thước font */
+        padding: 10px 0; /* Điều chỉnh khoảng cách */
+        margin-right: 0;
+    }
+
+    .navbar-light .navbar-brand,
+    .navbar-light a.btn {
+        height: 60px; /* Giảm chiều cao navbar */
+    }
+
+    .navbar .dropdown-toggle::after {
+        margin-left: 5px;
+    }
+
+    /* Điều chỉnh Header Carousel */
+    .header-carousel .owl-carousel-item {
+        min-height: 300px; /* Giảm chiều cao ảnh carousel */
+    }
+
+    .header-carousel .owl-nav {
+        top: 40%;
+        right: 5%; /* Điều chỉnh vị trí nút điều hướng */
+    }
+
+        .header-carousel .owl-nav .owl-prev,
+        .header-carousel .owl-nav .owl-next {
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+        }
+
+    /* Điều chỉnh Page Header */
+    .page-header {
+        min-height: 180px; /* Giảm chiều cao của header */
+        background-size: cover;
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+        font-size: 12px;
+    }
+
+    /* Điều chỉnh khoảng cách của dropdown menu */
+    .navbar .nav-item .dropdown-menu {
+        position: static;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        box-shadow: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-carousel .owl-carousel-item {
+        min-height: 400px; /* Giảm chiều cao cho màn hình nhỏ hơn 768px */
+    }
+}
+
+
 /*** Navbar ***/
 .navbar .dropdown-toggle::after {
     border: none;
@@ -90,7 +152,7 @@
     margin-right: 30px;
     padding: 25px 0;
     color: #FFFFFF;
-    font-size: 25px;
+    font-size: 20px;
     text-transform: uppercase;
     outline: none;
 }
@@ -197,6 +259,7 @@
         }
 
 .page-header {
+
     background: linear-gradient(rgba(24, 29, 56, .7), rgba(24, 29, 56, .7)), url(../img/carousel-1.jpg);
     background-position: center center;
     background-repeat: no-repeat;

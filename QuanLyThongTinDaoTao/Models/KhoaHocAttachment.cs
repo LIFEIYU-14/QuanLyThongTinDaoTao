@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QuanLyThongTinDaoTao.Models
 {
@@ -13,8 +10,16 @@ namespace QuanLyThongTinDaoTao.Models
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
 
+        // Khóa ngoại đến KhoaHoc
+        [Required]
+        public Guid KhoaHocId { get; set; }
+        [ForeignKey("KhoaHocId")]
         public virtual KhoaHoc KhoaHoc { get; set; }
+
+        // Khóa ngoại đến Attachment
+        [Required]
+        public Guid AttachmentId { get; set; }
+        [ForeignKey("AttachmentId")]
         public virtual Attachment Attachment { get; set; }
     }
-
 }

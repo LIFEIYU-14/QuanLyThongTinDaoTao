@@ -1,0 +1,51 @@
+﻿@model QuanLyThongTinDaoTao.Models.KhoaHoc
+
+@{
+    ViewBag.Title = "Thêm Khóa Học";
+    Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white text-center">
+            <h3><i class="fa-solid fa-book-open"></i> Thêm Khóa Học</h3>
+        </div>
+        <div class="card-body">
+            @using (Html.BeginForm("Create", "KhoaHoc", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                <div class="mb-3">
+                    @Html.LabelFor(model => model.TenKhoaHoc, "Tên Khóa Học", new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.TenKhoaHoc, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.TenKhoaHoc, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="mb-3">
+                    @Html.LabelFor(model => model.MoTa, "Mô Tả Khóa Học", new { @class = "form-label" })
+                    @Html.TextAreaFor(model => model.MoTa, new { @class = "form-control", rows = 5 })
+                    @Html.ValidationMessageFor(model => model.MoTa, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="mb-3">
+                    @Html.LabelFor(model => model.ThoiLuong, "Thời Lượng (giờ)", new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.ThoiLuong, new { @class = "form-control", type = "number", min = 1 })
+                    @Html.ValidationMessageFor(model => model.ThoiLuong, "", new { @class = "text-danger", type = "number", min = "0" })
+                 
+                </div>
+
+                <div class="mb-3">
+                    <label for="attachments" class="form-label">Tệp Đính Kèm (có thể chọn nhiều tệp)</label>
+                    <input type="file" name="attachments" id="attachments" class="form-control" multiple />
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-success me-2">
+                        <i class="fa-solid fa-circle-plus"></i> Thêm Khóa Học
+                    </button>
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">
+                            <i class="fa-solid fa-arrow-left"></i> Quay lại
+                    </a>
+               </div>
+             }
+    </div>
+</div>
+</div>
