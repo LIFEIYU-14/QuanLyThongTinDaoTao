@@ -9,7 +9,16 @@ namespace QuanLyThongTinDaoTao.Models
     {
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
+
+        // Khóa ngoại đến LopHoc
+        [Required]
+        public Guid LopHocId { get; set; }
+        [ForeignKey("LopHocId")]
         public virtual LopHoc LopHoc { get; set; }
+
+        [Required]
+        public Guid AttachmentId { get; set; }
+        [ForeignKey("AttachmentId")]
         public virtual Attachment Attachment { get; set; }
     }
 }

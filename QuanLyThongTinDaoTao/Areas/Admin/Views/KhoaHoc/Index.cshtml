@@ -36,7 +36,7 @@
         }
 </style>
 <p>
-    <a href="@Url.Action("Create")" class="btn btn-primary mt-5 ms-4 btn-lg">
+    <a href="@Url.Action("Create")" class="btn btn-primary mt-3 ms-4 btn-lg">
         <i class="fas fa-plus-circle"></i> Thêm Khóa Học Mới
     </a>
 </p>
@@ -56,35 +56,23 @@
                             ? Url.Content(imageAttachment.FilePath)
                             : Url.Content("~/Upload/KhoaHoc/default.png");
 
-            <div class="col-lg-4 col-md-6 col-sm-12 mt-5 " data-wow-delay="0.1s">
+            <div class="col-lg-4 col-md-6 col-sm-12 mt-3 " data-wow-delay="0.1s">
                 <div class="course-item bg-light">
                     <div class="position-relative overflow-hidden">
                         <a href="@Url.Action("Details", "KhoaHoc", new { id = khoaHoc.KhoaHocId })">
                             <img class="img-fluid" src='@imagePath' alt="@khoaHoc.TenKhoaHoc" />
                         </a>
                     </div>
-
-                    <div class="text-center p-3 pb-0">
-                        <h3 class="mb-0">$149.00</h3>
-                        <div class="mb-3">
-                            <small class="fa fa-star text-primary"></small>
-                            <small class="fa fa-star text-primary"></small>
-                            <small class="fa fa-star text-primary"></small>
-                            <small class="fa fa-star text-primary"></small>
-                            <small class="fa fa-star text-primary"></small>
-                            <small>(123)</small>
-                        </div>
-                        <h5 class="m-0">@khoaHoc.TenKhoaHoc</h5>
+                    <div class="text-center p-3 pb-3">
+                        <h3 class="m-0">@khoaHoc.TenKhoaHoc</h3>
                     </div>
                     <div class="d-flex border-top">
-                        @*<small class="flex-fill text-center border-end py-2">
-                                <i class="fa fa-user-tie text-primary me-2"></i>số lượng người học
-                            </small>*@
+             
                         <small class="flex-fill text-center border-end py-2">
                             <i class="fa fa-clock text-primary me-2"></i>@khoaHoc.ThoiLuong <span class="fw-bold text-secondary">tiết</span>
                         </small>
                         <small class="flex-fill text-center py-2">
-                            <i class="fa fa-user text-primary me-2"></i>số lượng người học
+                            <i class="fa fa-user text-primary me-2"></i>Số lượng
                         </small>
                     </div>
                 </div>

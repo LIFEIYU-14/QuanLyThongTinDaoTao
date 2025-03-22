@@ -1,0 +1,131 @@
+﻿@model QuanLyThongTinDaoTao.Models.LopHoc
+
+@{
+    ViewBag.Title = "Thêm Lớp Học";
+    Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white text-center">
+            <h3><i class="fa-solid fa-book-open"></i> Thêm Lớp Học</h3>
+        </div>
+        <div class="card-body">
+            @using (Html.BeginForm("Create", "LopHoc", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        @Html.LabelFor(model => model.TenLopHoc, "Tên Lớp Học", new { @class = "form-label" })
+                        @Html.TextBoxFor(model => model.TenLopHoc, new { @class = "form-control", required = "required" })
+                        @Html.ValidationMessageFor(model => model.TenLopHoc, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        @Html.LabelFor(model => model.SoTinChi, "Số Tín Chỉ", new { @class = "form-label" })
+                        @Html.TextBoxFor(model => model.SoTinChi, new { @class = "form-control", type = "number", min = 1, required = "required" })
+                        @Html.ValidationMessageFor(model => model.SoTinChi, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        @Html.LabelFor(model => model.NgayBatDau, "Ngày Bắt Đầu", new { @class = "form-label" })
+                        @Html.TextBoxFor(model => model.NgayBatDau, new { @class = "form-control", type = "date", required = "required" })
+                        @Html.ValidationMessageFor(model => model.NgayBatDau, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        @Html.LabelFor(model => model.NgayKetThuc, "Ngày Kết Thúc", new { @class = "form-label" })
+                        @Html.TextBoxFor(model => model.NgayKetThuc, new { @class = "form-control", type = "date", required = "required" })
+                        @Html.ValidationMessageFor(model => model.NgayKetThuc, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        @Html.LabelFor(model => model.TrangThai, "Trạng Thái Lớp Học", new { @class = "form-label" })
+                        @Html.DropDownListFor(model => model.TrangThai, new SelectList(new[] { "SapMo", "DangHoc", "DaKetThuc" }), new { @class = "form-control" })
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        @Html.LabelFor(model => model.SoLuongToiDa, "Số lượng tối đa", new { @class = "form-label" })
+                        @Html.TextBoxFor(model => model.SoLuongToiDa, new { @class = "form-control", type = "number", min = 1, required = "required" })
+                        @Html.ValidationMessageFor(model => model.SoLuongToiDa, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <!-- Phần nhập mô tả tích hợp CKEditor -->
+                <div class="mb-3">
+                    @Html.LabelFor(model => model.MoTa, "Mô Tả", new { @class = "form-label" })
+                    @Html.TextAreaFor(model => model.MoTa, new { @class = "form-control", rows = 5, id = "MoTa" })
+                    @Html.ValidationMessageFor(model => model.MoTa, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    @Html.Label("KhoaHocId", "Khóa Học", new { @class = "form-label" })
+                    <select class="form-control" name="KhoaHocId" required>
+                        <option value="">-- Chọn Khóa Học --</option>
+                        @foreach (var khoaHoc in ViewBag.KhoaHocList)
+                        {
+                            <option value="@khoaHoc.KhoaHocId">@khoaHoc.TenKhoaHoc</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="attachments" class="form-label">Tệp Đính Kèm (JPG, PNG, PDF, DOCX)</label>
+                    <input type="file" name="attachments" id="attachments" class="form-control" multiple />
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-success me-2">
+                        <i class="fa-solid fa-circle-plus"></i> Thêm Lớp Học
+                    </button>
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">
+                        <i class="fa-solid fa-arrow-left"></i> Quay lại
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<style>
+    .ck-editor__editable {
+        min-height: 150px;
+        max-height: 600px;
+        resize: vertical; /* Cho phép kéo theo chiều dọc */
+        overflow-y: auto;
+    }
+
+
+</style>
+
+<!-- Tích hợp CKEditor 5 -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Khởi tạo CKEditor
+        ClassicEditor
+            .create(document.querySelector('#MoTa'))
+            .then(editor => {
+                console.log('CKEditor đã khởi tạo thành công.');
+
+                const editorElement = editor.ui.view.editable.element;
+                editorElement.style.overflowY = 'auto';
+
+                // Điều chỉnh chiều cao tự động
+                function adjustHeight() {
+                    editorElement.style.height = 'auto';
+                    editorElement.style.height = Math.min(editorElement.scrollHeight, 500) + 'px';
+                }
+
+                editor.model.document.on('change:data', adjustHeight);
+                adjustHeight();
+            })
+            .catch(error => {
+                console.error('Lỗi CKEditor:', error);
+            });
+    });
+
+</script>

@@ -1,0 +1,59 @@
+﻿@model QuanLyThongTinDaoTao.Models.LopHoc
+
+@{
+    ViewBag.Title = "Chi Tiết Lớp Học";
+    Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
+}
+
+<div class="container py-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between">
+            <h4 class="mb-0">📚Thông Tin Lớp Học</h4>
+            <h3 class="badge bg-@(Model.TrangThai == "SapMo" ? "warning" : (Model.TrangThai == "DangHoc" ? "success" : "secondary"))">
+                @(Model.TrangThai == "SapMo" ? "Sắp Mở" : (Model.TrangThai == "DangHoc" ? "Đang Học" : "Đã Kết Thúc"))
+            </h3>
+        </div>
+        <div class="card-body fs-5">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <p><strong>Tên Lớp Học:</strong> @Model.TenLopHoc</p>
+                    <p><strong>Số Tín Chỉ:</strong> @Model.SoTinChi</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <p><strong>Ngày Bắt Đầu:</strong> @Model.NgayBatDau.ToString("dd/MM/yyyy")</p>
+                    <p><strong>Ngày Kết Thúc:</strong> @Model.NgayKetThuc.ToString("dd/MM/yyyy")</p>
+                </div>
+            </div>
+            <div class="mb-3">
+                <p><strong>Mô Tả:</strong></p>
+                <div class="border rounded p-3 bg-light">@Html.Raw(Model.MoTa)</div>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="mt-4">📎Tệp Đính Kèm</h3>
+    <div class="card shadow-sm">
+        <div class="card-body fs-5">
+            @if (Model.LopHocAttachments.Any())
+            {
+                <ul class="list-group">
+                    @foreach (var attachment in Model.LopHocAttachments)
+                    {
+                        <li class="list-group-item">
+                            <a href="@attachment.Attachment.FilePath" target="_blank" class="text-primary">@attachment.Attachment.FileName</a>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p>Không có tệp đính kèm.</p>
+            }
+        </div>
+    </div>
+
+    <div class="mt-4 d-flex justify-content-between">
+        <a href="@Url.Action("Edit", new { id = Model.LopHocId })" class="btn btn-warning btn-lg"><i class="fas fa-edit"></i> Sửa</a>
+        <a href="@Url.Action("Index")" class="btn btn-secondary btn-lg"><i class="fas fa-arrow-left"></i> Quay Lại</a>
+    </div>
+</div>

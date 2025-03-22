@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Web.Mvc;
 
 namespace QuanLyThongTinDaoTao.Models
 {
@@ -10,9 +11,6 @@ namespace QuanLyThongTinDaoTao.Models
     {
         [Key]
         public Guid LopHocId { get; set; } = Guid.NewGuid();
-
-        [Required]
-        public string MaLopHoc { get; set; }
 
         [Required]
         public string TenLopHoc { get; set; }
@@ -32,11 +30,13 @@ namespace QuanLyThongTinDaoTao.Models
         [Required]
         public int SoLuongToiDa { get; set; }
 
+
         // Nội dung mô tả lớp học (hỗ trợ nhập bằng CKEditor)
         public string MoTa { get; set; }
         public DateTime NgayTao { get; set; } = DateTime.Now;
         public DateTime NgayCapNhat { get; set; } = DateTime.Now;
         public virtual KhoaHoc KhoaHoc { get; set; }
+
         public virtual ICollection<GiangVien> GiangViens { get; set; }
         public virtual ICollection<HocVien> HocViens { get; set; }
         public virtual ICollection<BuoiHoc> BuoiHocs { get; set; }

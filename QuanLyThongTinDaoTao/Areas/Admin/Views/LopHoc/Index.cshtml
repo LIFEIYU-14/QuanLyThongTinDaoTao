@@ -1,0 +1,49 @@
+﻿@model List<QuanLyThongTinDaoTao.Models.LopHoc>
+
+@{
+    ViewBag.Title = "Danh Sách Lớp Học";
+    Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <p>
+        <a href="@Url.Action("Create")" class="btn btn-primary mt-3 btn-lg">
+            <i class="fas fa-plus-circle"></i> Thêm Lớp Học Mới
+        </a>
+    </p>
+    <table class="table table-bordered mt-3 fs-5">
+        <thead class="table-light">
+            <tr class="text-dark text-lg-center">
+                <th>Tên Lớp Học</th>
+                <th>Số Tín Chỉ</th>
+                <th>Ngày Bắt Đầu</th>
+                <th>Ngày Kết Thúc</th>
+                <th>Trạng Thái</th>
+                <th>Hành Động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var lophoc in Model)
+            {
+                <tr class="text-lg-center">
+                    <td>@lophoc.TenLopHoc</td>
+                    <td>@lophoc.SoTinChi</td>
+                    <td>@lophoc.NgayBatDau.ToString("dd/MM/yyyy")</td>
+                    <td>@lophoc.NgayKetThuc.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        <span class="badge bg-@(lophoc.TrangThai == "SapMo" ? "warning" : (lophoc.TrangThai == "DangHoc" ? "success" : "secondary"))">
+                            @(lophoc.TrangThai == "SapMo" ? "Sắp Mở" : (lophoc.TrangThai == "DangHoc" ? "Đang Học" : "Đã Kết Thúc"))
+                        </span>
+                    </td>
+                    <td>
+                        <a href="@Url.Action("Details", new { id = lophoc.LopHocId })" class="btn btn-info me-2 btn-lg"><i class="fas fa-eye"></i> Chi Tiết</a>
+                        <a href="@Url.Action("Edit", new { id = lophoc.LopHocId })" class="btn btn-warning me-2 btn-lg"><i class="fas fa-edit"></i> Sửa</a>
+                        <a href="@Url.Action("Delete", new { id = lophoc.LopHocId })" class="btn btn-danger btn-lg" onclick="return confirm('Bạn có chắc chắn muốn xóa lớp học này?');">
+                            <i class="fas fa-trash-alt"></i> Xóa
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

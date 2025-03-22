@@ -114,7 +114,19 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
             return RedirectToAction("Index");
         }
+        public ActionResult DanhSachLopHoc(Guid id)
+        {
+            var khoaHoc = db.KhoaHocs.Include(k => k.LopHocs).FirstOrDefault(k => k.KhoaHocId == id);
+            if (khoaHoc == null)
+            {
+                return HttpNotFound();
+            }
 
+            ViewBag.TenKhoaHoc = khoaHoc.TenKhoaHoc;
+            return View(khoaHoc.LopHocs.ToList());
+        }
+
+        // Upload tệp đính kèm
         // Upload tệp đính kèm
         private void UploadAttachments(Guid khoaHocId, HttpPostedFileBase[] attachments)
         {
@@ -129,7 +141,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 Directory.CreateDirectory(uploadPath);
             }
 
-            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".pdf", ".docx" };
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".pdf", ".docx", ".txt" };
             var khoaHoc = db.KhoaHocs.Find(khoaHocId);
 
             if (khoaHoc == null)
@@ -156,6 +168,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
                     var attachment = new Attachment
                     {
+                        AttachmentId = Guid.NewGuid(),
                         FileName = fileName,
                         FileType = extension.TrimStart('.'),
                         FilePath = "/Upload/KhoaHoc/" + fileName,
