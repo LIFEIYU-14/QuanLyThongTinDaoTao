@@ -7,7 +7,7 @@
     <div class="bg-light text-center rounded p-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
             <h6 class="mb-0 fs-3">Danh Sách Lớp Học</h6>
-            <a href="@Url.Action("Create")" class="btn btn-primary fs-5"><i class="fas fa-plus-circle"></i> Thêm Lớp Học Mới</a>
+         
         </div>
         <div class="table-responsive">
             <table class="table text-start align-middle table-bordered mb-0 fs-5">
@@ -39,7 +39,7 @@
                                     <i class="fas fa-eye"></i> Chi Tiết
                                 </a>
 
-                                <a href="@Url.Action("Edit", new { id = lophoc.LopHocId })" class="btn btn-sm btn-warning fs-6"><i class="fas fa-edit"></i> Sửa</a>
+                                <a href="@Url.Action("Edit","LopHoc", new { id = lophoc.LopHocId })" class="btn btn-sm btn-warning fs-6"><i class="fas fa-edit"></i> Sửa</a>
                                 <a href="@Url.Action("Delete", new { id = lophoc.LopHocId })" class="btn btn-sm btn-danger fs-6" onclick="return confirm('Bạn có chắc chắn muốn xóa lớp học này?');">
                                     <i class="fas fa-trash-alt"></i> Xóa
                                 </a>

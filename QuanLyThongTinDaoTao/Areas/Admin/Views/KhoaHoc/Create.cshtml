@@ -14,39 +14,50 @@
             @using (Html.BeginForm("Create", "KhoaHoc", FormMethod.Post, new { enctype = "multipart/form-data" }))
             {
                 @Html.AntiForgeryToken()
+
+                <!-- Hình đại diện Khóa học -->
                 <div class="mb-3">
-                    @Html.LabelFor(model => model.TenKhoaHoc, "Tên Khóa Học", new { @class = "form-label" })
-                    @Html.TextBoxFor(model => model.TenKhoaHoc, new { @class = "form-control" })
+                    <label class="form-label">Hình đại diện Khóa học</label>
+                    <input type="file" name="hinhDaiDien" class="form-control" accept=".jpg,.jpeg,.png" />
+                </div>
+
+                <!-- Tên Khóa Học -->
+                <div class="mb-3">
+                    @Html.LabelFor(model => model.TenKhoaHoc,"Tên Khóa Học",new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.TenKhoaHoc, new { @class = "form-control", placeholder = "Nhập tên khóa học" })
                     @Html.ValidationMessageFor(model => model.TenKhoaHoc, "", new { @class = "text-danger" })
                 </div>
 
+                <!-- Mô Tả Khóa Học -->
                 <div class="mb-3">
-                    @Html.LabelFor(model => model.MoTa, "Mô Tả Khóa Học", new { @class = "form-label" })
-                    @Html.TextAreaFor(model => model.MoTa, new { @class = "form-control", rows = 5 })
+                    @Html.LabelFor(model => model.MoTa,"Mô Tả", new { @class = "form-label" })
+                    @Html.TextAreaFor(model => model.MoTa, new { @class = "form-control", rows = 5, placeholder = "Nhập mô tả khóa học" })
                     @Html.ValidationMessageFor(model => model.MoTa, "", new { @class = "text-danger" })
                 </div>
 
+                <!-- Thời Lượng -->
                 <div class="mb-3">
-                    @Html.LabelFor(model => model.ThoiLuong, "Thời Lượng (giờ)", new { @class = "form-label" })
-                    @Html.TextBoxFor(model => model.ThoiLuong, new { @class = "form-control", type = "number", min = 1 })
-                    @Html.ValidationMessageFor(model => model.ThoiLuong, "", new { @class = "text-danger", type = "number", min = "0" })
-                 
+                    @Html.LabelFor(model => model.ThoiLuong,"Thời Lượng" ,new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.ThoiLuong, new { @class = "form-control", type = "number", min = 1, placeholder = "Nhập thời lượng (giờ)" })
+                    @Html.ValidationMessageFor(model => model.ThoiLuong, "", new { @class = "text-danger" })
                 </div>
 
+                <!-- Tệp Đính Kèm -->
                 <div class="mb-3">
-                    <label for="attachments" class="form-label">Tệp Đính Kèm (có thể chọn nhiều tệp)</label>
+                    <label for="attachments" class="form-label">Tệp Đính Kèm (JPG, PNG, PDF, DOCX, TXT)</label>
                     <input type="file" name="attachments" id="attachments" class="form-control" multiple />
                 </div>
 
+                <!-- Nút Thêm và Quay Lại -->
                 <div class="text-center">
-                    <button type="submit" class="btn btn-success me-2">
+                    <button type="submit" class="btn btn-success me-2 btn-lg">
                         <i class="fa-solid fa-circle-plus"></i> Thêm Khóa Học
                     </button>
-                    <a href="@Url.Action("Index")" class="btn btn-secondary">
+                    <a href="@Url.Action("Index")" class="btn btn-secondary btn-lg">
                         <i class="fas fa-arrow-left me-1"></i> Quay lại
                     </a>
-               </div>
-             }
+                </div>
+            }
+        </div>
     </div>
-</div>
 </div>

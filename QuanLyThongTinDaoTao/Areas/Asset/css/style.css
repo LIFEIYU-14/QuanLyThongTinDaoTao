@@ -1,4 +1,4 @@
-/********** Template CSS **********/
+﻿/********** Template CSS **********/
 :root {
     --primary: #009CFF;
     --light: #F3F6F9;
@@ -125,8 +125,10 @@
 .sidebar .navbar .navbar-nav .nav-link {
     padding: 7px 20px;
     color: var(--dark);
-    font-weight: 500;
+    font-size: 20px;
+    font-weight: 400;
     border-left: 3px solid var(--light);
+    border-right: 3px solid var(--light);
     border-radius: 0 30px 30px 0;
     outline: none;
 }
@@ -137,9 +139,16 @@
     background: #FFFFFF;
     border-color: var(--primary);
 }
+.sidebar .nav-item .nav-link {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    border-radius: 0; /* Loại bỏ viền bo tròn */
+    padding: 10px 15px; /* Căn chỉnh khoảng cách */
+}
 
 .sidebar .navbar .navbar-nav .nav-link i {
-    width: 40px;
+    width: 50px;
     height: 40px;
     display: inline-flex;
     align-items: center;

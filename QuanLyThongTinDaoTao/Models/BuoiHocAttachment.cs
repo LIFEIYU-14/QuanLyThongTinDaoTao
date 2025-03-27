@@ -12,7 +12,15 @@ namespace QuanLyThongTinDaoTao.Models
     {
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
-        public virtual BuoiHoc BuoiHoc { get; set; } 
+        // Khóa ngoại đến BuoiHoc
+        [Required]
+        public Guid BuoiHocId { get; set; }
+        [ForeignKey("BuoiHocId")]
+        public virtual BuoiHoc BuoiHoc { get; set; }
+        // Khóa ngoại đến Attachment
+        [Required]
+        public Guid AttachmentId { get; set; }
+        [ForeignKey("AttachmentId")]
         public virtual Attachment Attachment { get; set; }
     }
 

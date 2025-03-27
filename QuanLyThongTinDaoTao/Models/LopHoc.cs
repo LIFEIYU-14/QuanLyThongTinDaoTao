@@ -32,6 +32,7 @@ namespace QuanLyThongTinDaoTao.Models
 
 
         // Nội dung mô tả lớp học (hỗ trợ nhập bằng CKEditor)
+        [AllowHtml]
         public string MoTa { get; set; }
         public DateTime NgayTao { get; set; } = DateTime.Now;
         public DateTime NgayCapNhat { get; set; } = DateTime.Now;

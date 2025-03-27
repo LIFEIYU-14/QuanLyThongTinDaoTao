@@ -9,13 +9,14 @@
     <div class="bg-light text-center rounded p-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
             <h6 class="mb-0 fs-3">Danh Sách Lớp Học</h6>
-            <a href="@Url.Action("Create")" class="btn btn-primary fs-5"><i class="fas fa-plus-circle"></i> Thêm Lớp Học Mới</a>
+            <a href="@Url.Action("Create")" class="btn btn-success fs-5"><i class="fas fa-plus-circle"></i> Thêm Lớp Học Mới</a>
         </div>
         <div class="table-responsive">
             <table class="table text-start align-middle table-bordered mb-0 fs-5">
                 <thead>
                     <tr class="text-dark text-center">
                         <th scope="col">Tên Lớp Học</th>
+                        <th scope="col">Tên Khóa Học</th>
                         <th scope="col">Số Tín Chỉ</th>
                         <th scope="col">Ngày Bắt Đầu</th>
                         <th scope="col">Ngày Kết Thúc</th>
@@ -28,6 +29,7 @@
                     {
                         <tr class="text-center">
                             <td>@lophoc.TenLopHoc</td>
+                            <td>@(lophoc.KhoaHoc != null ? lophoc.KhoaHoc.TenKhoaHoc : "Chưa có")</td>
                             <td>@lophoc.SoTinChi</td>
                             <td>@lophoc.NgayBatDau.ToString("dd/MM/yyyy")</td>
                             <td>@lophoc.NgayKetThuc.ToString("dd/MM/yyyy")</td>

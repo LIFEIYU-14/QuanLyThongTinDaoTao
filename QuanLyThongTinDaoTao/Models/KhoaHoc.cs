@@ -10,6 +10,9 @@ namespace QuanLyThongTinDaoTao.Models
     {
         [Key]
         public Guid KhoaHocId { get; set; } = Guid.NewGuid();
+        // Hình đại diện cho khóa học
+        [StringLength(500)]
+        public string HinhDaiDienKhoaHoc { get; set; }
 
         [Required, StringLength(255)]
         public string TenKhoaHoc { get; set; }

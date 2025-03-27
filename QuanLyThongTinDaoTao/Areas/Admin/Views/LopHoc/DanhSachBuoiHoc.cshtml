@@ -1,0 +1,125 @@
+﻿@model List<QuanLyThongTinDaoTao.Models.BuoiHoc>
+@using QuanLyThongTinDaoTao.Models;
+
+@{
+    ViewBag.Title = "Danh Sách Buổi Học";
+    Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
+}
+
+<div class="container-fluid pt-4 px-4">
+
+    <div class="bg-light text-center rounded p-4">
+        <h6 class="mb-4 fs-3"><i class="fas fa-calendar-alt"></i> Danh Sách Buổi Học</h6>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="timeline">
+                @foreach (var buoiHoc in Model.OrderBy(b => b.NgayHoc).ThenBy(b => b.GioBatDau))
+                {
+                    var trangThaiText = buoiHoc.TrangThai == TrangThaiBuoiHoc.SapDienRa ? "Sắp Diễn Ra"
+                        : buoiHoc.TrangThai == TrangThaiBuoiHoc.DangDienRa ? "Đang Diễn Ra"
+                        : "Đã Kết Thúc";
+                    var badgeClass = buoiHoc.TrangThai == TrangThaiBuoiHoc.SapDienRa ? "bg-primary"
+                        : buoiHoc.TrangThai == TrangThaiBuoiHoc.DangDienRa ? "bg-success"
+                        : "bg-secondary";
+
+                    <div class="timeline-item">
+                        <div class="timeline-badge @badgeClass">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <h5>@(buoiHoc.LopHoc?.TenLopHoc ?? "N/A")</h5>
+                            <p><strong>📅 Ngày Học:</strong> @buoiHoc.NgayHoc.ToString("dd/MM/yyyy")</p>
+                            <p><strong>🕒 Thời Gian:</strong> @buoiHoc.GioBatDau - @buoiHoc.GioKetThuc</p>
+                            <p><strong>📌 Trạng Thái:</strong> <span class="badge @badgeClass">@trangThaiText</span></p>
+
+                            <a href="@Url.Action("Details", new { id = buoiHoc.BuoiHocId })" class="btn btn-info btn-sm">Chi Tiết</a>
+                            <a href="@Url.Action("Edit", new { id = buoiHoc.BuoiHocId })" class="btn btn-warning btn-sm">Sửa</a>
+                            <a href="@Url.Action("Delete", new { id = buoiHoc.BuoiHocId })" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa?');">Xóa</a>
+
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-center fs-5">❌ Không có buổi học nào được tìm thấy.</p>
+        }
+    </div>
+</div>
+
+
+<!-- CSS cho timeline -->
+<style>
+    .timeline {
+        position: relative;
+        margin: 30px 0;
+    }
+
+        .timeline:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background-color: #007bff;
+            left: 20px;
+            margin-left: -2px;
+        }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 30px;
+        padding-left: 60px;
+    }
+
+    .timeline-badge {
+        position: absolute;
+        top: 0;
+        left: 10px;
+        width: 40px;
+        height: 40px;
+        background-color: #007bff;
+        border-radius: 50%;
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .timeline-content {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+        .timeline-content h5 {
+            margin-top: 0;
+        }
+
+        .timeline-content .badge {
+            font-size: 14px;
+        }
+</style>
+
+<!-- JavaScript tìm kiếm -->
+<script>
+    function filterBuoiHoc() {
+        var searchLop = document.getElementById("searchLop").value.toLowerCase();
+        var searchNgay = document.getElementById("searchNgay").value;
+
+        document.querySelectorAll(".timeline-item").forEach(function (item) {
+            var lopHoc = item.getAttribute("data-lop") ? item.getAttribute("data-lop").toLowerCase() : "";
+            var ngayHoc = item.getAttribute("data-ngay");
+
+            if ((searchLop === "" || lopHoc.includes(searchLop)) &&
+                (searchNgay === "" || ngayHoc === searchNgay)) {
+                item.style.display = "block";
+            } else {
+                item.style.display = "none";
+            }
+        });
+    }
+</script>

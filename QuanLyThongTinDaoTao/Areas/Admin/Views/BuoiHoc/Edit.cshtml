@@ -1,0 +1,75 @@
+﻿@model QuanLyThongTinDaoTao.Models.BuoiHoc
+
+@{
+    ViewBag.Title = "Chỉnh Sửa Buổi Học";
+    Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-warning text-white text-center">
+            <h3><i class="fa-solid fa-edit"></i> Chỉnh Sửa Buổi Học</h3>
+        </div>
+        <div class="card-body">
+            @using (Html.BeginForm("Edit", "BuoiHoc", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(model => model.BuoiHocId)
+                @Html.HiddenFor(model => model.LopHoc.LopHocId)
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        @Html.LabelFor(model => model.NgayHoc, "Ngày Học", new { @class = "form-label" })
+                        @Html.TextBoxFor(model => model.NgayHoc, new { @class = "form-control", type = "date", required = "required" })
+                        @Html.ValidationMessageFor(model => model.NgayHoc, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        @Html.LabelFor(model => model.GioBatDau, "Giờ Bắt Đầu", new { @class = "form-label" })
+                        @Html.TextBoxFor(model => model.GioBatDau, new { @class = "form-control", type = "time", required = "required" })
+                        @Html.ValidationMessageFor(model => model.GioBatDau, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        @Html.LabelFor(model => model.GioKetThuc, "Giờ Kết Thúc", new { @class = "form-label" })
+                        @Html.TextBoxFor(model => model.GioKetThuc, new { @class = "form-control", type = "time", required = "required" })
+                        @Html.ValidationMessageFor(model => model.GioKetThuc, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        @Html.LabelFor(model => model.TrangThai, "Trạng Thái", new { @class = "form-label" })
+                        @Html.DropDownListFor(model => model.TrangThai,
+                            new SelectList(Enum.GetValues(typeof(QuanLyThongTinDaoTao.Models.TrangThaiBuoiHoc))),
+                            new { @class = "form-control" })
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    @Html.LabelFor(model => model.GhiChu, "Ghi Chú", new { @class = "form-label" })
+                    @Html.TextAreaFor(model => model.GhiChu, new { @class = "form-control", rows = 5, id = "GhiChu" })
+                    @Html.ValidationMessageFor(model => model.GhiChu, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="mb-3">
+                    <label for="attachments" class="form-label">Tệp Đính Kèm</label>
+                    <input type="file" name="attachments" id="attachments" class="form-control" multiple />
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-warning btn-lg">
+                        <i class="fa-solid fa-save"></i> Lưu Thay Đổi
+                    </button>
+                    <a href="@Url.Action("DanhSachBuoiHoc", new { id = Model.LopHoc.LopHocId })" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-arrow-left"></i> Quay lại
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    ClassicEditor.create(document.querySelector('#GhiChu')).catch(error => console.error(error));
+</script>

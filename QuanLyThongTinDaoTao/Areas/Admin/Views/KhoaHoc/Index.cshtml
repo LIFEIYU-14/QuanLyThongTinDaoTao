@@ -1,87 +1,108 @@
-﻿@model List<QuanLyThongTinDaoTao.Models.KhoaHoc>
+﻿@model PagedList.IPagedList<QuanLyThongTinDaoTao.Models.KhoaHoc>
+@using PagedList.Mvc;
+
 @{
     ViewBag.Title = "Index";
     Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
 }
 
-<style>
-    .course-item {
-        border: 2px solid #1ce9dd; /* Viền xung quanh khóa học */
-        border-radius: 30px;
-        transition: all 0.3s ease-in-out;
-        overflow: hidden;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
 
-        .course-item:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        }
 
-        .course-item img {
-            border-bottom: 2px solid #007bff;
-        }
+<!-- Courses Start -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+            <p>
+                <a href="@Url.Action("Create")" class="btn btn-success mt-3 btn-lg">
+                    <i class="fas fa-plus-circle"></i> Thêm Khóa Học Mới
+                </a>
+            </p>
 
-    .d-flex.border-top small {
-        transition: all 0.3s ease-in-out;
-        font-size:20px;
-    }
+            <h6 class="section-title bg-white text-center text-primary px-3"></h6>
+            <h1 class="mb-5">DANH SÁCH KHÓA HỌC</h1>
+        </div>
+        <div class="row g-4 justify-content-center">
+            @foreach (var khoaHoc in Model)
+            {
+                // Kiểm tra và ưu tiên hình đại diện
+                var imagePath = !string.IsNullOrEmpty(khoaHoc.HinhDaiDienKhoaHoc)
+                    ? Url.Content(khoaHoc.HinhDaiDienKhoaHoc)
+                    : (khoaHoc.KhoaHocAttachments?
+                         .FirstOrDefault(a => a.Attachment != null &&
+                                              (a.Attachment.FileType.ToLower().Contains("jpg")
+                                               || a.Attachment.FileType.ToLower().Contains("png")
+                                               || a.Attachment.FileType.ToLower().Contains("jpeg")))?
+                          .Attachment?.FilePath ?? Url.Content("~/Upload/KhoaHoc/default.png"));
+                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                    <div class="course-item bg-light">
+                        <div class="position-relative overflow-hidden">
+                            <a href="@Url.Action("Details", "KhoaHoc", new { id = khoaHoc.KhoaHocId })">
+                                <img class="img-fluid" src='@imagePath' alt="@khoaHoc.TenKhoaHoc" />
+                            </a>
+                            <div class="w-100 d-flex justify-content-center position-absolute bottom-0 start-0 mb-4">
+                                <a href="@Url.Action("Details", "KhoaHoc", new { id = khoaHoc.KhoaHocId })" class="flex-shrink-0 btn btn-sm btn-primary px-3" style="border-radius: 30px 30px;">Thông Tin Chi Tiết</a>
+                            </div>
+                        </div>
+                        <div class="text-center p-4 pb-0">
+                            <h3 class="mb-0">$149.00</h3>
+                            <div class="mb-3">
+                                <small class="fa fa-star text-primary"></small>
+                                <small class="fa fa-star text-primary"></small>
+                                <small class="fa fa-star text-primary"></small>
+                                <small class="fa fa-star text-primary"></small>
+                                <small class="fa fa-star text-primary"></small>
+                                <small>(123)</small>
+                            </div>
+                            <h5 class="mb-4">@khoaHoc.TenKhoaHoc</h5>
+                        </div>
+                        <div class="d-flex border-top">
+                            @*<small class="flex-fill text-center border-end py-2"><i class="fa fa-user-tie text-primary me-2"></i>số lượng người học</small>*@
+                            <small class="flex-fill text-center border-end py-2">
+                                <i class="fa fa-clock text-primary me-2"></i>@khoaHoc.ThoiLuong <span class="fw-bold text-secondary">tiết</span>
+                            </small>
 
-        .d-flex.border-top small:hover {
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-            border-radius: 5px;
-            padding: 5px;
-        }
-</style>
-<p>
-    <a href="@Url.Action("Create")" class="btn btn-primary mt-3 ms-4 btn-lg">
-        <i class="fas fa-plus-circle"></i> Thêm Khóa Học Mới
-    </a>
-</p>
-<div class="container-fluid">
-    <div class="row m-lg-auto">
-        @foreach (var khoaHoc in Model)
-        {
-            // Lấy hình ảnh đầu tiên có định dạng ảnh từ KhoaHocAttachments
-            var imageAttachment = khoaHoc.KhoaHocAttachments?
-                                   .FirstOrDefault(a => a.Attachment != null && a.Attachment.FileType.ToLower().Contains("jpg")
-                                                        || a.Attachment.FileType.ToLower().Contains("png")
-                                                        || a.Attachment.FileType.ToLower().Contains("jpeg"))
-                                   ?.Attachment;
-
-            // Đường dẫn ảnh hoặc ảnh mặc định
-            var imagePath = imageAttachment != null
-                            ? Url.Content(imageAttachment.FilePath)
-                            : Url.Content("~/Upload/KhoaHoc/default.png");
-
-            <div class="col-lg-4 col-md-6 col-sm-12 mt-3 " data-wow-delay="0.1s">
-                <div class="course-item bg-light">
-                    <div class="position-relative overflow-hidden">
-                        <a href="@Url.Action("Details", "KhoaHoc", new { id = khoaHoc.KhoaHocId })">
-                            <img class="img-fluid" src='@imagePath' alt="@khoaHoc.TenKhoaHoc" />
-                        </a>
-                    </div>
-                    <div class="text-center p-3 pb-3">
-                        <h3 class="m-0">@khoaHoc.TenKhoaHoc</h3>
-                    </div>
-                    <div class="d-flex border-top">
-             
-                        <small class="flex-fill text-center border-end py-2">
-                            <i class="fa fa-clock text-primary me-2"></i>@khoaHoc.ThoiLuong <span class="fw-bold text-secondary">tiết</span>
-                        </small>
-                        <small class="flex-fill text-center py-2">
-                            <i class="fa fa-user text-primary me-2"></i>Số lượng
-                        </small>
+                            <small class="flex-fill text-center py-2"><i class="fa fa-user text-primary me-2"></i>số lượng người học</small>
+                        </div>
                     </div>
                 </div>
-            </div>
-        }
+            }
+
+        </div>
     </div>
 </div>
+<div class="d-flex justify-content-center mt-4">
+    <ul class="pagination">
+        @if (Model.HasPreviousPage)
+        {
+            <li class="page-item">
+                <a class="page-link" href="@Url.Action("Index", new { page = Model.PageNumber - 1 })">&laquo;</a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item disabled">
+                <a class="page-link">&laquo;</a>
+            </li>
+        }
 
+        @for (int i = 1; i <= Model.PageCount; i++)
+        {
+            <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                <a class="page-link" href="@Url.Action("Index", new { page = i })">@i</a>
+            </li>
+        }
 
-
-
-
+        @if (Model.HasNextPage)
+        {
+            <li class="page-item">
+                <a class="page-link" href="@Url.Action("Index", new { page = Model.PageNumber + 1 })">&raquo;</a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item disabled">
+                <a class="page-link">&raquo;</a>
+            </li>
+        }
+    </ul>
+</div>
