@@ -74,6 +74,30 @@
                     </form>
                 </div>
             </nav>
+            <div class="navbar-nav ms-lg-5 p-lg-0">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa fa-user me-2"></i> @User.Identity.Name
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="#">Thông tin cá nhân</a></li>
+                            <li>
+                                <form action="@Url.Action("Logout", "Account")" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="dropdown-item">Đăng Xuất</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    <a href="@Url.Action("Login", "Account")" class="nav-item nav-link">Đăng Nhập</a>
+                }
+            </div>
+
         </div>
     </nav>
 
@@ -175,6 +199,40 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
     <!-- Template Javascript -->
     <script src="~/Asset/js/main.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+    $(document).ready(function () {
+        $("#sendCodeForm").submit(function (event) {
+            event.preventDefault(); // Ngăn chặn reload trang
+
+            var email = $("#Email").val(); // Lấy email nhập vào
+
+            if (!email) {
+                alert("Vui lòng nhập email!");
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("SendVerificationCode", "Account")',
+                type: 'POST',
+                data: { email: email },
+                success: function (response) {
+                    if (response.success) {
+                        $("#verification-form").show(); // Hiển thị form nhập mã
+                        $("#emailInput").val(email); // Điền email vào input ẩn
+                        alert(response.message);
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function () {
+                    alert("Có lỗi xảy ra, vui lòng thử lại.");
+                }
+            });
+        });
+    });
+    </script>
+
 </body>
 
 </html>

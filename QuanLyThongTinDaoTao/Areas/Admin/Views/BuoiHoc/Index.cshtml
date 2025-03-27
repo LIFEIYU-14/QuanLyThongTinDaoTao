@@ -7,8 +7,9 @@
 }
 
 <div class="container-fluid pt-4 px-4">
-    <a href="@Url.Action("Create", "BuoiHoc", new { id = ViewBag.LopHocId })" class="btn btn-success">Thêm Buổi Học</a>
-
+    <a href="@Url.Action("Create", "BuoiHoc", new { id = ViewBag.LopHocId })"class="btn btn-success mt-3 btn-lg">
+        <i class="fas fa-plus-circle"></i> Thêm Buổi Học
+    </a>
 
     <div class="bg-light text-center rounded p-4">
         <h6 class="mb-4 fs-3"><i class="fas fa-calendar-alt"></i> Danh Sách Buổi Học</h6>
@@ -38,7 +39,6 @@
                             <a href="@Url.Action("Details", new { id = buoiHoc.BuoiHocId })" class="btn btn-info btn-sm">Chi Tiết</a>
                             <a href="@Url.Action("Edit", new { id = buoiHoc.BuoiHocId })" class="btn btn-warning btn-sm">Sửa</a>
                             <a href="@Url.Action("Delete", new { id = buoiHoc.BuoiHocId })" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa?');">Xóa</a>
-
                         </div>
                     </div>
                 }
@@ -50,7 +50,6 @@
         }
     </div>
 </div>
-
 
 <!-- CSS cho timeline -->
 <style>

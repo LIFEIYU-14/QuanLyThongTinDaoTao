@@ -2,17 +2,17 @@
 
 namespace QuanLyThongTinDaoTao.ModelsService
 {
-	public class LoginViewModel
-	{
-        [Required(ErrorMessage = "Mã học viên không được để trống")]
-        [StringLength(20, ErrorMessage = "Mã học viên không hợp lệ")]
-        public string MaHocVien { get; set; }
+    public class LoginViewModel
+    {
+        [Required(ErrorMessage = "Email không được để trống")]
+        [EmailAddress(ErrorMessage = "Email không hợp lệ")]
+        [StringLength(255, ErrorMessage = "Email không được vượt quá 255 ký tự")]
+        [Display(Name = "Email")]
+        public string Email { get; set; }
 
-        [Required(ErrorMessage = "Mật khẩu không được để trống")]
-        [MinLength(6, ErrorMessage = "Mật khẩu phải có ít nhất 6 ký tự.")]
-        [DataType(DataType.Password)]
-        public string MatKhau { get; set; }
-
-        public bool RememberMe { get; set; }
+        [Required(ErrorMessage = "Mã xác nhận không được để trống")]
+        [RegularExpression(@"^\d{6}$", ErrorMessage = "Mã xác nhận phải có đúng 6 chữ số")]
+        [Display(Name = "Mã xác nhận")]
+        public string MaXacNhan { get; set; }
     }
 }

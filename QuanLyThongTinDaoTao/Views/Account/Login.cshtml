@@ -12,41 +12,33 @@
                 <div class="bg-light rounded-4 p-4 p-sm-5 my-4 mx-3 border border-primary" style="border-radius:28px">
                     <h3 class="text-center mb-4">CỔNG THÔNG TIN HỌC VIÊN</h3>
 
-                    @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "needs-validation", novalidate = "true" }))
-                    {
-                        @Html.AntiForgeryToken()
-
-                        <!-- Input Mã học viên -->
-                        <div class="form-group mb-4">
-                            @Html.TextBoxFor(m => m.MaHocVien, new { @class = "form-control border border-primary rounded-3", placeholder = "Nhập mã học viên" })
-                            @Html.ValidationMessageFor(m => m.MaHocVien, "", new { @class = "text-danger" })
-                        </div>
-
-                        <!-- Input Mật khẩu + Toggle Eye -->
-                        <div class="form-group mb-4">
-                            <div class="input-group border border-primary rounded-3">
-                                @Html.PasswordFor(m => m.MatKhau, new { @class = "form-control border border-primary rounded-start-3", placeholder = "Nhập mật khẩu", id = "password" })
-                                <span class="input-group-text bg-white border-0 rounded-end-3" onclick="togglePassword()">
-                                    <i class="fa fa-eye" id="eye-icon"></i>
-                                </span>
+                    <div id="email-form">
+                        @using (Html.BeginForm("SendVerificationCode", "Account", FormMethod.Post, new { @id = "emailForm" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class="form-group mb-4">
+                                <label>Email</label>
+                                <input type="email" id="emailInput" name="Email" class="form-control border border-primary rounded-3" placeholder="Nhập email" required />
                             </div>
-                            @Html.ValidationMessageFor(m => m.MatKhau, "", new { @class = "text-danger mt-2" })
-                        </div>
 
-                        <!-- Remember Me -->
-                        <div class="form-check mb-4">
-                            @Html.CheckBoxFor(m => m.RememberMe, new { @class = "form-check-input rounded-pill me-2" })
-                            @Html.LabelFor(m => m.RememberMe, new { @class = "form-check-label" })
-                        </div>
+                            <button type="submit" class="btn btn-secondary w-100 py-2 rounded-pill">Gửi mã xác nhận</button>
+                        }
+                    </div>
 
-                        <!-- Nút Đăng nhập -->
-                        <button type="submit" class="btn btn-primary w-100 py-2 rounded-pill mb-4">Đăng nhập</button>
-                    }
+                    <div id="verification-form" style="display: none;">
+                        @using (Html.BeginForm("VerifyCode", "Account", FormMethod.Post, new { @id = "verifyForm" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" id="hiddenEmail" name="Email" />
 
-                    <!-- Đăng ký / Quên mật khẩu -->
-                    <div class="text-center mt-4">
-                        <p class="mb-2">Chưa có tài khoản? <a href="@Url.Action("Register", "Account")">Đăng ký ngay</a></p>
-                        <p><a href="@Url.Action("ForgotPassword", "Account")">Quên mật khẩu?</a></p>
+                            <div class="form-group mb-3">
+                                <label>Mã xác nhận</label>
+                                <input type="text" id="verificationCode" name="MaXacNhan" class="form-control border border-primary rounded-3" placeholder="Nhập mã xác nhận" required />
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100">Xác nhận</button>
+                            <button type="button" class="btn btn-link w-100 mt-2" id="backToEmail">← Quay lại</button>
+                        }
                     </div>
                 </div>
             </div>
@@ -54,10 +46,66 @@
     </div>
 </div>
 
-@if (TempData["LoginError"] != null)
-{
-    <script>
-    alert("@Html.Raw(TempData["LoginError"])");
-    </script>
+<script>
+    document.getElementById("emailForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+        var email = document.getElementById("emailInput").value.trim();
 
-}
+        if (!email) {
+            alert("Vui lòng nhập email!");
+            return;
+        }
+
+        var formData = new FormData();
+        formData.append("email", email);
+
+        fetch("@Url.Action("SendVerificationCode", "Account")", {
+            method: "POST",
+            body: formData
+        }).then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  alert("Mã xác nhận đã được gửi!");
+                  document.getElementById("email-form").style.display = "none";
+                  document.getElementById("verification-form").style.display = "block";
+                  document.getElementById("hiddenEmail").value = email;
+                  document.getElementById("verificationCode").focus();
+              } else {
+                  alert(data.message);
+              }
+          }).catch(error => console.error("Lỗi:", error));
+    });
+
+    document.getElementById("verifyForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+        var email = document.getElementById("hiddenEmail").value.trim();
+        var code = document.getElementById("verificationCode").value.trim();
+
+        if (!email || !code) {
+            alert("Vui lòng nhập đầy đủ email và mã xác nhận!");
+            return;
+        }
+
+        var formData = new FormData();
+        formData.append("email", email);
+        formData.append("code", code);
+
+        fetch("@Url.Action("VerifyCode", "Account")", {
+            method: "POST",
+            body: formData
+        }).then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  alert("Đăng nhập thành công!");
+                  window.location.href = "/";
+              } else {
+                  alert(data.message);
+              }
+          }).catch(error => console.error("Lỗi:", error));
+    });
+
+    document.getElementById("backToEmail").addEventListener("click", function () {
+        document.getElementById("email-form").style.display = "block";
+        document.getElementById("verification-form").style.display = "none";
+    });
+</script>

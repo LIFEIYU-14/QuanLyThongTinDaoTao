@@ -75,9 +75,27 @@
                     </select>
                 </div>
 
-                <div class="mb-3">
-                    <label for="attachments" class="form-label">Tệp Đính Kèm (JPG, PNG, PDF, DOCX)</label>
-                    <input type="file" name="attachments" id="attachments" class="form-control" multiple />
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Tệp Đính Kèm (jpg, png, pdf, docx, xlsx, txt)</label>
+                    <input type="file" name="attachments" multiple class="form-control" accept=".jpg,.jpeg,.png,.pdf,.docx,.xlsx,.txt,.pptx" />
+
+                    @if (Model.LopHocAttachments != null && Model.LopHocAttachments.Any())
+                    {
+                        <h4 class="mt-4 text-primary">Tệp Đính Kèm</h4>
+                        <ul class="list-group">
+                            @foreach (var attachment in Model.LopHocAttachments)
+                            {
+                              
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <a href="@Url.Content(attachment.Attachment.FilePath)" target="_blank">@attachment.Attachment.FileName</a>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="deleteAttachment('@attachment.Attachment.AttachmentId')">
+                                        <i class="fas fa-trash-alt"></i> Xóa
+                                    </button>
+                                </li>
+                            }
+                        </ul>
+
+                    }
                 </div>
 
                 <div class="text-center">
@@ -92,11 +110,43 @@
         </div>
     </div>
 </div>
-
+<style>
+    .ck-editor__editable {
+        min-height: 150px;
+        max-height: 600px;
+        resize: vertical; /* Cho phép kéo theo chiều dọc */
+        overflow-y: auto;
+    }
+</style>
+<!-- Tích hợp CKEditor 5 -->
 <script>
+    function deleteAttachment(attachmentId) {
+    if (confirm('Bạn có chắc chắn muốn xóa tệp này?')) {
+        window.location.href = '/Admin/LopHoc/DeleteAttachment?attachmentId=' + attachmentId + '&lopHocId=@Model.LopHocId';
+    }
+}
     document.addEventListener('DOMContentLoaded', function () {
+        // Khởi tạo CKEditor
         ClassicEditor
             .create(document.querySelector('#MoTa'))
-            .catch(error => console.error('Lỗi CKEditor:', error));
+            .then(editor => {
+                console.log('CKEditor đã khởi tạo thành công.');
+
+                const editorElement = editor.ui.view.editable.element;
+                editorElement.style.overflowY = 'auto';
+
+                // Điều chỉnh chiều cao tự động
+                function adjustHeight() {
+                    editorElement.style.height = 'auto';
+                    editorElement.style.height = Math.min(editorElement.scrollHeight, 500) + 'px';
+                }
+
+                editor.model.document.on('change:data', adjustHeight);
+                adjustHeight();
+            })
+            .catch(error => {
+                console.error('Lỗi CKEditor:', error);
+            });
     });
+
 </script>

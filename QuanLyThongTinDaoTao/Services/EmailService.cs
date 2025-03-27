@@ -9,7 +9,7 @@ namespace QuanLyThongTinDaoTao.Services
 {
     public class EmailService
     {
-        public static void SendEmailWithAttachment(string toEmail, string subject, string body, byte[] attachmentData, string attachmentName)
+        public static void SendEmail(string toEmail, string subject, string body)
         {
             try
             {
@@ -36,14 +36,6 @@ namespace QuanLyThongTinDaoTao.Services
                     IsBodyHtml = true
                 })
                 {
-                    // 🔹 Đính kèm file QR Code
-                    if (attachmentData != null && attachmentData.Length > 0)
-                    {
-                        MemoryStream ms = new MemoryStream(attachmentData);
-                        Attachment attachment = new Attachment(ms, attachmentName, "image/png");
-                        message.Attachments.Add(attachment);
-                    }
-
                     smtp.Send(message);
                 }
             }
@@ -52,5 +44,6 @@ namespace QuanLyThongTinDaoTao.Services
                 Debug.WriteLine("Lỗi gửi email: " + ex.Message);
             }
         }
+
     }
 }

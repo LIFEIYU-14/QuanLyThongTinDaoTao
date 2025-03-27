@@ -1,9 +1,9 @@
-﻿using QuanLyThongTinDaoTao.Helpers;
-using QuanLyThongTinDaoTao.Models;
-using QuanLyThongTinDaoTao.ModelsService;
-using QuanLyThongTinDaoTao.Services;
+﻿using QuanLyThongTinDaoTao.Models;
 using System;
+using System.Configuration;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
@@ -14,140 +14,151 @@ namespace QuanLyThongTinDaoTao.Controllers
     {
         private readonly DbContextThongTinDaoTao _db = new DbContextThongTinDaoTao();
 
-        // GET: Account/Login
         public ActionResult Login()
         {
             return View();
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Login(LoginViewModel model)
+        public JsonResult SendVerificationCode(string email)
         {
-            if (ModelState.IsValid)
+            try
             {
-                var hocVien = _db.HocViens.SingleOrDefault(hv => hv.MaHocVien == model.MaHocVien);
-                if (hocVien != null && PasswordHelper.VerifyPassword(model.MatKhau, hocVien.MatKhau))
+                if (string.IsNullOrEmpty(email))
                 {
-                    var authTicket = new FormsAuthenticationTicket(
-                        1,
-                        hocVien.MaHocVien,
-                        DateTime.Now,
-                        DateTime.Now.AddMinutes(30),
-                        model.RememberMe,
-                        hocVien.HoVaTen
-                    );
-
-                    string encryptedTicket = FormsAuthentication.Encrypt(authTicket);
-                    var authCookie = new HttpCookie(FormsAuthentication.FormsCookieName, encryptedTicket)
-                    {
-                        HttpOnly = true,
-                        Expires = authTicket.Expiration
-                    };
-                    Response.Cookies.Add(authCookie);
-
-                    TempData["LoginSuccess"] = "Đăng nhập thành công! Chào mừng bạn, " + hocVien.HoVaTen + "!";
-                    return RedirectToAction("Index", "Home");
+                    return Json(new { success = false, message = "Email không được để trống!" });
                 }
 
-                TempData["LoginError"] = "Mã học viên hoặc mật khẩu không đúng.";
-                return RedirectToAction("Login");
+                string verificationCode = new Random().Next(100000, 999999).ToString();
+                Session["VerificationCode"] = verificationCode;
+                Session["VerificationEmail"] = email.Trim(); // Lưu email đã chuẩn hóa
+
+                string fromEmail = ConfigurationManager.AppSettings["EmailUsername"];
+                string fromPassword = ConfigurationManager.AppSettings["EmailPassword"];
+
+                var smtpClient = new SmtpClient("smtp.gmail.com")
+                {
+                    Port = 587,
+                    Credentials = new NetworkCredential(fromEmail, fromPassword),
+                    EnableSsl = true
+                };
+
+                var mailMessage = new MailMessage
+                {
+                    From = new MailAddress(fromEmail, "Hệ Thống Đào Tạo"),
+                    Subject = "Mã Xác Nhận Đăng Nhập",
+                    Body = $"Mã xác nhận của bạn là: <b>{verificationCode}</b>",
+                    IsBodyHtml = true
+                };
+
+                mailMessage.To.Add(email);
+                smtpClient.Send(mailMessage);
+
+                return Json(new { success = true, message = "Mã xác nhận đã được gửi!" });
             }
-            return View(model);
-        }
-
-        public ActionResult Logout()
-        {
-            FormsAuthentication.SignOut();
-            Session.Clear();
-            Session.Abandon();
-
-            Response.Cookies.Add(new HttpCookie(FormsAuthentication.FormsCookieName, "")
+            catch (Exception ex)
             {
-                Expires = DateTime.Now.AddDays(-1)
-            });
-
-            return RedirectToAction("Login", "Account");
-        }
-
-        public ActionResult Register()
-        {
-            return View();
+                return Json(new { success = false, message = "Lỗi khi gửi email: " + ex.Message });
+            }
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Register(RegisterViewModel model)
+        public JsonResult VerifyCode(string email, string code)
         {
-            if (ModelState.IsValid)
+            try
             {
-                if (_db.HocViens.Any(hv => hv.Email == model.Email))
+                if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(code))
                 {
-                    ModelState.AddModelError("Email", "Email này đã được sử dụng.");
-                    return View(model);
+                    return Json(new { success = false, message = "Vui lòng nhập đầy đủ email và mã xác nhận!" });
                 }
 
-                if (_db.HocViens.Any(hv => hv.SoDienThoai == model.SoDienThoai))
+                if (Session["VerificationCode"] == null || Session["VerificationEmail"] == null)
                 {
-                    ModelState.AddModelError("SoDienThoai", "Số điện thoại này đã được sử dụng.");
-                    return View(model);
+                    return Json(new { success = false, message = "Phiên xác nhận đã hết hạn. Vui lòng thử lại!" });
                 }
 
-                string hashedPassword = PasswordHelper.HashPassword(model.MatKhau);
-                string maHocVien = GenerateMaHocVien(model.NgaySinh.Value, model.SoNgauNhien);
+                string savedCode = Session["VerificationCode"]?.ToString().Trim();
+                string savedEmail = Session["VerificationEmail"]?.ToString().Trim();
 
-                var hocVien = new HocVien
+                // Log kiểm tra giá trị email & mã xác nhận
+                System.Diagnostics.Debug.WriteLine($"[DEBUG] Email nhập vào: {email}");
+                System.Diagnostics.Debug.WriteLine($"[DEBUG] Email session: {savedEmail}");
+                System.Diagnostics.Debug.WriteLine($"[DEBUG] Mã xác nhận nhập vào: {code}");
+                System.Diagnostics.Debug.WriteLine($"[DEBUG] Mã xác nhận session: {savedCode}");
+
+                if (!email.Equals(savedEmail, StringComparison.OrdinalIgnoreCase))
                 {
-                    NguoiDungId = Guid.NewGuid(),
-                    HoVaTen = model.HoVaTen,
-                    Email = model.Email,
-                    SoDienThoai = model.SoDienThoai,
-                    MatKhau = hashedPassword,
-                    VaiTro = VaiTroNguoiDung.HocVien,
-                    NgaySinh = model.NgaySinh,
-                    NgayTao = DateTime.Now,
-                    NgayCapNhat = DateTime.Now,
-                    MaHocVien = maHocVien
-                };
+                    return Json(new { success = false, message = "Email không khớp với email đã đăng ký." });
+                }
 
-                _db.HocViens.Add(hocVien);
-                _db.SaveChanges();
+                if (!code.Equals(savedCode, StringComparison.OrdinalIgnoreCase))
+                {
+                    return Json(new { success = false, message = "Mã xác nhận không chính xác. Vui lòng thử lại!" });
+                }
 
-                // 🔹 Tạo mã QR Code từ Mã Học Viên
-                byte[] qrCodeBytes = QRCodeHelper.GenerateQRCode(maHocVien);
-                string subject = "Chúc mừng bạn đã đăng ký thành công!";
-                string body = $@"
-                    <h3>Xin chào {hocVien.HoVaTen},</h3>
-                    <p>Chúc mừng bạn đã đăng ký thành công tài khoản trên hệ thống đào tạo.</p>
-                    <p>Mã học viên của bạn: <strong>{hocVien.MaHocVien}</strong></p>
-                    <p>Vui lòng đăng nhập vào hệ thống để bắt đầu học tập.</p>
-                    <p>Trân trọng,</p>
-                    <p><strong>Ban Quản Trị Hệ Thống Đào Tạo</strong></p>";
+                // Xử lý đăng nhập thành công
+                var hocVien = _db.HocViens.SingleOrDefault(hv => hv.Email == email);
+                if (hocVien == null)
+                {
+                    hocVien = new HocVien
+                    {
+                        Email = email,
+                        HoVaTen = "Học viên mới",
+                        MaHocVien = GenerateMaHocVien(),
+                        CoQuanLamViec = "Chưa cập nhật", // Thêm giá trị mặc định
+                        MatKhau = PasswordHelper.HashPassword("default123"), // Mật khẩu mặc định, có thể yêu cầu đổi sau
+                        VaiTro = VaiTroNguoiDung.HocVien,
+                        NgaySinh = new DateTime(2000, 1, 1), // Giả định ngày sinh, sau có thể yêu cầu cập nhật
+                        SoDienThoai = "0000000000", // Giá trị mặc định tránh lỗi ,sau có thể yêu cầu cập nhật
+                        NgayTao = DateTime.Now,
+                        NgayCapNhat = DateTime.Now
+                    };
+                    _db.HocViens.Add(hocVien);
+                }
 
                 try
                 {
-                    EmailService.SendEmailWithAttachment(hocVien.Email, subject, body, qrCodeBytes, "QRCode.png");
-                    TempData["RegisterSuccess"] = "Đăng ký thành công! Vui lòng kiểm tra email để nhận mã QR điểm danh.";
+                    _db.SaveChanges();
                 }
-                catch (Exception ex)
+                catch (System.Data.Entity.Validation.DbEntityValidationException ex)
                 {
-                    TempData["RegisterError"] = "Đăng ký thành công nhưng lỗi gửi email.";
-                    System.Diagnostics.Debug.WriteLine("Lỗi gửi email: " + ex.Message);
+                    foreach (var validationErrors in ex.EntityValidationErrors)
+                    {
+                        foreach (var validationError in validationErrors.ValidationErrors)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Property: {validationError.PropertyName} - Error: {validationError.ErrorMessage}");
+                        }
+                    }
+                    return Json(new { success = false, message = "Lỗi dữ liệu: Vui lòng kiểm tra lại thông tin!" });
                 }
 
-                return RedirectToAction("Login", "Account");
-            }
 
-            return View(model);
+                var authTicket = new FormsAuthenticationTicket(1, hocVien.Email, DateTime.Now, DateTime.Now.AddMinutes(30), false, hocVien.HoVaTen);
+                string encryptedTicket = FormsAuthentication.Encrypt(authTicket);
+                var authCookie = new HttpCookie(FormsAuthentication.FormsCookieName, encryptedTicket)
+                {
+                    HttpOnly = true,
+                    Expires = authTicket.Expiration
+                };
+                Response.Cookies.Add(authCookie);
+
+                Session.Remove("VerificationCode");
+                Session.Remove("VerificationEmail");
+
+                return Json(new { success = true, message = "Đăng nhập thành công!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
+            }
         }
 
-        /// <summary>
-        /// Tạo mã học viên theo format: 200 + ngày sinh (dd) + số ngẫu nhiên
-        /// </summary>
-        private string GenerateMaHocVien(DateTime ngaySinh, string soNgauNhien)
+
+
+
+        private string GenerateMaHocVien()
         {
-            string ngaySinhFormatted = ngaySinh.ToString("dd"); // Lấy 2 số ngày sinh (dd)
-            return $"200{ngaySinhFormatted}{soNgauNhien}";
+            return $"{DateTime.Now.Year}0000{_db.HocViens.Count() + 1:D4}";
         }
     }
 }

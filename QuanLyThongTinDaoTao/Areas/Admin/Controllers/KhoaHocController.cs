@@ -178,6 +178,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         {
             var khoaHoc = db.KhoaHocs
                 .Include(k => k.KhoaHocAttachments.Select(a => a.Attachment))
+                .Include(k => k.LopHocs.Select(l => l.BuoiHocs))
                 .FirstOrDefault(k => k.KhoaHocId == id);
 
             if (khoaHoc == null)
@@ -185,10 +186,24 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 return HttpNotFound();
             }
 
-            // Tạo bản sao để tránh lỗi collection modified
-            var khoaHocAttachments = khoaHoc.KhoaHocAttachments.ToList();
+            // Xóa các lớp học và các buổi học liên quan
+            if (khoaHoc.LopHocs != null)
+            {
+                foreach (var lopHoc in khoaHoc.LopHocs.ToList())
+                {
+                    if (lopHoc.BuoiHocs != null)
+                    {
+                        foreach (var buoiHoc in lopHoc.BuoiHocs.ToList())
+                        {
+                            db.BuoiHocs.Remove(buoiHoc);
+                        }
+                    }
+                    db.LopHocs.Remove(lopHoc);
+                }
+            }
 
-            // Xóa các file đính kèm nếu tồn tại
+            // Xóa các file đính kèm của Khóa học
+            var khoaHocAttachments = khoaHoc.KhoaHocAttachments.ToList();
             foreach (var khoaHocAttachment in khoaHocAttachments)
             {
                 var attachment = khoaHocAttachment.Attachment;
@@ -203,10 +218,10 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 }
             }
 
-            // Xóa các liên kết trong bảng trung gian
+            // Xóa các liên kết giữa Khóa học và Attachment
             db.KhoaHocAttachments.RemoveRange(khoaHocAttachments);
 
-            // Xóa khóa học
+            // Xóa Khóa học
             db.KhoaHocs.Remove(khoaHoc);
 
             // Lưu thay đổi
@@ -214,6 +229,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
             return RedirectToAction("Index");
         }
+
 
         public ActionResult DanhSachLopHoc(Guid id)
         {
@@ -343,7 +359,6 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             }
 
             db.SaveChanges();
-            TempData["Message"] = "Đã xóa tất cả tài liệu thành công.";
             return RedirectToAction("Edit", new { id = khoaHocId });
         }
     }

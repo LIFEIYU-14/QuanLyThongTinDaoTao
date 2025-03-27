@@ -1,0 +1,42 @@
+﻿@model IEnumerable<QuanLyThongTinDaoTao.Models.HocVien>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
+}
+<h2>Danh sách Học viên</h2>
+
+<p>
+    @Html.ActionLink("Thêm Học viên", "Create", null, new { @class = "btn btn-primary" })
+</p>
+
+<form method="get">
+    <input type="text" name="searchString" placeholder="Tìm kiếm..." />
+    <button type="submit">Tìm</button>
+</form>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Họ và tên</th>
+            <th>Email</th>
+            <th>Điện thoại</th>
+            <th>Ngày tạo</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.HoVaTen</td>
+                <td>@item.Email</td>
+                <td>@item.SoDienThoai</td>
+                <td>@item.NgayTao.ToShortDateString()</td>
+                <td>
+                    @Html.ActionLink("Sửa", "Edit", new { id = item.NguoiDungId }, new { @class = "btn btn-warning" })
+                    @Html.ActionLink("Xóa", "Delete", new { id = item.NguoiDungId }, new { @class = "btn btn-danger" })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

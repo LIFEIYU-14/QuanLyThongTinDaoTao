@@ -1,4 +1,5 @@
-﻿@model QuanLyThongTinDaoTao.Models.BuoiHoc
+﻿<!-- Edit View -->
+@model QuanLyThongTinDaoTao.Models.BuoiHoc
 
 @{
     ViewBag.Title = "Chỉnh Sửa Buổi Học";
@@ -11,57 +12,51 @@
             <h3><i class="fa-solid fa-edit"></i> Chỉnh Sửa Buổi Học</h3>
         </div>
         <div class="card-body">
-            @using (Html.BeginForm("Edit", "BuoiHoc", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            @using (Html.BeginForm("Edit", "BuoiHoc", FormMethod.Post))
             {
                 @Html.AntiForgeryToken()
                 @Html.HiddenFor(model => model.BuoiHocId)
-                @Html.HiddenFor(model => model.LopHoc.LopHocId)
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        @Html.LabelFor(model => model.NgayHoc, "Ngày Học", new { @class = "form-label" })
-                        @Html.TextBoxFor(model => model.NgayHoc, new { @class = "form-control", type = "date", required = "required" })
-                        @Html.ValidationMessageFor(model => model.NgayHoc, "", new { @class = "text-danger" })
-                    </div>
+                <div class="mb-3">
+                    @Html.Label("LopHocId", "Lớp Học", new { @class = "form-label" })
+                    <select class="form-control" name="LopHocId" required>
+                        <option value="">-- Chọn Lớp Học --</option>
+                        @foreach (var lopHoc in ViewBag.LopHocList)
+                        {
+                            <option value="@lopHoc.LopHocId">@lopHoc.TenLopHoc</option>
+                        }
+                    </select>
+                </div>
 
-                    <div class="col-md-6 mb-3">
-                        @Html.LabelFor(model => model.GioBatDau, "Giờ Bắt Đầu", new { @class = "form-label" })
-                        @Html.TextBoxFor(model => model.GioBatDau, new { @class = "form-control", type = "time", required = "required" })
-                        @Html.ValidationMessageFor(model => model.GioBatDau, "", new { @class = "text-danger" })
-                    </div>
+                <div class="mb-3">
+                    @Html.LabelFor(model => model.NgayHoc, "Ngày Học", new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.NgayHoc, new { @class = "form-control", type = "date" })
+                    @Html.ValidationMessageFor(model => model.NgayHoc, "", new { @class = "text-danger" })
                 </div>
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        @Html.LabelFor(model => model.GioKetThuc, "Giờ Kết Thúc", new { @class = "form-label" })
-                        @Html.TextBoxFor(model => model.GioKetThuc, new { @class = "form-control", type = "time", required = "required" })
-                        @Html.ValidationMessageFor(model => model.GioKetThuc, "", new { @class = "text-danger" })
+                        @Html.LabelFor(model => model.GioBatDau, "Giờ Bắt Đầu", new { @class = "form-label" })
+                        @Html.TextBoxFor(model => model.GioBatDau, new { @class = "form-control", type = "time" })
+                        @Html.ValidationMessageFor(model => model.GioBatDau, "", new { @class = "text-danger" })
                     </div>
-
                     <div class="col-md-6 mb-3">
-                        @Html.LabelFor(model => model.TrangThai, "Trạng Thái", new { @class = "form-label" })
-                        @Html.DropDownListFor(model => model.TrangThai,
-                            new SelectList(Enum.GetValues(typeof(QuanLyThongTinDaoTao.Models.TrangThaiBuoiHoc))),
-                            new { @class = "form-control" })
+                        @Html.LabelFor(model => model.GioKetThuc, "Giờ Kết Thúc", new { @class = "form-label" })
+                        @Html.TextBoxFor(model => model.GioKetThuc, new { @class = "form-control", type = "time" })
+                        @Html.ValidationMessageFor(model => model.GioKetThuc, "", new { @class = "text-danger" })
                     </div>
                 </div>
 
                 <div class="mb-3">
                     @Html.LabelFor(model => model.GhiChu, "Ghi Chú", new { @class = "form-label" })
                     @Html.TextAreaFor(model => model.GhiChu, new { @class = "form-control", rows = 5, id = "GhiChu" })
-                    @Html.ValidationMessageFor(model => model.GhiChu, "", new { @class = "text-danger" })
-                </div>
-
-                <div class="mb-3">
-                    <label for="attachments" class="form-label">Tệp Đính Kèm</label>
-                    <input type="file" name="attachments" id="attachments" class="form-control" multiple />
                 </div>
 
                 <div class="text-center">
                     <button type="submit" class="btn btn-warning btn-lg">
                         <i class="fa-solid fa-save"></i> Lưu Thay Đổi
                     </button>
-                    <a href="@Url.Action("DanhSachBuoiHoc", new { id = Model.LopHoc.LopHocId })" class="btn btn-secondary btn-lg">
+                    <a href="@Url.Action("Index")" class="btn btn-secondary btn-lg">
                         <i class="fas fa-arrow-left"></i> Quay lại
                     </a>
                 </div>
@@ -70,6 +65,39 @@
     </div>
 </div>
 
+<style>
+    .ck-editor__editable {
+        min-height: 150px;
+        max-height: 600px;
+        resize: vertical; /* Cho phép kéo theo chiều dọc */
+        overflow-y: auto;
+    }
+</style>
+
+<!-- Tích hợp CKEditor 5 -->
 <script>
-    ClassicEditor.create(document.querySelector('#GhiChu')).catch(error => console.error(error));
+    document.addEventListener('DOMContentLoaded', function () {
+        // Khởi tạo CKEditor
+        ClassicEditor
+            .create(document.querySelector('#GhiChu'))
+            .then(editor => {
+                console.log('CKEditor đã khởi tạo thành công.');
+
+                const editorElement = editor.ui.view.editable.element;
+                editorElement.style.overflowY = 'auto';
+
+                // Điều chỉnh chiều cao tự động
+                function adjustHeight() {
+                    editorElement.style.height = 'auto';
+                    editorElement.style.height = Math.min(editorElement.scrollHeight, 500) + 'px';
+                }
+
+                editor.model.document.on('change:data', adjustHeight);
+                adjustHeight();
+            })
+            .catch(error => {
+                console.error('Lỗi CKEditor:', error);
+            });
+    });
+
 </script>
