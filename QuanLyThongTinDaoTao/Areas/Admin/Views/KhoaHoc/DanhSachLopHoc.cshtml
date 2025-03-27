@@ -1,12 +1,12 @@
 ﻿@model List<QuanLyThongTinDaoTao.Models.LopHoc>
 @{
-    ViewBag.Title = "Danh Sách Lớp Học - " + ViewBag.TenKhoaHoc;
+    ViewBag.Title = "Danh Sách Lớp Học";
     Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
 }
 <div class="container-fluid pt-4 px-4">
     <div class="bg-light text-center rounded p-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
-            <h6 class="mb-0 fs-3">Danh Sách Lớp Học</h6>
+            <h6 class="mb-0 fs-3">Danh Sách Lớp Học --- @ViewBag.TenKhoaHoc</h6>
          
         </div>
         <div class="table-responsive">

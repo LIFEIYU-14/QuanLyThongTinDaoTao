@@ -42,5 +42,7 @@ namespace QuanLyThongTinDaoTao.Models
         public virtual ICollection<HocVien> HocViens { get; set; }
         public virtual ICollection<BuoiHoc> BuoiHocs { get; set; }
         public virtual ICollection<LopHocAttachment> LopHocAttachments { get; set; }
+        [NotMapped]
+        public bool IsRegistered { get; set; }
     }
 }

@@ -19,6 +19,74 @@ namespace QuanLyThongTinDaoTao.Controllers
             return View();
         }
 
+        public ActionResult Logout()
+        {
+            FormsAuthentication.SignOut();
+            Session.Clear();
+            return RedirectToAction("Login");
+        }
+
+        public ActionResult ThongTinCaNhan()
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Login");
+            }
+
+            string email = User.Identity.Name; // Lấy email từ FormsAuthentication
+
+            var hocVien = _db.HocViens.FirstOrDefault(h => h.Email == email);
+            if (hocVien == null)
+            {
+                return HttpNotFound("Không tìm thấy thông tin học viên.");
+            }
+
+            return View(hocVien);
+        }
+
+        public ActionResult Edit()
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Login");
+            }
+
+            string email = User.Identity.Name;
+            var hocVien = _db.HocViens.FirstOrDefault(h => h.Email == email);
+            if (hocVien == null)
+            {
+                return HttpNotFound("Không tìm thấy thông tin học viên.");
+            }
+
+            return View(hocVien);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(HocVien model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var hocVien = _db.HocViens.FirstOrDefault(h => h.Email == model.Email);
+            if (hocVien == null)
+            {
+                return HttpNotFound("Không tìm thấy học viên.");
+            }
+
+            hocVien.HoVaTen = model.HoVaTen;
+            hocVien.NgaySinh = model.NgaySinh;
+            hocVien.SoDienThoai = model.SoDienThoai;
+            hocVien.CoQuanLamViec = model.CoQuanLamViec;
+            hocVien.NgayCapNhat = DateTime.Now;
+
+            _db.SaveChanges();
+
+            return RedirectToAction("ThongTinCaNhan");
+        }
+
         [HttpPost]
         public JsonResult SendVerificationCode(string email)
         {
@@ -31,7 +99,7 @@ namespace QuanLyThongTinDaoTao.Controllers
 
                 string verificationCode = new Random().Next(100000, 999999).ToString();
                 Session["VerificationCode"] = verificationCode;
-                Session["VerificationEmail"] = email.Trim(); // Lưu email đã chuẩn hóa
+                Session["VerificationEmail"] = email.Trim();
 
                 string fromEmail = ConfigurationManager.AppSettings["EmailUsername"];
                 string fromPassword = ConfigurationManager.AppSettings["EmailPassword"];
@@ -80,12 +148,6 @@ namespace QuanLyThongTinDaoTao.Controllers
                 string savedCode = Session["VerificationCode"]?.ToString().Trim();
                 string savedEmail = Session["VerificationEmail"]?.ToString().Trim();
 
-                // Log kiểm tra giá trị email & mã xác nhận
-                System.Diagnostics.Debug.WriteLine($"[DEBUG] Email nhập vào: {email}");
-                System.Diagnostics.Debug.WriteLine($"[DEBUG] Email session: {savedEmail}");
-                System.Diagnostics.Debug.WriteLine($"[DEBUG] Mã xác nhận nhập vào: {code}");
-                System.Diagnostics.Debug.WriteLine($"[DEBUG] Mã xác nhận session: {savedCode}");
-
                 if (!email.Equals(savedEmail, StringComparison.OrdinalIgnoreCase))
                 {
                     return Json(new { success = false, message = "Email không khớp với email đã đăng ký." });
@@ -105,42 +167,20 @@ namespace QuanLyThongTinDaoTao.Controllers
                         Email = email,
                         HoVaTen = "Học viên mới",
                         MaHocVien = GenerateMaHocVien(),
-                        CoQuanLamViec = "Chưa cập nhật", // Thêm giá trị mặc định
-                        MatKhau = PasswordHelper.HashPassword("default123"), // Mật khẩu mặc định, có thể yêu cầu đổi sau
+                        CoQuanLamViec = "Chưa cập nhật",
+                        MatKhau = PasswordHelper.HashPassword("default123"),
                         VaiTro = VaiTroNguoiDung.HocVien,
-                        NgaySinh = new DateTime(2000, 1, 1), // Giả định ngày sinh, sau có thể yêu cầu cập nhật
-                        SoDienThoai = "0000000000", // Giá trị mặc định tránh lỗi ,sau có thể yêu cầu cập nhật
+                        NgaySinh = new DateTime(2000, 1, 1),
+                        SoDienThoai = "0000000000",
                         NgayTao = DateTime.Now,
                         NgayCapNhat = DateTime.Now
                     };
                     _db.HocViens.Add(hocVien);
-                }
-
-                try
-                {
                     _db.SaveChanges();
                 }
-                catch (System.Data.Entity.Validation.DbEntityValidationException ex)
-                {
-                    foreach (var validationErrors in ex.EntityValidationErrors)
-                    {
-                        foreach (var validationError in validationErrors.ValidationErrors)
-                        {
-                            System.Diagnostics.Debug.WriteLine($"Property: {validationError.PropertyName} - Error: {validationError.ErrorMessage}");
-                        }
-                    }
-                    return Json(new { success = false, message = "Lỗi dữ liệu: Vui lòng kiểm tra lại thông tin!" });
-                }
 
-
-                var authTicket = new FormsAuthenticationTicket(1, hocVien.Email, DateTime.Now, DateTime.Now.AddMinutes(30), false, hocVien.HoVaTen);
-                string encryptedTicket = FormsAuthentication.Encrypt(authTicket);
-                var authCookie = new HttpCookie(FormsAuthentication.FormsCookieName, encryptedTicket)
-                {
-                    HttpOnly = true,
-                    Expires = authTicket.Expiration
-                };
-                Response.Cookies.Add(authCookie);
+                // Thiết lập FormsAuthentication để duy trì trạng thái đăng nhập
+                FormsAuthentication.SetAuthCookie(hocVien.Email, false);
 
                 Session.Remove("VerificationCode");
                 Session.Remove("VerificationEmail");
@@ -152,9 +192,6 @@ namespace QuanLyThongTinDaoTao.Controllers
                 return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
             }
         }
-
-
-
 
         private string GenerateMaHocVien()
         {

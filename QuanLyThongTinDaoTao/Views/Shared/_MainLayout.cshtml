@@ -63,8 +63,19 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <div class="navbar-nav ms-lg-5 p-lg-0">
-                <a href="@Url.Action("Index", "Home")" class="nav-item nav-link">Trang Chủ</a>
-                <a href="@Url.Action("Index", "Courses")" class="nav-item nav-link">Khóa Học</a>
+                <div class="nav-item dropdown">
+                    <a href="@Url.Action("Index", "Courses")" class="nav-item nav-link">Khóa Học</a>
+                </div>
+            </div>
+            <div class="navbar-nav ms-lg-5 p-lg-0">
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Học Tập</a>
+                    <div class="dropdown-menu fade-down m-0">
+                        <a href="@Url.Action("Index", "")" class="dropdown-item">Lịch Học</a>
+                        <a href="@Url.Action("Index", "")" class="dropdown-item">Danh Sách Lớp Đăng Ký</a>
+
+                    </div>
+                </div>
             </div>
             <nav class="navbar navbar-light bg-light ms-auto me-lg-5" style="width: 300px;">
                 <div class="container-fluid">
@@ -74,23 +85,26 @@
                     </form>
                 </div>
             </nav>
+
             <div class="navbar-nav ms-lg-5 p-lg-0">
                 @if (User.Identity.IsAuthenticated)
                 {
+
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fa fa-user me-2"></i> @User.Identity.Name
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="userDropdown">
-                            <li><a class="dropdown-item" href="#">Thông tin cá nhân</a></li>
-                            <li>
-                                <form action="@Url.Action("Logout", "Account")" method="post">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="dropdown-item">Đăng Xuất</button>
-                                </form>
-                            </li>
-                        </ul>
+                        <div class="dropdown-menu" aria-labelledby="userDropdown">
+                            <a class="dropdown-item" href="@Url.Action("ThongTinCaNhan","Account")">Thông tin cá nhân</a>
+
+                            <form action="@Url.Action("Logout", "Account")" method="post">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="dropdown-item">Đăng Xuất</button>
+                            </form>
+
+                        </div>
                     </div>
+
                 }
                 else
                 {

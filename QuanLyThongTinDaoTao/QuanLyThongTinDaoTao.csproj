@@ -186,6 +186,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CoursesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\RegisterController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -273,6 +274,18 @@
     <Compile Include="Migrations\202503270232351_270dahwuq.cs" />
     <Compile Include="Migrations\202503270232351_270dahwuq.Designer.cs">
       <DependentUpon>202503270232351_270dahwuq.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202503270836515_4582222.cs" />
+    <Compile Include="Migrations\202503270836515_4582222.Designer.cs">
+      <DependentUpon>202503270836515_4582222.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202503270913288_4582wkd.cs" />
+    <Compile Include="Migrations\202503270913288_4582wkd.Designer.cs">
+      <DependentUpon>202503270913288_4582wkd.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202503270940164_4gskdc.cs" />
+    <Compile Include="Migrations\202503270940164_4gskdc.Designer.cs">
+      <DependentUpon>202503270940164_4gskdc.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ModelsService\LoginViewModel.cs" />
@@ -675,6 +688,9 @@
     <Content Include="Views\Shared\_MainLayout.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Account\Register.cshtml" />
+    <Content Include="Views\Account\ThongTinCaNhan.cshtml" />
+    <Content Include="Views\Account\Edit.cshtml" />
+    <Content Include="Views\Courses\DanhSachLopHoc.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -682,6 +698,7 @@
     <Folder Include="Upload\BuoiHoc\" />
     <Folder Include="Upload\KhoaHoc\" />
     <Folder Include="Upload\LopHoc\" />
+    <Folder Include="Views\Register\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />
@@ -773,6 +790,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202503270232351_270dahwuq.resx">
       <DependentUpon>202503270232351_270dahwuq.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202503270836515_4582222.resx">
+      <DependentUpon>202503270836515_4582222.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202503270913288_4582wkd.resx">
+      <DependentUpon>202503270913288_4582wkd.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202503270940164_4gskdc.resx">
+      <DependentUpon>202503270940164_4gskdc.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
