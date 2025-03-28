@@ -291,6 +291,10 @@
     <Compile Include="Migrations\202503280219187_fghjklsfd.Designer.cs">
       <DependentUpon>202503280219187_fghjklsfd.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202503280716239_dsm.cs" />
+    <Compile Include="Migrations\202503280716239_dsm.Designer.cs">
+      <DependentUpon>202503280716239_dsm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ModelsService\LoginViewModel.cs" />
     <Compile Include="ModelsService\RegisterViewModel.cs" />
@@ -809,6 +813,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202503280219187_fghjklsfd.resx">
       <DependentUpon>202503280219187_fghjklsfd.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202503280716239_dsm.resx">
+      <DependentUpon>202503280716239_dsm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

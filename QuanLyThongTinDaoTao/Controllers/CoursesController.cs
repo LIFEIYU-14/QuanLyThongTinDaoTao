@@ -63,7 +63,7 @@ namespace QuanLyThongTinDaoTao.Controllers
             // Đảm bảo người dùng đã đăng nhập
             if (!User.Identity.IsAuthenticated)
             {
-                return RedirectToAction("Login");
+                return RedirectToAction("Login","Account");
             }
 
             // Lấy email của người dùng đã đăng nhập

@@ -42,12 +42,7 @@
 
 <body>
     <div class="container-xxl position-relative bg-white d-flex p-0">
-        <!-- Spinner Start -->
-        <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
-            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-                <span class="sr-only">Loading...</span>
-            </div>
-        </div>
+       
         <!-- Spinner End -->
         <!-- Sidebar Start -->
         <div class="sidebar pe-4 pb-3">
@@ -93,9 +88,9 @@
                 <a href="index.html" class="navbar-brand d-flex d-lg-none me-4">
                     <h2 class="text-primary mb-0"><i class="fa fa-hashtag"></i></h2>
                 </a>
-                <a href="#" class="sidebar-toggler flex-shrink-5">
+                @*<a href="#" class="sidebar-toggler flex-shrink-0">
                     <i class="fa fa-bars"></i>
-                </a>
+                </a>*@
                 <form class="d-none d-md-flex ms-4">
                     <input class="form-control border-0" type="search" placeholder="Search">
                 </form>
@@ -183,35 +178,7 @@
 
     <!-- Template Javascript -->
     <script src="~/Areas/Asset/js/main.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const currentPath = window.location.pathname;
-            const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
-
-            navLinks.forEach(link => {
-                const linkPath = link.getAttribute('href');
-                if (currentPath === linkPath) {
-                    navLinks.forEach(nav => nav.classList.remove('active'));
-                    link.classList.add('active');
-                }
-            });
-        });
-
-    </script>
-    <script>
-    $(document).ready(function () {
-        var successMessage = '@TempData["SuccessMessage"]';
-        var errorMessage = '@TempData["ErrorMessage"]';
-
-        if (successMessage) {
-            toastr.success(successMessage, 'Thành công!', { timeOut: 3000 });
-        }
-
-        if (errorMessage) {
-            toastr.error(errorMessage, 'Lỗi!', { timeOut: 5000 });
-        }
-    });
-    </script>
+  
 
 </body>
 
