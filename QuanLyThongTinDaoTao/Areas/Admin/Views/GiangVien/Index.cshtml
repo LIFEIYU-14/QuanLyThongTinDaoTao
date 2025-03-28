@@ -1,0 +1,44 @@
+﻿@model IEnumerable<QuanLyThongTinDaoTao.Models.GiangVien>
+@{
+    ViewBag.Title = "Danh sách giảng viên";
+    Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
+}
+
+<h2>Danh sách giảng viên</h2>
+
+<p>
+    @Html.ActionLink("Thêm giảng viên", "Create", null, new { @class = "btn btn-primary" })
+</p>
+
+<table class="table table-bordered">
+    <thead class="thead-dark">
+        <tr>
+            <th>Mã GV</th>
+            <th>Họ Tên</th>
+            <th>Ngày Sinh</th>
+            <th>Chuyên Môn</th>
+            <th>Học Hàm</th>
+            <th>Email</th>
+            <th>Số ĐT</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.MaGiangVien</td>
+                <td>@item.HoVaTen</td>
+                <td>@item.NgaySinh</td>
+                <td>@item.ChuyenMon</td>
+                <td>@item.HocHam</td>
+                <td>@item.Email</td>
+                <td>@item.SoDienThoai</td>
+                <td>
+                    @Html.ActionLink("Sửa", "Edit", new { id = item.NguoiDungId }, new { @class = "btn btn-warning btn-sm" })
+                    @Html.ActionLink("Xóa", "Delete", new { id = item.NguoiDungId }, new { @class = "btn btn-danger btn-sm", onclick = "return confirm('Bạn có chắc muốn xóa giảng viên này không?');" })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

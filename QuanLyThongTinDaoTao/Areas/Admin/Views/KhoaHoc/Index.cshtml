@@ -34,7 +34,7 @@
                                                || a.Attachment.FileType.ToLower().Contains("jpeg")))?
                           .Attachment?.FilePath ?? Url.Content("~/Upload/KhoaHoc/default.png"));
                 <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-                    <div class="course-item bg-light">
+                    <div class="course-item bg-secondary">
                         <div class="position-relative overflow-hidden">
                             <a href="@Url.Action("Details", "KhoaHoc", new { id = khoaHoc.KhoaHocId })">
                                 <img class="img-fluid" src='@imagePath' alt="@khoaHoc.TenKhoaHoc" />
