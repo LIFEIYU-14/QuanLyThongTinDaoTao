@@ -697,6 +697,7 @@
     <Content Include="Views\Courses\DanhSachLopHoc.cshtml" />
     <Content Include="Views\QuanLyHocTap\LopHocDaDangKy.cshtml" />
     <Content Include="Views\QuanLyHocTap\LichHoc.cshtml" />
+    <Content Include="Views\QuanLyHocTap\_LichHocPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

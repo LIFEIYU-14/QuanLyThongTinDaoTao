@@ -3,39 +3,28 @@
 @{
     ViewBag.Title = "Lịch Học";
     Layout = "~/Views/Shared/_MainLayout.cshtml";
-
-    // Lấy danh sách các ngày học trong tuần (Thứ 2 -> Chủ Nhật)
-    var ngayHocTuan = Enumerable.Range(0, 7)
-        .Select(i => DateTime.Today.AddDays(i - (int)DateTime.Today.DayOfWeek + 1)) // Lấy ngày đầu tuần
-        .ToList();
-    // Ngày mặc định (hôm nay)
-    DateTime ngayHienTai = DateTime.Today;
-
-    // Hàm lấy buổi học theo ca (Sáng, Chiều)
-    Func<DateTime, string, List<QuanLyThongTinDaoTao.Models.BuoiHoc>> getBuoiHoc = (ngay, ca) =>
-    {
-        return Model.Where(bh =>
-            bh.NgayHoc.Date == ngay &&
-            ((ca == "Sáng" && bh.GioBatDau.Hours < 12) ||
-             (ca == "Chiều" && bh.GioBatDau.Hours >= 12 && bh.GioBatDau.Hours < 18))
-        ).ToList();
-    };
+    // Tính toán tuần hiển thị: lấy ngày hiện tại, chuyển về thứ Hai
+    var today = DateTime.Today;
+    int dow = (int)today.DayOfWeek;
+    dow = (dow == 0) ? 7 : dow; // nếu Sunday (0) thì xem như 7
+    var weekStart = today.AddDays(1 - dow);
 }
 
 <div class="container my-4" id="lichHocContainer">
     <!-- Thanh công cụ -->
     <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
         <div class="d-flex flex-wrap align-items-center gap-2">
-            <input type="date" id="selectedDate" class="form-control" style="min-width: 200px;">
-            <button id="goToToday" class="btn btn-success">
+            <button class="btn btn-success" onclick="goToToday()">
                 <i class="fa-solid fa-calendar-day"></i> Hôm nay
             </button>
-            <button id="prevWeek" class="btn btn-primary">
+            <button class="btn btn-primary" onclick="prevWeek()">
                 <i class="fa-solid fa-chevron-left"></i> Trở về
             </button>
-            <button id="nextWeek" class="btn btn-primary">
+            <button class="btn btn-primary" onclick="nextWeek()">
                 Tiếp <i class="fa-solid fa-chevron-right"></i>
             </button>
+            <!-- Input chọn ngày -->
+            <input type="date" id="selectedDate" class="form-control" style="max-width:200px;" onchange="changeSelectedDate()" />
         </div>
 
         <div class="d-flex gap-2">
@@ -48,73 +37,51 @@
         </div>
     </div>
 
-    <!-- Bảng thời khóa biểu -->
-    <div class="table-responsive">
-        <table class="table table-bordered align-middle text-center">
-            <thead class="table-success">
-                <tr>
-                    <th style="min-width: 120px;">Ca học</th>
-                    @foreach (var ngay in ngayHocTuan)
-                    {
-                        <th>
-                            @ngay.ToString("dddd") <br />
-                            @ngay.ToString("dd/MM/yyyy")
-                        </th>
-
-                    }
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var ca in new[] { "Sáng", "Chiều" })
-                {
-                    <tr>
-                        <td class="fw-bold">@ca</td>
-                        @foreach (var ngay in ngayHocTuan)
-                        {
-                            var buoiHocList = getBuoiHoc(ngay, ca);
-                            <td>
-                                @if (buoiHocList.Any())
-                                {
-                                    foreach (var buoiHoc in buoiHocList)
-                                    {
-                                        <div class="class-info mb-2 p-2 text-start bg-light border rounded">
-                                            <div class="fw-bold">@buoiHoc.LopHoc.TenLopHoc</div>
-                                            <div>Tiết: @buoiHoc.GioBatDau.Hours - @buoiHoc.GioKetThuc.Hours</div>
-                                            <div>Phòng: Zoom</div>
-                                            <div>Trạng Thái: @buoiHoc.TrangThai</div>
-                                        </div>
-                                    }
-                                }
-                                else
-                                {
-                                    <span class="text-muted">--</span>
-                                }
-                            </td>
-                        }
-                    </tr>
-                }
-            </tbody>
-        </table>
+    <!-- Nội dung lịch học sẽ được cập nhật qua AJAX -->
+    <div id="lichHocContent">
+        @Html.Partial("_LichHocPartial")
     </div>
 </div>
 
-<!-- JavaScript -->
 <script>
-    $(document).ready(function () {
-    var today = new Date();
-    var currentWeekStart = new Date(today);
-    currentWeekStart.setDate(today.getDate() - today.getDay() + 1); // Đặt về Thứ 2
+    // Hàm in lịch
+    function printSchedule() {
+        window.print();
+    }
+
+    // Hàm chuyển đổi fullscreen
+    function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+    }
+
+   var today = new Date();
+
+    function getWeekStart(date) {
+        var d = new Date(date);
+        var day = d.getDay();
+        day = (day === 0) ? 7 : day; // Nếu là Chủ Nhật thì tính là 7
+        d.setDate(d.getDate() - day + 1);
+        return d;
+    }
+
+    var currentWeekStart = getWeekStart(today);
 
     function loadSchedule(startDate) {
-        var formattedDate = startDate.toISOString().split("T")[0]; // yyyy-MM-dd
-        $("#selectedDate").val(formattedDate);
+        var formattedDate = startDate.toISOString().split("T")[0]; // Format yyyy-MM-dd
+        document.getElementById("selectedDate").value = formattedDate;
 
         $.ajax({
             url: '@Url.Action("LichHoc", "QuanLyHocTap")',
             type: 'GET',
             data: { startDate: formattedDate },
             success: function (response) {
-                $("#lichHocContainer").html(response);
+                document.getElementById("lichHocContent").innerHTML = response;
             },
             error: function () {
                 alert("Không thể tải lịch học.");
@@ -122,35 +89,27 @@
         });
     }
 
-    // Cập nhật lịch khi chọn ngày
-    $("#selectedDate").change(function () {
-        var selectedDate = new Date($(this).val());
-        currentWeekStart = new Date(selectedDate);
-        currentWeekStart.setDate(selectedDate.getDate() - selectedDate.getDay() + 1); // Cập nhật đầu tuần
+    function prevWeek() {
+        currentWeekStart.setDate(currentWeekStart.getDate() - 7);
         loadSchedule(currentWeekStart);
-    });
+    }
 
-    // Chuyển sang tuần trước
-    $("#prevWeek").click(function () {
-        currentWeekStart.setDate(currentWeekStart.getDate() - 7); // Lùi 7 ngày
+    function nextWeek() {
+        currentWeekStart.setDate(currentWeekStart.getDate() + 7);
         loadSchedule(currentWeekStart);
-    });
+    }
 
-    // Chuyển sang tuần sau
-    $("#nextWeek").click(function () {
-        currentWeekStart.setDate(currentWeekStart.getDate() + 7); // Tiến 7 ngày
+    function goToToday() {
+        currentWeekStart = getWeekStart(new Date());
         loadSchedule(currentWeekStart);
-    });
+    }
 
-    // Trở về hôm nay
-    $("#goToToday").click(function () {
-        currentWeekStart = new Date();
-        currentWeekStart.setDate(currentWeekStart.getDate() - currentWeekStart.getDay() + 1);
+    function changeSelectedDate() {
+        var selectedDate = new Date(document.getElementById("selectedDate").value);
+        currentWeekStart = getWeekStart(selectedDate);
         loadSchedule(currentWeekStart);
-    });
+    }
 
-    // Tải lịch học lần đầu
+    // Load lịch học lần đầu
     loadSchedule(currentWeekStart);
-});
-
 </script>

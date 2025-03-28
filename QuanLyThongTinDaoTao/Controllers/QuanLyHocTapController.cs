@@ -16,6 +16,7 @@ namespace QuanLyThongTinDaoTao.Controllers
         {
             return View();
         }
+
         public ActionResult LopHocDaDangKy()
         {
             if (!User.Identity.IsAuthenticated)
@@ -41,7 +42,8 @@ namespace QuanLyThongTinDaoTao.Controllers
 
             return View(lopHocsDaDangKy);
         }
-        public ActionResult LichHoc()
+
+        public ActionResult LichHoc(string startDate)
         {
             if (!User.Identity.IsAuthenticated)
             {
@@ -58,7 +60,7 @@ namespace QuanLyThongTinDaoTao.Controllers
                 return HttpNotFound("Không tìm thấy thông tin học viên.");
             }
 
-            // Lấy danh sách lớp học mà học viên đã đăng ký
+            // Lấy danh sách lớp học mà học viên đã đăng ký (lấy cả ID của lớp)
             var lopHocsDaDangKy = db.DangKyHocs
                 .Where(dk => dk.NguoiDungId == hocVien.NguoiDungId)
                 .Select(dk => dk.LopHoc.LopHocId)
@@ -71,9 +73,25 @@ namespace QuanLyThongTinDaoTao.Controllers
                 .ThenBy(bh => bh.GioBatDau)
                 .ToList();
 
+            // Lọc theo tuần dựa vào startDate (nếu có)
+            DateTime weekStart;
+            if (!DateTime.TryParse(startDate, out weekStart))
+            {
+                weekStart = DateTime.Today;
+            }
+            // Chuyển về thứ Hai (nếu Sunday thì xem như cuối tuần của tuần trước)
+            int dow = (int)weekStart.DayOfWeek;
+            dow = (dow == 0) ? 7 : dow;
+            weekStart = weekStart.AddDays(1 - dow);
+            DateTime weekEnd = weekStart.AddDays(7);
+            lichHoc = lichHoc.Where(bh => bh.NgayHoc >= weekStart && bh.NgayHoc < weekEnd).ToList();
+
+            // Nếu request là AJAX, trả về PartialView
+            if (Request.IsAjaxRequest())
+            {
+                return PartialView("_LichHocPartial", lichHoc);
+            }
             return View(lichHoc);
         }
-
     }
-
 }
