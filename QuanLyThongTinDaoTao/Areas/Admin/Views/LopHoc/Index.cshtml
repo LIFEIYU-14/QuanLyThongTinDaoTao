@@ -6,15 +6,19 @@
 }
 
 <div class="container-fluid pt-4 px-4">
-    <div class="bg-light text-center rounded p-4">
+    <div class="bg-light rounded p-4 shadow-sm">
         <div class="d-flex align-items-center justify-content-between mb-4">
-            <h6 class="mb-0 fs-3">Danh Sách Lớp Học</h6>
-            <a href="@Url.Action("Create")" class="btn btn-success fs-5"><i class="fas fa-plus-circle"></i> Thêm Lớp Học Mới</a>
+            <h4 class="mb-0 text-primary fw-bold">
+                <i class="fas fa-school"></i> Danh Sách Lớp Học
+            </h4>
+            <a href="@Url.Action("Create")" class="btn btn-success fs-5">
+                <i class="fas fa-plus-circle"></i> Thêm Lớp Học Mới
+            </a>
         </div>
         <div class="table-responsive">
-            <table class="table text-start align-middle table-bordered mb-0 fs-5">
-                <thead>
-                    <tr class="text-dark text-center">
+            <table class="table table-striped align-middle table-bordered">
+                <thead class="table-primary">
+                    <tr class="text-center">
                         <th scope="col">Tên Lớp Học</th>
                         <th scope="col">Tên Khóa Học</th>
                         <th scope="col">Số Tín Chỉ</th>
@@ -28,7 +32,7 @@
                     @foreach (var lophoc in Model)
                     {
                         <tr class="text-center">
-                            <td>@lophoc.TenLopHoc</td>
+                            <td class="text-start">@lophoc.TenLopHoc</td>
                             <td>@(lophoc.KhoaHoc != null ? lophoc.KhoaHoc.TenKhoaHoc : "Chưa có")</td>
                             <td>@lophoc.SoTinChi</td>
                             <td>@lophoc.NgayBatDau.ToString("dd/MM/yyyy")</td>
@@ -39,9 +43,13 @@
                                 </span>
                             </td>
                             <td>
-                                <a href="@Url.Action("Details", new { id = lophoc.LopHocId })" class="btn btn-sm btn-info fs-6"><i class="fas fa-eye"></i> Chi Tiết</a>
-                                <a href="@Url.Action("Edit", new { id = lophoc.LopHocId })" class="btn btn-sm btn-warning fs-6"><i class="fas fa-edit"></i> Sửa</a>
-                                <a href="@Url.Action("Delete", new { id = lophoc.LopHocId })" class="btn btn-sm btn-danger fs-6" onclick="return confirm('Bạn có chắc chắn muốn xóa lớp học này?');">
+                                <a href="@Url.Action("Details", new { id = lophoc.LopHocId })" class="btn btn-info btn-sm">
+                                    <i class="fas fa-eye"></i> Chi Tiết
+                                </a>
+                                <a href="@Url.Action("Edit", new { id = lophoc.LopHocId })" class="btn btn-warning btn-sm">
+                                    <i class="fas fa-edit"></i> Sửa
+                                </a>
+                                <a href="@Url.Action("Delete", new { id = lophoc.LopHocId })" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa lớp học này?');">
                                     <i class="fas fa-trash-alt"></i> Xóa
                                 </a>
                             </td>

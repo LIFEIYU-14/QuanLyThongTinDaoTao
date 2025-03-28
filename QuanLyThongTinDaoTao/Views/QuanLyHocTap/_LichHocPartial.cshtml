@@ -17,10 +17,12 @@
     {
         return Model.Where(bh =>
             bh.NgayHoc.Date == ngay &&
-            ((ca == "Sáng" && bh.GioBatDau.Hours < 12) ||
-             (ca == "Chiều" && bh.GioBatDau.Hours >= 12 && bh.GioBatDau.Hours < 18))
-        ).ToList();
+            ((ca == "Sáng" && bh.GioBatDau.TotalHours >= 6 && bh.GioBatDau.TotalHours < 12) ||
+             (ca == "Chiều" && bh.GioBatDau.TotalHours >= 12 && bh.GioBatDau.TotalHours < 18)))
+        .OrderBy(bh => bh.GioBatDau) // Sắp xếp theo giờ học trong buổi
+        .ToList();
     };
+
 
 
 }
@@ -53,16 +55,20 @@
                                 foreach (var buoiHoc in buoiHocList)
                                 {
                                     <div class="class-info mb-2 p-2 text-start bg-light border rounded">
-                                        <div class="fw-bold">@buoiHoc.LopHoc.TenLopHoc</div>
-                                        <div>Tiết: @buoiHoc.GioBatDau.Hours - @buoiHoc.GioKetThuc.Hours</div>
-                                        <div>Phòng: Zoom</div>
-                                        <div>Trạng Thái: @buoiHoc.TrangThai</div>
+                                        <div class="fw-bold text-center">@buoiHoc.LopHoc.TenLopHoc</div>
+                                        <div class="text-center">
+                                            Giờ Học: @(new DateTime(buoiHoc.GioBatDau.Ticks).ToString("HH:mm")) -
+                                            @(new DateTime(buoiHoc.GioKetThuc.Ticks).ToString("HH:mm"))
+                                        </div>
+
+                                        <div class="text-center">Phòng: Zoom</div>
+                                        <div class="text-center">Trạng Thái: @buoiHoc.TrangThai</div>
                                     </div>
                                 }
                             }
                             else
                             {
-                                <span class="text-muted">--</span>
+                                <span class="text-muted">--<br /> -- <br /> -- <br /></span>
                             }
                         </td>
                     }

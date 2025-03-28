@@ -93,13 +93,11 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             TempData["SuccessMessage"] = "Lớp học đã được tạo thành công!";
             return RedirectToAction("Index");
         }
-
-        // GET: Xóa lớp học
         public ActionResult Delete(Guid id)
         {
             var lopHoc = db.LopHocs
                 .Include(l => l.LopHocAttachments.Select(a => a.Attachment))
-                .Include(l => l.BuoiHocs) // Load danh sách BuoiHoc
+                .Include(l => l.BuoiHocs)
                 .FirstOrDefault(l => l.LopHocId == id);
 
             if (lopHoc == null)
@@ -107,48 +105,44 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 return HttpNotFound();
             }
 
-            return View(lopHoc);
-        }
-
-        // POST: Xóa lớp học
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(Guid id)
-        {
-            var lopHoc = db.LopHocs
-                .Include(l => l.LopHocAttachments.Select(a => a.Attachment))
-                .Include(l => l.BuoiHocs)
-                .FirstOrDefault(l => l.LopHocId == id);
-
-            if (lopHoc != null)
+            // Xóa các buổi học liên quan đến lớp học này
+            if (lopHoc.BuoiHocs != null)
             {
-                // Xóa các buổi học liên quan
-                db.BuoiHocs.RemoveRange(lopHoc.BuoiHocs);
-
-                // Xóa các file đính kèm nếu có
-                var lopHocAttachments = lopHoc.LopHocAttachments.ToList();
-                foreach (var item in lopHocAttachments)
+                foreach (var buoiHoc in lopHoc.BuoiHocs.ToList())
                 {
-                    var attachment = item.Attachment;
-                    if (attachment != null)
-                    {
-                        string filePath = Server.MapPath(attachment.FilePath);
-                        if (!string.IsNullOrEmpty(filePath) && System.IO.File.Exists(filePath))
-                        {
-                            System.IO.File.Delete(filePath);
-                        }
-                        db.Attachments.Remove(attachment);
-                    }
-                    db.LopHocAttachments.Remove(item);
+                    db.BuoiHocs.Remove(buoiHoc);
                 }
-
-                // Xóa lớp học
-                db.LopHocs.Remove(lopHoc);
-                db.SaveChanges();
             }
+
+            // Xóa các file đính kèm của lớp học
+            var lopHocAttachments = lopHoc.LopHocAttachments.ToList();
+            foreach (var lopHocAttachment in lopHocAttachments)
+            {
+                var attachment = lopHocAttachment.Attachment;
+                if (attachment != null)
+                {
+                    string filePath = Server.MapPath(attachment.FilePath);
+                    if (!string.IsNullOrEmpty(filePath) && System.IO.File.Exists(filePath))
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
+                    db.Attachments.Remove(attachment);
+                }
+            }
+
+            // Xóa các liên kết giữa Lớp học và Attachment
+            db.LopHocAttachments.RemoveRange(lopHocAttachments);
+
+            // Xóa lớp học
+            db.LopHocs.Remove(lopHoc);
+
+            // Lưu thay đổi
+            db.SaveChanges();
 
             return RedirectToAction("Index");
         }
+
+
 
         // GET: Chỉnh sửa lớp học
         public ActionResult Edit(Guid id)

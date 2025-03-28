@@ -47,6 +47,12 @@
                         @Html.ValidationMessageFor(model => model.GioKetThuc, "", new { @class = "text-danger" })
                     </div>
                 </div>
+                <!-- Tệp Đính Kèm -->
+                <div class="mb-3">
+                    <label for="attachments" class="form-label">Tệp Đính Kèm (JPG, PNG, PDF, DOCX, TXT)</label>
+                    <input type="file" name="attachments" id="attachments" class="form-control" multiple />
+                </div>
+
 
                 <small class="text-danger" id="GioHocError"></small>
 
