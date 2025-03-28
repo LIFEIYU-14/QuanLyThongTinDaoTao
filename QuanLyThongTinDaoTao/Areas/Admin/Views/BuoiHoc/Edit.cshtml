@@ -1,5 +1,4 @@
-﻿<!-- Edit View -->
-@model QuanLyThongTinDaoTao.Models.BuoiHoc
+﻿@model QuanLyThongTinDaoTao.Models.BuoiHoc
 
 @{
     ViewBag.Title = "Chỉnh Sửa Buổi Học";
@@ -12,7 +11,7 @@
             <h3><i class="fa-solid fa-edit"></i> Chỉnh Sửa Buổi Học</h3>
         </div>
         <div class="card-body">
-            @using (Html.BeginForm("Edit", "BuoiHoc", FormMethod.Post))
+            @using (Html.BeginForm("Edit", "BuoiHoc", FormMethod.Post, new { enctype = "multipart/form-data" }))
             {
                 @Html.AntiForgeryToken()
                 @Html.HiddenFor(model => model.BuoiHocId)
@@ -23,29 +22,33 @@
                         <option value="">-- Chọn Lớp Học --</option>
                         @foreach (var lopHoc in ViewBag.LopHocList)
                         {
-                            <option value="@lopHoc.LopHocId">@lopHoc.TenLopHoc</option>
+                            var selected = Model.LopHoc != null && (Guid)lopHoc.LopHocId == Model.LopHoc.LopHocId ? "selected" : "";
+                            <option value="@lopHoc.LopHocId" @selected>@lopHoc.TenLopHoc</option>
                         }
                     </select>
                 </div>
 
                 <div class="mb-3">
                     @Html.LabelFor(model => model.NgayHoc, "Ngày Học", new { @class = "form-label" })
-                    @Html.TextBoxFor(model => model.NgayHoc, new { @class = "form-control", type = "date" })
+                    @Html.TextBoxFor(model => model.NgayHoc, new { @class = "form-control", type = "date", id = "NgayHoc" })
+                    <small class="text-danger" id="NgayHocError"></small>
                     @Html.ValidationMessageFor(model => model.NgayHoc, "", new { @class = "text-danger" })
                 </div>
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         @Html.LabelFor(model => model.GioBatDau, "Giờ Bắt Đầu", new { @class = "form-label" })
-                        @Html.TextBoxFor(model => model.GioBatDau, new { @class = "form-control", type = "time" })
+                        @Html.TextBoxFor(model => model.GioBatDau, new { @class = "form-control", type = "time", id = "GioBatDau" })
                         @Html.ValidationMessageFor(model => model.GioBatDau, "", new { @class = "text-danger" })
                     </div>
                     <div class="col-md-6 mb-3">
                         @Html.LabelFor(model => model.GioKetThuc, "Giờ Kết Thúc", new { @class = "form-label" })
-                        @Html.TextBoxFor(model => model.GioKetThuc, new { @class = "form-control", type = "time" })
+                        @Html.TextBoxFor(model => model.GioKetThuc, new { @class = "form-control", type = "time", id = "GioKetThuc" })
                         @Html.ValidationMessageFor(model => model.GioKetThuc, "", new { @class = "text-danger" })
                     </div>
                 </div>
+
+                <small class="text-danger" id="GioHocError"></small>
 
                 <div class="mb-3">
                     @Html.LabelFor(model => model.GhiChu, "Ghi Chú", new { @class = "form-label" })
@@ -69,7 +72,7 @@
     .ck-editor__editable {
         min-height: 150px;
         max-height: 600px;
-        resize: vertical; /* Cho phép kéo theo chiều dọc */
+        resize: vertical;
         overflow-y: auto;
     }
 </style>
@@ -77,21 +80,17 @@
 <!-- Tích hợp CKEditor 5 -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Khởi tạo CKEditor
         ClassicEditor
             .create(document.querySelector('#GhiChu'))
             .then(editor => {
                 console.log('CKEditor đã khởi tạo thành công.');
-
                 const editorElement = editor.ui.view.editable.element;
                 editorElement.style.overflowY = 'auto';
 
-                // Điều chỉnh chiều cao tự động
                 function adjustHeight() {
                     editorElement.style.height = 'auto';
                     editorElement.style.height = Math.min(editorElement.scrollHeight, 500) + 'px';
                 }
-
                 editor.model.document.on('change:data', adjustHeight);
                 adjustHeight();
             })
@@ -99,5 +98,4 @@
                 console.error('Lỗi CKEditor:', error);
             });
     });
-
 </script>

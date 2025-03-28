@@ -20,13 +20,14 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             return View(buoiHocs);
         }
 
-        // Tạo buổi học
+        // Tạo buổi học (GET)
         public ActionResult Create()
         {
             ViewBag.LopHocList = db.LopHocs.ToList();
             return View();
         }
 
+        // Tạo buổi học (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(BuoiHoc model, Guid LopHocId, HttpPostedFileBase[] attachments)
@@ -36,9 +37,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 ViewBag.LopHocList = db.LopHocs.ToList();
                 return View(model);
             }
-            
-            model.BuoiHocId = Guid.NewGuid();
-            // Gán KhoaHoc từ KhoaHocId
+
             var lopHoc = db.LopHocs.Find(LopHocId);
             if (lopHoc == null)
             {
@@ -47,6 +46,31 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 return View(model);
             }
 
+            // Kiểm tra NgayHoc có nằm trong khoảng NgayBatDau - NgayKetThuc của lớp không?
+            if (model.NgayHoc < lopHoc.NgayBatDau || model.NgayHoc > lopHoc.NgayKetThuc)
+            {
+                ModelState.AddModelError("NgayHoc", "Ngày học phải nằm trong khoảng từ " + lopHoc.NgayBatDau.ToShortDateString() + " đến " + lopHoc.NgayKetThuc.ToShortDateString());
+                ViewBag.LopHocList = db.LopHocs.ToList();
+                return View(model);
+            }
+
+            // Kiểm tra trùng thời gian với buổi học khác của cùng lớp
+            bool isOverlap = db.BuoiHocs.Any(b =>
+                b.LopHoc.LopHocId == LopHocId &&
+                b.NgayHoc == model.NgayHoc &&
+                ((model.GioBatDau >= b.GioBatDau && model.GioBatDau < b.GioKetThuc) ||
+                 (model.GioKetThuc > b.GioBatDau && model.GioKetThuc <= b.GioKetThuc) ||
+                 (model.GioBatDau <= b.GioBatDau && model.GioKetThuc >= b.GioKetThuc))
+            );
+
+            if (isOverlap)
+            {
+                ModelState.AddModelError("GioBatDau", "Thời gian buổi học bị trùng với một buổi học khác.");
+                ViewBag.LopHocList = db.LopHocs.ToList();
+                return View(model);
+            }
+
+            model.BuoiHocId = Guid.NewGuid();
             model.LopHoc = lopHoc;
 
             db.BuoiHocs.Add(model);
@@ -60,12 +84,13 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             TempData["SuccessMessage"] = "Buổi học đã được tạo thành công!";
             return RedirectToAction("Index");
         }
-      
-        // Chỉnh sửa buổi học
+
+        // Chỉnh sửa buổi học (GET)
         public ActionResult Edit(Guid id)
         {
-            var buoiHoc = db.BuoiHocs.Include(k => k.BuoiHocAttachments.Select(a => a.Attachment))
-                                    .FirstOrDefault(k => k.BuoiHocId == id);
+            var buoiHoc = db.BuoiHocs
+                .Include(k => k.BuoiHocAttachments.Select(a => a.Attachment))
+                .FirstOrDefault(k => k.BuoiHocId == id);
             if (buoiHoc == null)
             {
                 return HttpNotFound();
@@ -74,6 +99,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             return View(buoiHoc);
         }
 
+        // Chỉnh sửa buổi học (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(BuoiHoc model, Guid LopHocId, HttpPostedFileBase[] attachments)
@@ -84,12 +110,43 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 return View(model);
             }
 
-            var buoiHoc = db.BuoiHocs.Include(k => k.BuoiHocAttachments.Select(a => a.Attachment))
-                                   .FirstOrDefault(k => k.BuoiHocId == model.BuoiHocId);
-
+            var buoiHoc = db.BuoiHocs.Find(model.BuoiHocId);
             if (buoiHoc == null)
             {
                 return HttpNotFound();
+            }
+
+            var lopHoc = db.LopHocs.Find(LopHocId);
+            if (lopHoc == null)
+            {
+                ModelState.AddModelError("LopHocId", "Lớp học không tồn tại.");
+                ViewBag.LopHocList = db.LopHocs.ToList();
+                return View(model);
+            }
+
+            // Kiểm tra NgayHoc có nằm trong khoảng hợp lệ không?
+            if (model.NgayHoc < lopHoc.NgayBatDau || model.NgayHoc > lopHoc.NgayKetThuc)
+            {
+                ModelState.AddModelError("NgayHoc", "Ngày học phải nằm trong khoảng từ " + lopHoc.NgayBatDau.ToShortDateString() + " đến " + lopHoc.NgayKetThuc.ToShortDateString());
+                ViewBag.LopHocList = db.LopHocs.ToList();
+                return View(model);
+            }
+
+            // Kiểm tra trùng thời gian (trừ buổi học hiện tại)
+            bool isOverlap = db.BuoiHocs.Any(b =>
+                b.LopHoc.LopHocId == LopHocId &&
+                b.NgayHoc == model.NgayHoc &&
+                b.BuoiHocId != model.BuoiHocId &&
+                ((model.GioBatDau >= b.GioBatDau && model.GioBatDau < b.GioKetThuc) ||
+                 (model.GioKetThuc > b.GioBatDau && model.GioKetThuc <= b.GioKetThuc) ||
+                 (model.GioBatDau <= b.GioBatDau && model.GioKetThuc >= b.GioKetThuc))
+            );
+
+            if (isOverlap)
+            {
+                ModelState.AddModelError("GioBatDau", "Thời gian buổi học bị trùng với một buổi học khác.");
+                ViewBag.LopHocList = db.LopHocs.ToList();
+                return View(model);
             }
 
             // Cập nhật thông tin buổi học
@@ -98,17 +155,10 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             buoiHoc.GioKetThuc = model.GioKetThuc;
             buoiHoc.TrangThai = model.TrangThai;
             buoiHoc.GhiChu = model.GhiChu;
-
-            // Cập nhật LopHoc
-            var lopHoc = db.LopHocs.Find(LopHocId);
-            if (lopHoc != null)
-            {
-                buoiHoc.LopHoc = lopHoc;
-            }
+            buoiHoc.LopHoc = lopHoc;
 
             db.SaveChanges();
 
-            // Xử lý file đính kèm nếu có
             if (attachments != null)
             {
                 UploadAttachments(buoiHoc.BuoiHocId, attachments);
@@ -118,7 +168,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
-        // Xóa buổi học
+        // Xóa buổi học (GET)
         public ActionResult Delete(Guid id)
         {
             var buoiHoc = db.BuoiHocs.Find(id);
@@ -127,6 +177,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             return View(buoiHoc);
         }
 
+        // Xóa buổi học (POST)
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(Guid id)
@@ -144,7 +195,9 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         // Xem chi tiết buổi học
         public ActionResult Details(Guid id)
         {
-            var buoiHoc = db.BuoiHocs.Include(b => b.BuoiHocAttachments.Select(a => a.Attachment)).FirstOrDefault(b => b.BuoiHocId == id);
+            var buoiHoc = db.BuoiHocs
+                .Include(b => b.BuoiHocAttachments.Select(a => a.Attachment))
+                .FirstOrDefault(b => b.BuoiHocId == id);
             if (buoiHoc == null)
                 return HttpNotFound();
             return View(buoiHoc);
@@ -153,10 +206,12 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         // Upload tệp đính kèm
         private void UploadAttachments(Guid buoiHocId, HttpPostedFileBase[] attachments)
         {
-            if (attachments == null || attachments.Length == 0) return;
+            if (attachments == null || attachments.Length == 0)
+                return;
 
             string uploadPath = Server.MapPath("~/Upload/BuoiHoc/");
-            if (!Directory.Exists(uploadPath)) Directory.CreateDirectory(uploadPath);
+            if (!Directory.Exists(uploadPath))
+                Directory.CreateDirectory(uploadPath);
 
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".pdf", ".docx", ".ppt", ".pptx", ".txt" };
 
@@ -165,7 +220,8 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 if (file != null && file.ContentLength > 0)
                 {
                     string extension = Path.GetExtension(file.FileName).ToLower();
-                    if (!allowedExtensions.Contains(extension)) continue;
+                    if (!allowedExtensions.Contains(extension))
+                        continue;
 
                     string fileName = Path.GetFileNameWithoutExtension(file.FileName) + "_" + DateTime.Now.ToString("yyyyMMddHHmmss") + extension;
                     string filePath = Path.Combine(uploadPath, fileName);

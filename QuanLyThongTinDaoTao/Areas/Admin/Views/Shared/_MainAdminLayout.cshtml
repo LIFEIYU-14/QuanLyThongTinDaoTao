@@ -31,6 +31,13 @@
 
     <!-- Template Stylesheet -->
     <link href="~/Areas/Asset/css/style.css" rel="stylesheet">
+
+    <!-- Thêm CSS của Toastr -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
+    <!-- Thêm thư viện JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
 </head>
 
 <body>
@@ -177,20 +184,35 @@
 
     <!-- Template Javascript -->
     <script src="~/Areas/Asset/js/main.js"></script>
-   <script>
-       document.addEventListener('DOMContentLoaded', function () {
-           const currentPath = window.location.pathname;
-           const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
 
-           navLinks.forEach(link => {
-               const linkPath = link.getAttribute('href');
-               if (currentPath === linkPath) {
-                   navLinks.forEach(nav => nav.classList.remove('active'));
-                   link.classList.add('active');
-               }
-           });
-       });
-   </script>
+            navLinks.forEach(link => {
+                const linkPath = link.getAttribute('href');
+                if (currentPath === linkPath) {
+                    navLinks.forEach(nav => nav.classList.remove('active'));
+                    link.classList.add('active');
+                }
+            });
+        });
+
+    </script>
+    <script>
+    $(document).ready(function () {
+        var successMessage = '@TempData["SuccessMessage"]';
+        var errorMessage = '@TempData["ErrorMessage"]';
+
+        if (successMessage) {
+            toastr.success(successMessage, 'Thành công!', { timeOut: 3000 });
+        }
+
+        if (errorMessage) {
+            toastr.error(errorMessage, 'Lỗi!', { timeOut: 5000 });
+        }
+    });
+    </script>
 
 </body>
 

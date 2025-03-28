@@ -1,0 +1,49 @@
+﻿@model List<QuanLyThongTinDaoTao.Models.LopHoc>
+@{
+    ViewBag.Title = "Lớp Học Đã Đăng Ký";
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+}
+
+<div class="container-xxl py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Danh Sách Lớp Học Đã Đăng Ký</h2>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table text-start align-middle table-bordered">
+                    <thead>
+                        <tr class="text-dark text-center">
+                            <th scope="col">Tên Lớp Học</th>
+                            <th scope="col">Khóa Học</th>
+                            <th scope="col">Ngày Bắt Đầu</th>
+                            <th scope="col">Ngày Kết Thúc</th>
+                            <th scope="col">Hủy Đăng Ký</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var lopHoc in Model)
+                        {
+                            <tr class="text-center">
+                                <td>@lopHoc.TenLopHoc</td>
+                                <td>@(lopHoc.KhoaHoc != null ? lopHoc.KhoaHoc.TenKhoaHoc : "N/A")</td>
+                                <td>@lopHoc.NgayBatDau.ToString("dd/MM/yyyy")</td>
+                                <td>@lopHoc.NgayKetThuc.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    <a href="@Url.Action("CancelRegister", "Courses", new { lopHocId = lopHoc.LopHocId })" class="btn btn-danger btn-sm"
+                                       onclick="return confirm('Bạn có chắc chắn muốn hủy đăng ký lớp học này?');">
+                                        Hủy Đăng Ký
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="text-danger text-center">Bạn chưa đăng ký lớp học nào.</p>
+        }
+    </div>
+</div>

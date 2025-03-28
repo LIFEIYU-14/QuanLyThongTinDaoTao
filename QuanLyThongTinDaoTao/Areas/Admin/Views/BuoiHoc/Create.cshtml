@@ -29,16 +29,19 @@
                 <div class="mb-3">
                     @Html.LabelFor(model => model.NgayHoc, "Ngày Học", new { @class = "form-label" })
                     @Html.TextBoxFor(model => model.NgayHoc, new { @class = "form-control", type = "date" })
+                    @Html.ValidationMessageFor(model => model.NgayHoc, "", new { @class = "text-danger" })
                 </div>
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         @Html.LabelFor(model => model.GioBatDau, "Giờ Bắt Đầu", new { @class = "form-label" })
                         @Html.TextBoxFor(model => model.GioBatDau, new { @class = "form-control", type = "time" })
+                        @Html.ValidationMessageFor(model => model.GioBatDau, "", new { @class = "text-danger" })
                     </div>
                     <div class="col-md-6 mb-3">
                         @Html.LabelFor(model => model.GioKetThuc, "Giờ Kết Thúc", new { @class = "form-label" })
                         @Html.TextBoxFor(model => model.GioKetThuc, new { @class = "form-control", type = "time" })
+                        @Html.ValidationMessageFor(model => model.GioKetThuc, "", new { @class = "text-danger" })
                     </div>
                 </div>
 
@@ -59,11 +62,12 @@
         </div>
     </div>
 </div>
+
 <style>
     .ck-editor__editable {
         min-height: 150px;
         max-height: 600px;
-        resize: vertical; /* Cho phép kéo theo chiều dọc */
+        resize: vertical;
         overflow-y: auto;
     }
 </style>
@@ -71,21 +75,17 @@
 <!-- Tích hợp CKEditor 5 -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Khởi tạo CKEditor
         ClassicEditor
             .create(document.querySelector('#GhiChu'))
             .then(editor => {
                 console.log('CKEditor đã khởi tạo thành công.');
-
                 const editorElement = editor.ui.view.editable.element;
                 editorElement.style.overflowY = 'auto';
 
-                // Điều chỉnh chiều cao tự động
                 function adjustHeight() {
                     editorElement.style.height = 'auto';
                     editorElement.style.height = Math.min(editorElement.scrollHeight, 500) + 'px';
                 }
-
                 editor.model.document.on('change:data', adjustHeight);
                 adjustHeight();
             })
@@ -93,5 +93,4 @@
                 console.error('Lỗi CKEditor:', error);
             });
     });
-
 </script>

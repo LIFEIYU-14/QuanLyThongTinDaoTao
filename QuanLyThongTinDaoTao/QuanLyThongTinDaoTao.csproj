@@ -186,7 +186,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CoursesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\RegisterController.cs" />
+    <Compile Include="Controllers\QuanLyHocTapController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -286,6 +286,10 @@
     <Compile Include="Migrations\202503270940164_4gskdc.cs" />
     <Compile Include="Migrations\202503270940164_4gskdc.Designer.cs">
       <DependentUpon>202503270940164_4gskdc.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202503280219187_fghjklsfd.cs" />
+    <Compile Include="Migrations\202503280219187_fghjklsfd.Designer.cs">
+      <DependentUpon>202503280219187_fghjklsfd.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ModelsService\LoginViewModel.cs" />
@@ -691,6 +695,8 @@
     <Content Include="Views\Account\ThongTinCaNhan.cshtml" />
     <Content Include="Views\Account\Edit.cshtml" />
     <Content Include="Views\Courses\DanhSachLopHoc.cshtml" />
+    <Content Include="Views\QuanLyHocTap\LopHocDaDangKy.cshtml" />
+    <Content Include="Views\QuanLyHocTap\LichHoc.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -799,6 +805,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202503270940164_4gskdc.resx">
       <DependentUpon>202503270940164_4gskdc.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202503280219187_fghjklsfd.resx">
+      <DependentUpon>202503280219187_fghjklsfd.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

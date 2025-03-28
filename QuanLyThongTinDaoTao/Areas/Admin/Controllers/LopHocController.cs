@@ -1,5 +1,4 @@
-﻿// LopHocController.cs
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
@@ -20,16 +19,21 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             var lopHocs = db.LopHocs.Include(l => l.KhoaHoc).ToList();
             return View(lopHocs);
         }
+
+        // Hiển thị chi tiết lớp học
         public ActionResult Details(Guid id)
         {
-            var lopHoc = db.LopHocs.Include(k => k.LopHocAttachments.Select(a => a.Attachment))
-                                       .FirstOrDefault(k => k.LopHocId == id);
+            var lopHoc = db.LopHocs
+                .Include(k => k.LopHocAttachments.Select(a => a.Attachment))
+                .FirstOrDefault(k => k.LopHocId == id);
             if (lopHoc == null)
             {
                 return HttpNotFound();
             }
             return View(lopHoc);
         }
+
+        // Hiển thị danh sách buổi học của lớp học
         public ActionResult DanhSachBuoiHoc(Guid id)
         {
             var lopHoc = db.LopHocs.Include(l => l.BuoiHocs).FirstOrDefault(k => k.LopHocId == id);
@@ -42,6 +46,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             return View(lopHoc.BuoiHocs.ToList());
         }
 
+        // GET: Tạo lớp học
         public ActionResult Create()
         {
             ViewBag.KhoaHocList = db.KhoaHocs.ToList();
@@ -54,12 +59,14 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         [ValidateInput(false)]
         public ActionResult Create(LopHoc model, Guid KhoaHocId, HttpPostedFileBase[] attachments)
         {
+            // Nếu ModelState không hợp lệ (bao gồm ràng buộc ngày qua CustomValidation)
             if (!ModelState.IsValid)
             {
                 ViewBag.KhoaHocList = db.KhoaHocs.ToList();
                 return View(model);
             }
 
+            // Thiết lập ID và thời gian tạo, cập nhật
             model.LopHocId = Guid.NewGuid();
             model.NgayTao = DateTime.Now;
             model.NgayCapNhat = DateTime.Now;
@@ -72,13 +79,13 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 ViewBag.KhoaHocList = db.KhoaHocs.ToList();
                 return View(model);
             }
-
             model.KhoaHoc = khoaHoc;
 
             db.LopHocs.Add(model);
             db.SaveChanges();
 
-            if (attachments != null)
+            // Xử lý file đính kèm nếu có
+            if (attachments != null && attachments.Any())
             {
                 UploadAttachments(model.LopHocId, attachments);
             }
@@ -86,6 +93,8 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             TempData["SuccessMessage"] = "Lớp học đã được tạo thành công!";
             return RedirectToAction("Index");
         }
+
+        // GET: Xóa lớp học
         public ActionResult Delete(Guid id)
         {
             var lopHoc = db.LopHocs
@@ -98,42 +107,55 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 return HttpNotFound();
             }
 
-            // Xóa các buổi học liên quan
-            db.BuoiHocs.RemoveRange(lopHoc.BuoiHocs);
+            return View(lopHoc);
+        }
 
-            // Xóa các file đính kèm nếu tồn tại
-            var lopHocAttachments = lopHoc.LopHocAttachments.ToList();
-            foreach (var lopHocAttachment in lopHocAttachments)
+        // POST: Xóa lớp học
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(Guid id)
+        {
+            var lopHoc = db.LopHocs
+                .Include(l => l.LopHocAttachments.Select(a => a.Attachment))
+                .Include(l => l.BuoiHocs)
+                .FirstOrDefault(l => l.LopHocId == id);
+
+            if (lopHoc != null)
             {
-                var attachment = lopHocAttachment.Attachment;
-                if (attachment != null)
+                // Xóa các buổi học liên quan
+                db.BuoiHocs.RemoveRange(lopHoc.BuoiHocs);
+
+                // Xóa các file đính kèm nếu có
+                var lopHocAttachments = lopHoc.LopHocAttachments.ToList();
+                foreach (var item in lopHocAttachments)
                 {
-                    string filePath = Server.MapPath(attachment.FilePath);
-                    if (!string.IsNullOrEmpty(filePath) && System.IO.File.Exists(filePath))
+                    var attachment = item.Attachment;
+                    if (attachment != null)
                     {
-                        System.IO.File.Delete(filePath);
+                        string filePath = Server.MapPath(attachment.FilePath);
+                        if (!string.IsNullOrEmpty(filePath) && System.IO.File.Exists(filePath))
+                        {
+                            System.IO.File.Delete(filePath);
+                        }
+                        db.Attachments.Remove(attachment);
                     }
-                    db.Attachments.Remove(attachment);
+                    db.LopHocAttachments.Remove(item);
                 }
+
+                // Xóa lớp học
+                db.LopHocs.Remove(lopHoc);
+                db.SaveChanges();
             }
-
-            // Xóa các liên kết trong bảng trung gian
-            db.LopHocAttachments.RemoveRange(lopHocAttachments);
-
-            // Xóa lớp học
-            db.LopHocs.Remove(lopHoc);
-
-            // Lưu thay đổi
-            db.SaveChanges();
 
             return RedirectToAction("Index");
         }
 
-        // GET: Chỉnh sửa Lớp học
+        // GET: Chỉnh sửa lớp học
         public ActionResult Edit(Guid id)
         {
-            var lopHoc = db.LopHocs.Include(k => k.LopHocAttachments.Select(a => a.Attachment))
-                                     .FirstOrDefault(k => k.LopHocId == id);
+            var lopHoc = db.LopHocs
+                .Include(k => k.LopHocAttachments.Select(a => a.Attachment))
+                .FirstOrDefault(k => k.LopHocId == id);
             if (lopHoc == null)
             {
                 return HttpNotFound();
@@ -142,27 +164,29 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             return View(lopHoc);
         }
 
-        // POST: Cập nhật thông tin Lớp học
+        // POST: Cập nhật thông tin lớp học
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ValidateInput(false)]
         public ActionResult Edit(LopHoc model, Guid KhoaHocId, HttpPostedFileBase[] attachments)
         {
+            // Kiểm tra ràng buộc ngày (CustomValidation trong model sẽ tự chạy, nhưng bạn có thể kiểm tra thêm nếu cần)
             if (!ModelState.IsValid)
             {
                 ViewBag.KhoaHocList = db.KhoaHocs.ToList();
                 return View(model);
             }
 
-            var lopHoc = db.LopHocs.Include(k => k.LopHocAttachments.Select(a => a.Attachment))
-                                     .FirstOrDefault(k => k.LopHocId == model.LopHocId);
+            var lopHoc = db.LopHocs
+                .Include(k => k.LopHocAttachments.Select(a => a.Attachment))
+                .FirstOrDefault(k => k.LopHocId == model.LopHocId);
 
             if (lopHoc == null)
             {
                 return HttpNotFound();
             }
 
-            // Cập nhật thông tin lớp học
+            // Cập nhật các thông tin
             lopHoc.TenLopHoc = model.TenLopHoc;
             lopHoc.SoTinChi = model.SoTinChi;
             lopHoc.NgayBatDau = model.NgayBatDau;
@@ -182,7 +206,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             db.SaveChanges();
 
             // Xử lý file đính kèm nếu có
-            if (attachments != null)
+            if (attachments != null && attachments.Any())
             {
                 UploadAttachments(lopHoc.LopHocId, attachments);
             }
@@ -191,15 +215,17 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
-
+        // Phương thức xử lý upload file đính kèm
         private void UploadAttachments(Guid lopHocId, HttpPostedFileBase[] attachments)
         {
-            if (attachments == null || attachments.Length == 0) return;
+            if (attachments == null || attachments.Length == 0)
+                return;
 
             string uploadPath = Server.MapPath("~/Upload/LopHoc/");
-            if (!Directory.Exists(uploadPath)) Directory.CreateDirectory(uploadPath);
+            if (!Directory.Exists(uploadPath))
+                Directory.CreateDirectory(uploadPath);
 
-            // Thêm các định dạng ppt, pptx, txt
+            // Cho phép các định dạng file: ppt, pptx, txt, jpg, jpeg, png, pdf, docx
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".pdf", ".docx", ".ppt", ".pptx", ".txt" };
 
             foreach (var file in attachments)
@@ -207,11 +233,10 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 if (file != null && file.ContentLength > 0)
                 {
                     string extension = Path.GetExtension(file.FileName).ToLower();
-                    if (!allowedExtensions.Contains(extension)) continue;
+                    if (!allowedExtensions.Contains(extension))
+                        continue;
 
-                    string fileName = Path.GetFileNameWithoutExtension(file.FileName)
-                                       + "_" + DateTime.Now.ToString("yyyyMMddHHmmss")
-                                       + extension;
+                    string fileName = $"{Path.GetFileNameWithoutExtension(file.FileName)}_{DateTime.Now:yyyyMMddHHmmss}{extension}";
                     string filePath = Path.Combine(uploadPath, fileName);
                     file.SaveAs(filePath);
 
@@ -236,10 +261,11 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 }
             }
         }
+
         [HttpGet]
         public ActionResult DeleteAllAttachments(Guid lopHocId)
         {
-            // Lấy danh sách tất cả attachment liên quan đến lớp học
+            // Lấy danh sách tất cả các attachment liên quan đến lớp học
             var attachments = db.LopHocAttachments.Where(k => k.LopHocId == lopHocId).ToList();
             if (!attachments.Any())
             {
@@ -248,14 +274,11 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
             foreach (var item in attachments)
             {
-                // Xóa tệp vật lý
                 string filePath = Server.MapPath(item.Attachment.FilePath);
                 if (System.IO.File.Exists(filePath))
                 {
                     System.IO.File.Delete(filePath);
                 }
-
-                // Xóa bản ghi trong bảng Attachment và KhoaHocAttachment
                 db.Attachments.Remove(item.Attachment);
                 db.LopHocAttachments.Remove(item);
             }
@@ -263,6 +286,5 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             db.SaveChanges();
             return RedirectToAction("Edit", new { id = lopHocId });
         }
-
     }
 }

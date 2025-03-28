@@ -22,6 +22,8 @@ namespace QuanLyThongTinDaoTao.Models
         public DateTime NgayBatDau { get; set; }
 
         [Required]
+        [DataType(DataType.Date)]
+        [CustomValidation(typeof(LopHoc), "ValidateNgayKetThuc")]
         public DateTime NgayKetThuc { get; set; }
 
         [Required]
@@ -44,5 +46,15 @@ namespace QuanLyThongTinDaoTao.Models
         public virtual ICollection<LopHocAttachment> LopHocAttachments { get; set; }
         [NotMapped]
         public bool IsRegistered { get; set; }
+        // Phương thức kiểm tra ngày kết thúc phải lớn hơn ngày bắt đầu
+        public static ValidationResult ValidateNgayKetThuc(object value, ValidationContext context)
+        {
+            var lopHoc = (LopHoc)context.ObjectInstance;
+            if (lopHoc.NgayBatDau >= lopHoc.NgayKetThuc)
+            {
+                return new ValidationResult("Ngày kết thúc phải lớn hơn ngày bắt đầu.");
+            }
+            return ValidationResult.Success;
+        }
     }
 }

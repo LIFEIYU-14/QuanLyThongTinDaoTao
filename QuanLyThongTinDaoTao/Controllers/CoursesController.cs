@@ -47,7 +47,7 @@ namespace QuanLyThongTinDaoTao.Controllers
                 string email = User.Identity.Name;
                 var hocVien = db.HocViens.FirstOrDefault(hv => hv.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
                 ViewBag.HocVien = hocVien; // Pass hocVien to ViewBag
-                                           // Check if the student is already registered for any of the classes in the course
+                                         
                 foreach (var lopHoc in lopHocs)
                 {
                     lopHoc.IsRegistered = db.DangKyHocs.Any(dk => dk.LopHocId == lopHoc.LopHocId && dk.NguoiDungId == hocVien.NguoiDungId);

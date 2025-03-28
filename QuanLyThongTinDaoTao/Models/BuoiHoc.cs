@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Web.Mvc;
 
 namespace QuanLyThongTinDaoTao.Models
 {
@@ -13,7 +14,7 @@ namespace QuanLyThongTinDaoTao.Models
     }
     [Table("BuoiHocs")]
 
-    public class BuoiHoc
+    public class BuoiHoc :IValidatableObject
     {
         [Key]
         public Guid BuoiHocId { get; set; } = Guid.NewGuid();
@@ -39,6 +40,7 @@ namespace QuanLyThongTinDaoTao.Models
         public virtual LopHoc LopHoc { get; set; }
         public virtual GiangVien GiangVien { get; set; }
         public virtual ICollection<BuoiHocAttachment> BuoiHocAttachments { get; set; }
+        // Custom Validation cho giờ kết thúc đã có sẵn
         public static ValidationResult ValidateGioKetThuc(TimeSpan gioKetThuc, ValidationContext context)
         {
             var instance = (BuoiHoc)context.ObjectInstance;
@@ -47,6 +49,21 @@ namespace QuanLyThongTinDaoTao.Models
                 return new ValidationResult("Giờ kết thúc phải lớn hơn giờ bắt đầu.");
             }
             return ValidationResult.Success;
+        }
+
+        // Thực hiện validation để kiểm tra NgàyHoc nằm trong khoảng thời gian của lớp học
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (LopHoc != null)
+            {
+                if (NgayHoc < LopHoc.NgayBatDau || NgayHoc > LopHoc.NgayKetThuc)
+                {
+                    yield return new ValidationResult(
+                        "Ngày học phải nằm trong khoảng thời gian của lớp học.",
+                        new[] { "NgayHoc" }
+                    );
+                }
+            }
         }
     }
 }

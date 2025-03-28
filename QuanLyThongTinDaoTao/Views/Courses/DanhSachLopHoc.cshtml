@@ -22,7 +22,7 @@
                              class="card-img-top"
                              alt="@khoaHoc.TenKhoaHoc">
                         <div class="card-body">
-                            <h5 class="card-title">@khoaHoc.TenKhoaHoc</h5>
+                            <h5 class="card-title text-center">@khoaHoc.TenKhoaHoc</h5>
                             <p class="card-text">@khoaHoc.MoTa</p>
                         </div>
                     </div>
@@ -56,11 +56,28 @@
                                                 <td>@lophoc.NgayBatDau.ToString("dd/MM/yyyy")</td>
                                                 <td>@lophoc.NgayKetThuc.ToString("dd/MM/yyyy")</td>
                                                 <td>
-                                                    <span class="badge bg-@(lophoc.TrangThai == "SapMo" ? "primary" : (lophoc.TrangThai == "DangHoc" ? "success" : "secondary"))">
-                                                        @(lophoc.TrangThai == "SapMo" ? "Sắp Mở" : (lophoc.TrangThai == "DangHoc" ? "Đang Học" : "Đã Kết Thúc"))
-                                                    </span>
+                                                    @{
+                                                        string badgeClass = "secondary";
+                                                        string statusText = "Không xác định";
+
+                                                        switch (lophoc.TrangThai)
+                                                        {
+                                                            case "SapMo":
+                                                                badgeClass = "primary";
+                                                                statusText = "Sắp Mở";
+                                                                break;
+                                                            case "DangHoc":
+                                                                badgeClass = "success";
+                                                                statusText = "Đang Học";
+                                                                break;
+                                                            case "DaKetThuc":
+                                                                badgeClass = "secondary";
+                                                                statusText = "Đã Kết Thúc";
+                                                                break;
+                                                        }
+                                                    }
+                                                    <span class="badge bg-@badgeClass">@statusText</span>
                                                 </td>
-                                                <td>
                                                 <td>
                                                     @if (lophoc.IsRegistered)
                                                     {
@@ -74,8 +91,6 @@
                                                             <i class="fas fa-user-plus"></i> Đăng Ký
                                                         </a>
                                                     }
-                                                </td>
-
                                                 </td>
                                             </tr>
                                         }
@@ -97,3 +112,4 @@ else
 {
     <p class="text-danger">Không tìm thấy thông tin khóa học.</p>
 }
+    
