@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Web.Mvc;
 
 namespace QuanLyThongTinDaoTao.Models
 {
@@ -19,8 +20,8 @@ namespace QuanLyThongTinDaoTao.Models
         [Required, StringLength(255)]
         public string TenKhoaHoc { get; set; }
 
-
-        [Required, StringLength(255)]
+        // Nội dung mô tả lớp học (hỗ trợ nhập bằng CKEditor)
+        [AllowHtml]
         public string MoTa { get; set; }
 
         [Required]

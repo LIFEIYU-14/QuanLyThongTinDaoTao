@@ -7,13 +7,13 @@ namespace QuanLyThongTinDaoTao.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.5.1")]
-    public sealed partial class NEWUPDATE428 : IMigrationMetadata
+    public sealed partial class NEWUPDATE1 : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(NEWUPDATE428));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(NEWUPDATE1));
         
         string IMigrationMetadata.Id
         {
-            get { return "202503310928292_NEWUPDATE428"; }
+            get { return "202503310937342_NEWUPDATE1"; }
         }
         
         string IMigrationMetadata.Source

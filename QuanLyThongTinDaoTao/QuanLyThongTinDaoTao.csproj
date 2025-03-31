@@ -190,9 +190,13 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\QRCodeHelper.cs" />
-    <Compile Include="Migrations\202503310928292_NEWUPDATE428.cs" />
-    <Compile Include="Migrations\202503310928292_NEWUPDATE428.Designer.cs">
-      <DependentUpon>202503310928292_NEWUPDATE428.cs</DependentUpon>
+    <Compile Include="Migrations\202503310933045_NEWUPDATE.cs" />
+    <Compile Include="Migrations\202503310933045_NEWUPDATE.Designer.cs">
+      <DependentUpon>202503310933045_NEWUPDATE.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202503310937342_NEWUPDATE1.cs" />
+    <Compile Include="Migrations\202503310937342_NEWUPDATE1.Designer.cs">
+      <DependentUpon>202503310937342_NEWUPDATE1.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ModelsService\LoginViewModel.cs" />
@@ -535,8 +539,11 @@
     <Content Include="Scripts\jquery-3.7.0.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202503310928292_NEWUPDATE428.resx">
-      <DependentUpon>202503310928292_NEWUPDATE428.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202503310933045_NEWUPDATE.resx">
+      <DependentUpon>202503310933045_NEWUPDATE.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202503310937342_NEWUPDATE1.resx">
+      <DependentUpon>202503310937342_NEWUPDATE1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
