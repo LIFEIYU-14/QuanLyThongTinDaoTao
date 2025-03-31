@@ -6,11 +6,14 @@
 <div class="container-fluid pt-4 px-4">
     <div class="bg-light text-center rounded p-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
-            <h6 class="mb-0 fs-3">Danh Sách Lớp Học --- @ViewBag.TenKhoaHoc</h6>
+            <h6 class="mb-0 fs-3">Danh Sách Lớp Học --- Khóa Học: @ViewBag.TenKhoaHoc</h6>
             <p>
-                <a href="@Url.Action("Create","LopHoc")" class="btn btn-success mt-3 btn-lg">
-                    <i class="fas fa-plus-circle"></i> Thêm Lớp Học Mới
-                </a>
+                @if (ViewBag.KhoaHocId != null)
+                {
+                    <a href="@Url.Action("Create", "LopHoc", new { KhoaHocId = ViewBag.KhoaHocId })" class="btn btn-primary">
+                        Thêm lớp học
+                    </a>
+                }
             </p>
 
         </div>

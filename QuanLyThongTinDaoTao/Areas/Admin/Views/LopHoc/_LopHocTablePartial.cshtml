@@ -1,0 +1,28 @@
+﻿@model List<QuanLyThongTinDaoTao.Models.LopHoc>
+
+@foreach (var lophoc in Model)
+{
+    <tr class="text-center">
+        <td class="text-start">@lophoc.TenLopHoc</td>
+        <td>@(lophoc.KhoaHoc != null ? lophoc.KhoaHoc.TenKhoaHoc : "Chưa có")</td>
+        <td>@lophoc.SoTinChi</td>
+        <td>@lophoc.NgayBatDau.ToString("dd/MM/yyyy")</td>
+        <td>@lophoc.NgayKetThuc.ToString("dd/MM/yyyy")</td>
+        <td>
+            <span class="badge bg-@(lophoc.TrangThai == "SapMo" ? "primary" : (lophoc.TrangThai == "DangHoc" ? "success" : "secondary"))">
+                @(lophoc.TrangThai == "SapMo" ? "Sắp Mở" : (lophoc.TrangThai == "DangHoc" ? "Đang Học" : "Đã Kết Thúc"))
+            </span>
+        </td>
+        <td>
+            <a href="@Url.Action("Details", new { id = lophoc.LopHocId })" class="btn btn-info btn-sm">
+                <i class="fas fa-eye"></i> Chi Tiết
+            </a>
+            <a href="@Url.Action("Edit", new { id = lophoc.LopHocId })" class="btn btn-warning btn-sm">
+                <i class="fas fa-edit"></i> Sửa
+            </a>
+            <a href="@Url.Action("Delete", new { id = lophoc.LopHocId })" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa lớp học này?');">
+                <i class="fas fa-trash-alt"></i> Xóa
+            </a>
+        </td>
+    </tr>
+}

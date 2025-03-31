@@ -14,9 +14,13 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         public readonly DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
 
         // Hiển thị danh sách lớp học
-        public ActionResult Index()
+        public ActionResult Index(Guid? KhoaHocId)
         {
-            var lopHocs = db.LopHocs.Include(l => l.KhoaHoc).ToList();
+            ViewBag.KhoaHocList = db.KhoaHocs.ToList();
+
+            var lopHocs = db.LopHocs.Include(lh => lh.KhoaHoc).ToList();
+            var danhSachKhoaHoc = db.KhoaHocs.ToList();
+            ViewBag.KhoaHocList = danhSachKhoaHoc; // Truyền danh sách khóa học vào ViewBag
             return View(lopHocs);
         }
 
@@ -90,9 +94,10 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 UploadAttachments(model.LopHocId, attachments);
             }
 
-            TempData["SuccessMessage"] = "Lớp học đã được tạo thành công!";
+            TempData["Success"] = "Lớp học đã được tạo thành công!";
             return RedirectToAction("Index");
         }
+
         public ActionResult Delete(Guid id)
         {
             var lopHoc = db.LopHocs
@@ -280,5 +285,24 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             db.SaveChanges();
             return RedirectToAction("Edit", new { id = lopHocId });
         }
+
+        public ActionResult FilterByKhoaHoc(Guid? khoaHocId)
+        {
+            if (khoaHocId.HasValue)
+            {
+                var danhSachLopHoc = db.LopHocs
+                    .Include(lh => lh.KhoaHoc) // Đảm bảo load dữ liệu KhoaHoc
+                    .Where(lh => lh.KhoaHoc != null && lh.KhoaHoc.KhoaHocId == khoaHocId.Value)
+                    .ToList();
+
+                return PartialView("_LopHocTablePartial", danhSachLopHoc);
+            }
+
+            // Nếu không lọc theo khóa học, trả về toàn bộ danh sách lớp học
+            return PartialView("_LopHocTablePartial", db.LopHocs.Include(lh => lh.KhoaHoc).ToList());
+        }
+       
+
+
     }
 }

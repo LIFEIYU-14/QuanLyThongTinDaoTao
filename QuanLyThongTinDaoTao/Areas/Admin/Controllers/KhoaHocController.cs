@@ -361,5 +361,6 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             db.SaveChanges();
             return RedirectToAction("Edit", new { id = khoaHocId });
         }
+       
     }
 }

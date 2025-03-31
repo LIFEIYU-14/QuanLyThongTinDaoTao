@@ -1,20 +1,18 @@
 ﻿@model QuanLyThongTinDaoTao.Models.LopHoc
-
 @{
-    ViewBag.Title = "Thêm Lớp Học";
+    ViewBag.Title = "ThemLopHoc_KhoaHoc";
     Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
 }
-
 <div class="container mt-5">
     <div class="card shadow-lg">
         <div class="card-header bg-primary text-white text-center">
-            <h3> <i class="fas fa-plus-circle"></i>Thêm Lớp Học</h3>
+            <h3><i class="fas fa-plus-circle"></i> Thêm Lớp Học</h3>
         </div>
         <div class="card-body">
-            @using (Html.BeginForm("Create", "LopHoc", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            @using (Html.BeginForm("ThemLopHoc_KhoaHoc", "KhoaHoc", FormMethod.Post, new { enctype = "multipart/form-data" }))
             {
                 @Html.AntiForgeryToken()
-
+                <input type="hidden" name="idKhoaHoc" value="@ViewBag.KhoaHocId" />
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         @Html.LabelFor(model => model.TenLopHoc, "Tên Lớp Học", new { @class = "form-label" })
@@ -28,7 +26,6 @@
                         @Html.ValidationMessageFor(model => model.SoTinChi, "", new { @class = "text-danger" })
                     </div>
                 </div>
-
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         @Html.LabelFor(model => model.NgayBatDau, "Ngày Bắt Đầu", new { @class = "form-label" })
@@ -43,48 +40,18 @@
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        @Html.LabelFor(model => model.TrangThai, "Trạng Thái Lớp Học", new { @class = "form-label" })
-                        @Html.DropDownListFor(model => model.TrangThai, new SelectList(new[] { "SapMo", "DangHoc", "DaKetThuc" }), new { @class = "form-control" })
-                    </div>
 
-                    <div class="col-md-6 mb-3">
-                        @Html.LabelFor(model => model.SoLuongToiDa, "Số lượng tối đa", new { @class = "form-label" })
-                        @Html.TextBoxFor(model => model.SoLuongToiDa, new { @class = "form-control", type = "number", min = 1, required = "required" })
-                        @Html.ValidationMessageFor(model => model.SoLuongToiDa, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-
-                <!-- Phần nhập mô tả tích hợp CKEditor -->
                 <div class="mb-3">
                     @Html.LabelFor(model => model.MoTa, "Mô Tả", new { @class = "form-label" })
                     @Html.TextAreaFor(model => model.MoTa, new { @class = "form-control", rows = 5, id = "MoTa" })
                     @Html.ValidationMessageFor(model => model.MoTa, "", new { @class = "text-danger" })
                 </div>
 
-
-                <div class="col-md-6 mb-3">
-                    @Html.Label("KhoaHocId", "Khóa Học", new { @class = "form-label" })
-                    <select class="form-control" name="KhoaHocId" required>
-                        <option value="">-- Chọn Khóa Học --</option>
-                        @foreach (var khoaHoc in ViewBag.KhoaHocList)
-                        {
-                            <option value="@khoaHoc.KhoaHocId">@khoaHoc.TenKhoaHoc</option>
-                        }
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                    <label for="attachments" class="form-label">Tệp Đính Kèm (JPG, PNG, PDF, DOCX)</label>
-                    <input type="file" name="attachments" id="attachments" class="form-control" multiple />
-                </div>
-
                 <div class="text-center">
-                    <button type="submit" class="btn btn-success me-2 btn-lg">
+                    <button type="submit" class="btn btn-success btn-lg">
                         <i class="fa-solid fa-circle-plus"></i> Thêm Lớp Học
                     </button>
-                    <a href="@Url.Action("Index")" class="btn btn-secondary btn-lg">
+                    <a href="@Url.Action("DanhSachLopHoc")" class="btn btn-secondary btn-lg">
                         <i class="fas fa-arrow-left me-1"></i> Quay lại
                     </a>
                 </div>
@@ -92,41 +59,22 @@
         </div>
     </div>
 </div>
+
 <style>
     .ck-editor__editable {
         min-height: 150px;
         max-height: 600px;
-        resize: vertical; /* Cho phép kéo theo chiều dọc */
+        resize: vertical;
         overflow-y: auto;
     }
-
-
 </style>
 
-<!-- Tích hợp CKEditor 5 -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Khởi tạo CKEditor
         ClassicEditor
             .create(document.querySelector('#MoTa'))
-            .then(editor => {
-                console.log('CKEditor đã khởi tạo thành công.');
-
-                const editorElement = editor.ui.view.editable.element;
-                editorElement.style.overflowY = 'auto';
-
-                // Điều chỉnh chiều cao tự động
-                function adjustHeight() {
-                    editorElement.style.height = 'auto';
-                    editorElement.style.height = Math.min(editorElement.scrollHeight, 500) + 'px';
-                }
-
-                editor.model.document.on('change:data', adjustHeight);
-                adjustHeight();
-            })
             .catch(error => {
                 console.error('Lỗi CKEditor:', error);
             });
     });
-
 </script>

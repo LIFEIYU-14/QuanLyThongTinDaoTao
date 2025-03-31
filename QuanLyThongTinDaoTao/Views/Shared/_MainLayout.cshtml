@@ -212,19 +212,23 @@
     <script src="~/Asset/js/main.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var message = '@TempData["Message"]';
-        var error = '@TempData["Error"]';
+            document.addEventListener("DOMContentLoaded", function () {
+                var message = '@Html.Raw(TempData["Message"])';
+                var error = '@Html.Raw(TempData["Error"])';
+                var success = '@Html.Raw(TempData["Success"])';
 
-        if (message) {
-            alert(message);
-        }
-
-        if (error) {
-            alert(error);
-        }
-    });
+                if (message && message !== "null") {
+                    alert(message);
+                }
+                if (error && error !== "null") {
+                    alert(error);
+                }
+                if (success && success !== "null") {
+                    alert(success);
+                }
+            });
     </script>
+
 
 
 </body>

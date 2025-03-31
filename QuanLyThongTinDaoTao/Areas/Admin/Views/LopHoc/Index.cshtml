@@ -15,6 +15,16 @@
                 <i class="fas fa-plus-circle"></i> Thêm Lớp Học Mới
             </a>
         </div>
+
+        <!-- Dropdown chọn khóa học -->
+        <select class="form-control mb-3" id="KhoaHocId" name="KhoaHocId">
+            <option value="">-- Tất cả Khóa Học --</option>
+            @foreach (var khoaHoc in ViewBag.KhoaHocList)
+            {
+                <option value="@khoaHoc.KhoaHocId">@khoaHoc.TenKhoaHoc</option>
+            }
+        </select>
+
         <div class="table-responsive">
             <table class="table table-striped align-middle table-bordered">
                 <thead class="table-primary">
@@ -28,35 +38,33 @@
                         <th scope="col">Hành Động</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @foreach (var lophoc in Model)
-                    {
-                        <tr class="text-center">
-                            <td class="text-start">@lophoc.TenLopHoc</td>
-                            <td>@(lophoc.KhoaHoc != null ? lophoc.KhoaHoc.TenKhoaHoc : "Chưa có")</td>
-                            <td>@lophoc.SoTinChi</td>
-                            <td>@lophoc.NgayBatDau.ToString("dd/MM/yyyy")</td>
-                            <td>@lophoc.NgayKetThuc.ToString("dd/MM/yyyy")</td>
-                            <td>
-                                <span class="badge bg-@(lophoc.TrangThai == "SapMo" ? "primary" : (lophoc.TrangThai == "DangHoc" ? "success" : "secondary"))">
-                                    @(lophoc.TrangThai == "SapMo" ? "Sắp Mở" : (lophoc.TrangThai == "DangHoc" ? "Đang Học" : "Đã Kết Thúc"))
-                                </span>
-                            </td>
-                            <td>
-                                <a href="@Url.Action("Details", new { id = lophoc.LopHocId })" class="btn btn-info btn-sm">
-                                    <i class="fas fa-eye"></i> Chi Tiết
-                                </a>
-                                <a href="@Url.Action("Edit", new { id = lophoc.LopHocId })" class="btn btn-warning btn-sm">
-                                    <i class="fas fa-edit"></i> Sửa
-                                </a>
-                                <a href="@Url.Action("Delete", new { id = lophoc.LopHocId })" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa lớp học này?');">
-                                    <i class="fas fa-trash-alt"></i> Xóa
-                                </a>
-                            </td>
-                        </tr>
-                    }
+                <tbody id="tableBody">
+                    @Html.Partial("_LopHocTablePartial", Model)
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function () {
+        $("#KhoaHocId").change(function () {
+            var khoaHocId = $(this).val();
+            $.ajax({
+                url: '@Url.Action("FilterByKhoaHoc", "LopHoc")',
+                type: 'GET',
+                data: { khoaHocId: khoaHocId || null },
+                success: function (data) {
+                    if (data.error) {
+                        $("#tableBody").html('<tr><td colspan="7" class="text-center text-danger"><strong>' + data.error + '</strong></td></tr>');
+                    } else {
+                        $("#tableBody").html(data);
+                    }
+                },
+                error: function (xhr) {
+                    console.log("Lỗi khi tải dữ liệu: " + xhr.responseText);
+                }
+            });
+        });
+    });
+</script>

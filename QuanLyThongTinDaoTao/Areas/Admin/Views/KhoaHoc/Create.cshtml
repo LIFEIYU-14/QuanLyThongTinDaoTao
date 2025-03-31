@@ -16,28 +16,34 @@
                 @Html.AntiForgeryToken()
 
                 <!-- Hình đại diện Khóa học -->
-                <div class="mb-3">
-                    <label class="form-label">Hình đại diện Khóa học</label>
-                    <input type="file" name="hinhDaiDien" class="form-control" accept=".jpg,.jpeg,.png" />
+                <div class="mb-3 text-center">
+                    <label class="form-label fw-semibold">Hình đại diện Khóa học</label>
+                    <div>
+                        <img id="previewImage" src="~/Upload/KhoaHoc/HinhDaiDien/default.png"
+                             alt="Hình khóa học" class="rounded border mb-2" style="max-width: 200px; height: auto;" />
+                    </div>
+                    <input type="file" name="hinhDaiDien" id="imageFile" class="form-control" accept=".jpg,.jpeg,.png" onchange="previewFile()" />
                 </div>
+
 
                 <!-- Tên Khóa Học -->
                 <div class="mb-3">
-                    @Html.LabelFor(model => model.TenKhoaHoc,"Tên Khóa Học",new { @class = "form-label" })
+                    @Html.LabelFor(model => model.TenKhoaHoc, "Tên Khóa Học", new { @class = "form-label" })
                     @Html.TextBoxFor(model => model.TenKhoaHoc, new { @class = "form-control", placeholder = "Nhập tên khóa học" })
                     @Html.ValidationMessageFor(model => model.TenKhoaHoc, "", new { @class = "text-danger" })
                 </div>
 
                 <!-- Mô Tả Khóa Học -->
                 <div class="mb-3">
-                    @Html.LabelFor(model => model.MoTa,"Mô Tả", new { @class = "form-label" })
-                    @Html.TextAreaFor(model => model.MoTa, new { @class = "form-control", rows = 5, placeholder = "Nhập mô tả khóa học" })
+                    @Html.LabelFor(model => model.MoTa, "Mô Tả", new { @class = "form-label" })
+                    @Html.TextAreaFor(model => model.MoTa, new { @class = "form-control", rows = 5, id = "MoTa" })
+
                     @Html.ValidationMessageFor(model => model.MoTa, "", new { @class = "text-danger" })
                 </div>
 
                 <!-- Thời Lượng -->
                 <div class="mb-3">
-                    @Html.LabelFor(model => model.ThoiLuong,"Thời Lượng" ,new { @class = "form-label" })
+                    @Html.LabelFor(model => model.ThoiLuong, "Thời Lượng", new { @class = "form-label" })
                     @Html.TextBoxFor(model => model.ThoiLuong, new { @class = "form-control", type = "number", min = 1, placeholder = "Nhập thời lượng (giờ)" })
                     @Html.ValidationMessageFor(model => model.ThoiLuong, "", new { @class = "text-danger" })
                 </div>
@@ -61,3 +67,45 @@
         </div>
     </div>
 </div>
+
+
+<!-- Tích hợp CKEditor 5 -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Khởi tạo CKEditor
+        ClassicEditor
+            .create(document.querySelector('#MoTa'))
+            .then(editor => {
+                console.log('CKEditor đã khởi tạo thành công.');
+
+                const editorElement = editor.ui.view.editable.element;
+                editorElement.style.overflowY = 'auto';
+
+                // Điều chỉnh chiều cao tự động
+                function adjustHeight() {
+                    editorElement.style.height = 'auto';
+                    editorElement.style.height = Math.min(editorElement.scrollHeight, 500) + 'px';
+                }
+
+                editor.model.document.on('change:data', adjustHeight);
+                adjustHeight();
+            })
+            .catch(error => {
+                console.error('Lỗi CKEditor:', error);
+            });
+    });
+    function previewFile() {
+        var preview = document.getElementById("previewImage");
+        var file = document.getElementById("imageFile").files[0];
+        var reader = new FileReader();
+
+        reader.onloadend = function () {
+            preview.src = reader.result;
+        }
+
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    }
+
+</script>

@@ -121,30 +121,29 @@ namespace QuanLyThongTinDaoTao.Controllers
 
             Session.Remove("OTP_" + email);
             Session.Remove("HocVienData_" + email);
+            // **Tìm học viên theo email**
+            var hocVien = db.HocViens.FirstOrDefault(hv => hv.Email == email);
 
-            // **Kiểm tra xem học viên đã tồn tại chưa**
-            var existingHocVien = db.HocViens.FirstOrDefault(hv => hv.Email == email);
-            if (existingHocVien != null)
+            if (hocVien == null)
             {
-                TempData["Error"] = "Email đã được đăng ký trước đó. Vui lòng sử dụng email khác hoặc kiểm tra lại.";
-                return RedirectToAction("Index", "Home");
+                // **Nếu chưa có học viên, tạo mới**
+                hocVien = new HocVien
+                {
+                    NguoiDungId = Guid.NewGuid(),
+                    MaHocVien = DateTime.Now.Year + hocVienData.NgaySinh.Year.ToString() + new Random().Next(1000, 9999),
+                    HoVaTen = hocVienData.HoVaTen,
+                    Email = hocVienData.Email,
+                    NgaySinh = hocVienData.NgaySinh,
+                    SoDienThoai = hocVienData.SoDienThoai,
+                    CoQuanLamViec = hocVienData.CoQuanLamViec,
+                    QR_Code_HV = Guid.NewGuid().ToString(),
+                    IsConfirmed = true,
+                    VaiTro = VaiTroNguoiDung.HocVien
+                };
+
+                db.HocViens.Add(hocVien);
+                db.SaveChanges();
             }
-            var hocVien = new HocVien
-            {
-                NguoiDungId = Guid.NewGuid(),
-                MaHocVien = DateTime.Now.Year + hocVienData.NgaySinh.Year.ToString() + new Random().Next(1000, 9999),
-                HoVaTen = hocVienData.HoVaTen,
-                Email = hocVienData.Email,
-                NgaySinh = hocVienData.NgaySinh,
-                SoDienThoai = hocVienData.SoDienThoai,
-                CoQuanLamViec = hocVienData.CoQuanLamViec,
-                QR_Code_HV = Guid.NewGuid().ToString(),
-                IsConfirmed = true,
-                VaiTro = VaiTroNguoiDung.HocVien
-            };
-
-            db.HocViens.Add(hocVien);
-            db.SaveChanges();
 
             var lopHoc = db.LopHocs.Include(l => l.KhoaHoc).FirstOrDefault(l => l.LopHocId == hocVienData.LopHocId);
             if (lopHoc == null)
@@ -152,7 +151,15 @@ namespace QuanLyThongTinDaoTao.Controllers
                 TempData["Error"] = "Lớp học không tồn tại.";
                 return RedirectToAction("Index", "Home");
             }
+            // **Kiểm tra xem học viên đã đăng ký lớp học chưa**
+            var existingDangKy = db.DangKyHocs.FirstOrDefault(dk => dk.NguoiDungId == hocVien.NguoiDungId && dk.LopHocId == hocVienData.LopHocId);
+            if (existingDangKy != null)
+            {
+                TempData["Error"] = "Bạn đã đăng ký lớp học này trước đó.";
+                return RedirectToAction("Index", "Home");
+            }
 
+            // **Tạo đăng ký lớp học mới**
             var dangKyHoc = new DangKyHoc
             {
                 DangKyId = Guid.NewGuid(),
@@ -166,7 +173,8 @@ namespace QuanLyThongTinDaoTao.Controllers
             db.SaveChanges();
 
             await emailService.SendQrCodeEmail(hocVien.Email, hocVien.QR_Code_HV);
-            return RedirectToAction("Success");
+            TempData["Success"] = "Xác nhận thành công";
+            return RedirectToAction("DanhSachLopHoc", "Courses");
         }
 
         protected override void Dispose(bool disposing)
