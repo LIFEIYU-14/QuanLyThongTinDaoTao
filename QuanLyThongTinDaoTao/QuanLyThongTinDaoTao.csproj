@@ -198,6 +198,10 @@
     <Compile Include="Migrations\202503310937342_NEWUPDATE1.Designer.cs">
       <DependentUpon>202503310937342_NEWUPDATE1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202503311003118_NEWUPDATE12.cs" />
+    <Compile Include="Migrations\202503311003118_NEWUPDATE12.Designer.cs">
+      <DependentUpon>202503311003118_NEWUPDATE12.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ModelsService\LoginViewModel.cs" />
     <Compile Include="ModelsService\RegisterViewModel.cs" />
@@ -544,6 +548,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202503310937342_NEWUPDATE1.resx">
       <DependentUpon>202503310937342_NEWUPDATE1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202503311003118_NEWUPDATE12.resx">
+      <DependentUpon>202503311003118_NEWUPDATE12.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -24,17 +24,24 @@ namespace QuanLyThongTinDaoTao.Controllers
             return View(khoaHocs);
         }
 
-        public ActionResult DanhSachLopHoc(Guid id)
+        public ActionResult DanhSachLopHoc(Guid? id)
         {
+            if (!id.HasValue)
+            {
+                return HttpNotFound("Lớp học không hợp lệ.");
+            }
+
             var khoaHoc = db.KhoaHocs.Include(k => k.LopHocs)
                                      .Include(k => k.KhoaHocAttachments)
-                                     .FirstOrDefault(k => k.KhoaHocId == id);
+                                     .FirstOrDefault(k => k.KhoaHocId == id.Value);
+
             if (khoaHoc == null)
-                return HttpNotFound();
+                return HttpNotFound("Không tìm thấy khóa học.");
 
             ViewBag.KhoaHoc = khoaHoc;
             return View(khoaHoc.LopHocs.ToList());
         }
+
 
         public ActionResult Register(Guid? lopHocId)
         {
@@ -167,13 +174,26 @@ namespace QuanLyThongTinDaoTao.Controllers
             };
 
             db.DangKyHocs.Add(dangKyHoc);
-            db.SaveChanges();
 
-            await emailService.SendQrCodeEmail(hocVien.Email, hocVien.QR_Code_HV);
-            TempData["Success"] = "Xác nhận thành công";
-            return RedirectToAction("DanhSachLopHoc", "Courses");
+            try
+            {
+                db.SaveChanges();
+                await emailService.SendQrCodeEmail(hocVien.Email, hocVien.QR_Code_HV);
+                TempData["Success"] = "Xác nhận thành công";
+                return RedirectToAction("DanhSachLopHoc", "Courses");
+            }
+            catch (System.Data.Entity.Validation.DbEntityValidationException ex)
+            {
+                foreach (var validationErrors in ex.EntityValidationErrors)
+                {
+                    foreach (var validationError in validationErrors.ValidationErrors)
+                    {
+                        ModelState.AddModelError("", $"{validationError.PropertyName}: {validationError.ErrorMessage}");
+                    }
+                }
+                return View("Register");
+            }
         }
-
         protected override void Dispose(bool disposing)
         {
             if (disposing)

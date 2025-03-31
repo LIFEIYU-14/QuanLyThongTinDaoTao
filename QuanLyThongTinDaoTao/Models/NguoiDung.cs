@@ -11,9 +11,7 @@ namespace QuanLyThongTinDaoTao.Models
     {
         [Key]
         public Guid NguoiDungId { get; set; } = Guid.NewGuid();
-        [Required]
         public string TaiKhoan { get; set; }
-        [Required]
         public string MatKhau { get; set; }
         public DateTime NgayTao { get; set; } = DateTime.Now;
         public DateTime NgayCapNhat { get; set; } = DateTime.Now;
