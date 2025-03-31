@@ -78,29 +78,29 @@
                     <a href="@Url.Action("LopHocDaDangKy", "QuanLyHocTap")" class="dropdown-item">Danh Sách Lớp Đăng Ký</a>
                 </div>
             </div>
-            @if (User.Identity.IsAuthenticated)
-            {
+            @*@if (User.Identity.IsAuthenticated)
+                {
 
-                <div class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fa fa-user me-2"></i> @User.Identity.Name.ToString()
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="userDropdown">
-                        <a class="dropdown-item" href="@Url.Action("ThongTinCaNhan","Account")">Thông tin cá nhân</a>
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa fa-user me-2"></i> @User.Identity.Name.ToString()
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="userDropdown">
+                            <a class="dropdown-item" href="@Url.Action("ThongTinCaNhan","Account")">Thông tin cá nhân</a>
 
-                        <form action="@Url.Action("Logout", "Account")" method="post">
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="dropdown-item">Đăng Xuất</button>
-                        </form>
+                            <form action="@Url.Action("Logout", "Account")" method="post">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="dropdown-item">Đăng Xuất</button>
+                            </form>
 
+                        </div>
                     </div>
-                </div>
 
-            }
-            else
-            {
-                <a href="@Url.Action("Login", "Account")" class="nav-item nav-link">Đăng Nhập</a>
-            }
+                }
+                else
+                {
+                    <a href="@Url.Action("Login", "Account")" class="nav-item nav-link">Đăng Nhập</a>
+                }*@
             <nav class="navbar navbar-light bg-light ms-auto me-lg-5" style="width: 300px;">
                 <div class="container-fluid">
                     <form class="d-flex w-100">
@@ -212,37 +212,20 @@
     <script src="~/Asset/js/main.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-    $(document).ready(function () {
-        $("#sendCodeForm").submit(function (event) {
-            event.preventDefault(); // Ngăn chặn reload trang
+    document.addEventListener("DOMContentLoaded", function () {
+        var message = '@TempData["Message"]';
+        var error = '@TempData["Error"]';
 
-            var email = $("#Email").val(); // Lấy email nhập vào
+        if (message) {
+            alert(message);
+        }
 
-            if (!email) {
-                alert("Vui lòng nhập email!");
-                return;
-            }
-
-            $.ajax({
-                url: '@Url.Action("SendVerificationCode", "Account")',
-                type: 'POST',
-                data: { email: email },
-                success: function (response) {
-                    if (response.success) {
-                        $("#verification-form").show(); // Hiển thị form nhập mã
-                        $("#emailInput").val(email); // Điền email vào input ẩn
-                        alert(response.message);
-                    } else {
-                        alert(response.message);
-                    }
-                },
-                error: function () {
-                    alert("Có lỗi xảy ra, vui lòng thử lại.");
-                }
-            });
-        });
+        if (error) {
+            alert(error);
+        }
     });
     </script>
+
 
 </body>
 

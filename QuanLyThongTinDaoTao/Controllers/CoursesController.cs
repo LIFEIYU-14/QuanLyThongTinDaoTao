@@ -1,158 +1,181 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
-using PagedList;
 using System.Data.Entity;
+using System.Threading.Tasks;
 using QuanLyThongTinDaoTao.Models;
+using QuanLyThongTinDaoTao.Services;
+using PagedList;
 
 namespace QuanLyThongTinDaoTao.Controllers
 {
     public class CoursesController : Controller
     {
-        public DbContextThongTinDaoTao db = new DbContextThongTinDaoTao(); // Khai báo DbContext
+        private readonly DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
+        private readonly EmailService emailService = new EmailService();
 
-        // GET: Courses
         public ActionResult Index(int? page)
         {
-            int pageSize = 12; // Số lượng khóa học trên mỗi trang
-            int pageNumber = (page ?? 1); // Trang mặc định là trang 1
-
+            int pageSize = 12;
+            int pageNumber = (page ?? 1);
             var khoaHocs = db.KhoaHocs.Include(k => k.KhoaHocAttachments)
-                                       .OrderByDescending(k => k.NgayTao)
-                                       .ToPagedList(pageNumber, pageSize);
-
+                                      .OrderByDescending(k => k.NgayTao)
+                                      .ToPagedList(pageNumber, pageSize);
             return View(khoaHocs);
         }
 
-        // Danh sách lớp học của khóa học
         public ActionResult DanhSachLopHoc(Guid id)
         {
-            var khoaHoc = db.KhoaHocs
-                .Include(k => k.LopHocs)  // Load danh sách lớp học
-                .Include(k => k.KhoaHocAttachments) // Load file đính kèm khóa học
-                .FirstOrDefault(k => k.KhoaHocId == id);
-
+            var khoaHoc = db.KhoaHocs.Include(k => k.LopHocs)
+                                     .Include(k => k.KhoaHocAttachments)
+                                     .FirstOrDefault(k => k.KhoaHocId == id);
             if (khoaHoc == null)
-            {
-                return HttpNotFound(); // Nếu khóa học không tồn tại
-            }
+                return HttpNotFound();
 
-            ViewBag.KhoaHoc = khoaHoc; // Truyền thông tin khóa học vào ViewBag
-
-            var lopHocs = khoaHoc.LopHocs?.ToList() ?? new List<LopHoc>(); // Tránh null nếu không có lớp học
-                                                                         
-            if (User.Identity.IsAuthenticated)
-            {
-                string email = User.Identity.Name;
-                var hocVien = db.HocViens.FirstOrDefault(hv => hv.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
-                ViewBag.HocVien = hocVien; // Pass hocVien to ViewBag
-                                         
-                foreach (var lopHoc in lopHocs)
-                {
-                    lopHoc.IsRegistered = db.DangKyHocs.Any(dk => dk.LopHocId == lopHoc.LopHocId && dk.NguoiDungId == hocVien.NguoiDungId);
-                }
-            }
-            return View(lopHocs);
+            ViewBag.KhoaHoc = khoaHoc;
+            return View(khoaHoc.LopHocs.ToList());
         }
 
-        // Đăng ký lớp học
-
-        public ActionResult Register(Guid lopHocId)
+        public ActionResult Register(Guid? lopHocId)
         {
-            // Đảm bảo người dùng đã đăng nhập
-            if (!User.Identity.IsAuthenticated)
+            if (!lopHocId.HasValue)
             {
-                return RedirectToAction("Login","Account");
+                TempData["Error"] = "Lớp học không hợp lệ.";
+                return RedirectToAction("Index");
             }
 
-            // Lấy email của người dùng đã đăng nhập
-            string email = User.Identity.Name;
-
-            // Tìm lớp học theo lopHocId
-            var lopHoc = db.LopHocs.FirstOrDefault(l => l.LopHocId == lopHocId);
+            var lopHoc = db.LopHocs.Include(l => l.KhoaHoc).FirstOrDefault(l => l.LopHocId == lopHocId.Value);
             if (lopHoc == null)
             {
-                return HttpNotFound("Lớp học không tồn tại.");
+                TempData["Error"] = "Lớp học không tồn tại.";
+                return RedirectToAction("Index");
             }
 
-            // Tìm học viên theo email
-            var hocVien = db.HocViens.FirstOrDefault(hv => hv.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
-            if (hocVien == null)
+            return View(lopHoc);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Register(FormCollection form)
+        {
+            try
             {
-                return HttpNotFound("Không tìm thấy thông tin học viên.");
+                string hoVaTen = form["HoVaTen"];
+                string email = form["Email"];
+                string soDienThoai = form["SoDienThoai"];
+                string coQuanLamViec = form["CoQuanLamViec"] ?? "Không có";
+
+                if (!DateTime.TryParse(form["NgaySinh"], out DateTime ngaySinh))
+                {
+                    ModelState.AddModelError("", "Ngày sinh không hợp lệ.");
+                    return View();
+                }
+
+                if (!Guid.TryParse(form["LopHocId"], out Guid lopHocId))
+                {
+                    ModelState.AddModelError("", "Lớp học không hợp lệ.");
+                    return View();
+                }
+
+                var lopHoc = db.LopHocs.Include(l => l.KhoaHoc).FirstOrDefault(l => l.LopHocId == lopHocId);
+                if (lopHoc == null) return HttpNotFound();
+
+                // Tạo mã OTP
+                string otp = new Random().Next(100000, 999999).ToString();
+                Session["OTP_" + email] = otp;
+                Session["HocVienData_" + email] = new HocVienTempData
+                {
+                    HoVaTen = hoVaTen,
+                    Email = email,
+                    NgaySinh = ngaySinh,
+                    SoDienThoai = soDienThoai,
+                    CoQuanLamViec = coQuanLamViec,
+                    LopHocId = lopHocId,
+                    KhoaHocId = lopHoc?.KhoaHoc?.KhoaHocId ?? Guid.Empty
+                };
+
+                await emailService.SendOtpEmail(email, otp);
+                ViewBag.Email = email;
+                return View(lopHoc);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Lỗi đăng ký: " + ex.Message);
+                return View();
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> VerifyOTP(string email, string otp)
+        {
+            string storedOtp = Session["OTP_" + email]?.ToString();
+            if (storedOtp == null || storedOtp != otp)
+            {
+                TempData["Error"] = "Mã OTP không chính xác hoặc đã hết hạn.";
+                return RedirectToAction("Register", new { email });
             }
 
-            // Kiểm tra xem học viên đã đăng ký lớp học này chưa
-            var daDangKy = db.DangKyHocs.Any(dk => dk.LopHocId == lopHoc.LopHocId && dk.NguoiDungId == hocVien.NguoiDungId);
-            if (daDangKy)
-            {
-                TempData["Message"] = "Bạn đã đăng ký lớp học này rồi.";
-                return RedirectToAction("DanhSachLopHoc", new { id = lopHoc.KhoaHoc.KhoaHocId });
-            }
+            var hocVienData = Session["HocVienData_" + email] as HocVienTempData;
+            if (hocVienData == null) return RedirectToAction("Index", "Home");
 
-            // Kiểm tra lớp học có đủ số lượng học viên không
-            if (lopHoc.HocViens.Count >= lopHoc.SoLuongToiDa)
-            {
-                TempData["Message"] = "Lớp học đã đầy.";
-                return RedirectToAction("DanhSachLopHoc", new { id = lopHoc.KhoaHoc.KhoaHocId });
-            }
+            Session.Remove("OTP_" + email);
+            Session.Remove("HocVienData_" + email);
 
-            // Thêm mới đăng ký lớp học
-            var dangKy = new DangKyHoc
+            // **Kiểm tra xem học viên đã tồn tại chưa**
+            var existingHocVien = db.HocViens.FirstOrDefault(hv => hv.Email == email);
+            if (existingHocVien != null)
             {
-                NguoiDungId = hocVien.NguoiDungId,
-                LopHocId = lopHoc.LopHocId,
-                KhoaHocId = lopHoc.KhoaHoc.KhoaHocId,
-                NgayDangKy = DateTime.Now
+                TempData["Error"] = "Email đã được đăng ký trước đó. Vui lòng sử dụng email khác hoặc kiểm tra lại.";
+                return RedirectToAction("Index", "Home");
+            }
+            var hocVien = new HocVien
+            {
+                NguoiDungId = Guid.NewGuid(),
+                MaHocVien = DateTime.Now.Year + hocVienData.NgaySinh.Year.ToString() + new Random().Next(1000, 9999),
+                HoVaTen = hocVienData.HoVaTen,
+                Email = hocVienData.Email,
+                NgaySinh = hocVienData.NgaySinh,
+                SoDienThoai = hocVienData.SoDienThoai,
+                CoQuanLamViec = hocVienData.CoQuanLamViec,
+                QR_Code_HV = Guid.NewGuid().ToString(),
+                IsConfirmed = true,
+                VaiTro = VaiTroNguoiDung.HocVien
             };
 
-            db.DangKyHocs.Add(dangKy);
+            db.HocViens.Add(hocVien);
             db.SaveChanges();
 
-            TempData["Message"] = "Đăng ký lớp học thành công!";
-            return RedirectToAction("DanhSachLopHoc", new { id = lopHoc.KhoaHoc.KhoaHocId });
-        }
-        // Hủy đăng ký lớp học
-        public ActionResult CancelRegister(Guid lopHocId)
-        {
-            // Đảm bảo người dùng đã đăng nhập
-            if (!User.Identity.IsAuthenticated)
-            {
-                return RedirectToAction("Login");
-            }
-
-            // Lấy email của người dùng đã đăng nhập
-            string email = User.Identity.Name;
-
-            // Tìm lớp học theo lopHocId
-            var lopHoc = db.LopHocs.FirstOrDefault(l => l.LopHocId == lopHocId);
+            var lopHoc = db.LopHocs.Include(l => l.KhoaHoc).FirstOrDefault(l => l.LopHocId == hocVienData.LopHocId);
             if (lopHoc == null)
             {
-                return HttpNotFound("Lớp học không tồn tại.");
+                TempData["Error"] = "Lớp học không tồn tại.";
+                return RedirectToAction("Index", "Home");
             }
 
-            // Tìm học viên theo email
-            var hocVien = db.HocViens.FirstOrDefault(hv => hv.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
-            if (hocVien == null)
+            var dangKyHoc = new DangKyHoc
             {
-                return HttpNotFound("Không tìm thấy thông tin học viên.");
-            }
+                DangKyId = Guid.NewGuid(),
+                NguoiDungId = hocVien.NguoiDungId,
+                LopHocId = hocVienData.LopHocId,
+                KhoaHocId = lopHoc.KhoaHoc.KhoaHocId,
+                IsConfirmed = true
+            };
 
-            // Tìm đăng ký của học viên với lớp học
-            var dangKy = db.DangKyHocs.FirstOrDefault(dk => dk.LopHocId == lopHoc.LopHocId && dk.NguoiDungId == hocVien.NguoiDungId);
-            if (dangKy == null)
-            {
-                TempData["Message"] = "Bạn chưa đăng ký lớp học này.";
-                return RedirectToAction("DanhSachLopHoc", new { id = lopHoc.KhoaHoc.KhoaHocId });
-            }
-
-            // Xóa đăng ký lớp học
-            db.DangKyHocs.Remove(dangKy);
+            db.DangKyHocs.Add(dangKyHoc);
             db.SaveChanges();
 
-            TempData["Message"] = "Hủy đăng ký lớp học thành công!";
-            return RedirectToAction("DanhSachLopHoc", new { id = lopHoc.KhoaHoc.KhoaHocId });
+            await emailService.SendQrCodeEmail(hocVien.Email, hocVien.QR_Code_HV);
+            return RedirectToAction("Success");
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

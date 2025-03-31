@@ -15,10 +15,6 @@ namespace QuanLyThongTinDaoTao.Models
         [Required(ErrorMessage = "Họ tên bắt buộc nhập")]
         public string HoVaTen { get; set; }
 
-        [Required(ErrorMessage = "Mật khẩu bắt buộc nhập")]
-        [MinLength(6, ErrorMessage = "Mật khẩu ít nhất 6 ký tự")]
-        public string MatKhau { get; set; }
-
         [Required]
         public VaiTroNguoiDung VaiTro { get; set; }
 
@@ -44,16 +40,5 @@ namespace QuanLyThongTinDaoTao.Models
         GiangVien,
         HocVien
     }
-    public static class PasswordHelper
-    {
-        public static string HashPassword(string password)
-        {
-            return BCrypt.Net.BCrypt.HashPassword(password);
-        }
-
-        public static bool VerifyPassword(string password, string hashedPassword)
-        {
-            return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
-        }
-    }
+    
 }

@@ -14,8 +14,9 @@ namespace QuanLyThongTinDaoTao.Models
         [Required]
         [StringLength(255)]
         public string CoQuanLamViec { get; set; }
-        [Required]
         public string QR_Code_HV { get; set; } = Guid.NewGuid().ToString();
+        public bool IsConfirmed { get; set; } = false; // Chỉ lưu học viên khi xác nhận
+        public string XacNhanToken { get; set; } // Token để xác nhận đăng ký
         public virtual ICollection<LopHoc> LopHocs { get; set; }
         public virtual ICollection<ThongBao> ThongBaos { get; set; }
     }

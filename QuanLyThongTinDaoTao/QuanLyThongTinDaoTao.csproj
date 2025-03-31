@@ -187,7 +187,6 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CoursesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\QuanLyHocTapController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -296,6 +295,22 @@
     <Compile Include="Migrations\202503280716239_dsm.Designer.cs">
       <DependentUpon>202503280716239_dsm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202503291259036_AddConfirmationToDangKyHoc.cs" />
+    <Compile Include="Migrations\202503291259036_AddConfirmationToDangKyHoc.Designer.cs">
+      <DependentUpon>202503291259036_AddConfirmationToDangKyHoc.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202503291311531_AddConfirmationToDangKyHoc2.cs" />
+    <Compile Include="Migrations\202503291311531_AddConfirmationToDangKyHoc2.Designer.cs">
+      <DependentUpon>202503291311531_AddConfirmationToDangKyHoc2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202503291337030_AddConfirmationToDangKyHocdahj.cs" />
+    <Compile Include="Migrations\202503291337030_AddConfirmationToDangKyHocdahj.Designer.cs">
+      <DependentUpon>202503291337030_AddConfirmationToDangKyHocdahj.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202503300508457_rghdl.cs" />
+    <Compile Include="Migrations\202503300508457_rghdl.Designer.cs">
+      <DependentUpon>202503300508457_rghdl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ModelsService\LoginViewModel.cs" />
     <Compile Include="ModelsService\RegisterViewModel.cs" />
@@ -308,6 +323,7 @@
     <Compile Include="Models\DiemDanh.cs" />
     <Compile Include="Models\GiangVien.cs" />
     <Compile Include="Models\HocVien.cs" />
+    <Compile Include="Models\HocVienTempData.cs" />
     <Compile Include="Models\KhoaHoc.cs" />
     <Compile Include="Models\KhoaHocAttachment.cs" />
     <Compile Include="Models\LopHoc.cs" />
@@ -591,14 +607,11 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Courses\Index.cshtml" />
     <Content Include="Views\Shared\_MainLayout.cshtml" />
-    <Content Include="Views\Account\Login.cshtml" />
-    <Content Include="Views\Account\Register.cshtml" />
-    <Content Include="Views\Account\ThongTinCaNhan.cshtml" />
-    <Content Include="Views\Account\Edit.cshtml" />
     <Content Include="Views\Courses\DanhSachLopHoc.cshtml" />
     <Content Include="Views\QuanLyHocTap\LopHocDaDangKy.cshtml" />
     <Content Include="Views\QuanLyHocTap\LichHoc.cshtml" />
     <Content Include="Views\QuanLyHocTap\_LichHocPartial.cshtml" />
+    <Content Include="Views\Courses\Register.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -606,7 +619,6 @@
     <Folder Include="Upload\BuoiHoc\" />
     <Folder Include="Upload\KhoaHoc\" />
     <Folder Include="Upload\LopHoc\" />
-    <Folder Include="Views\Register\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />
@@ -713,6 +725,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202503280716239_dsm.resx">
       <DependentUpon>202503280716239_dsm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202503291259036_AddConfirmationToDangKyHoc.resx">
+      <DependentUpon>202503291259036_AddConfirmationToDangKyHoc.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202503291311531_AddConfirmationToDangKyHoc2.resx">
+      <DependentUpon>202503291311531_AddConfirmationToDangKyHoc2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202503291337030_AddConfirmationToDangKyHocdahj.resx">
+      <DependentUpon>202503291337030_AddConfirmationToDangKyHocdahj.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202503300508457_rghdl.resx">
+      <DependentUpon>202503300508457_rghdl.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

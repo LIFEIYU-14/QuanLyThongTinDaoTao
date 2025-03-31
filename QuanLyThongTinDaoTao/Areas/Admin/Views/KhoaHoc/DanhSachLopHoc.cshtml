@@ -7,7 +7,12 @@
     <div class="bg-light text-center rounded p-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
             <h6 class="mb-0 fs-3">Danh Sách Lớp Học --- @ViewBag.TenKhoaHoc</h6>
-         
+            <p>
+                <a href="@Url.Action("Create","LopHoc")" class="btn btn-success mt-3 btn-lg">
+                    <i class="fas fa-plus-circle"></i> Thêm Lớp Học Mới
+                </a>
+            </p>
+
         </div>
         <div class="table-responsive">
             <table class="table text-start align-middle table-bordered mb-0 fs-5">

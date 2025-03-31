@@ -18,10 +18,25 @@ namespace QuanLyThongTinDaoTao.Models
         [Required]
         [StringLength(255)]
         public string HocHam { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "Mật khẩu bắt buộc nhập")]
+        [MinLength(6, ErrorMessage = "Mật khẩu ít nhất 6 ký tự")]
+        public string MatKhau { get; set; }
         public string QR_Code_GV { get; set; } = Guid.NewGuid().ToString();
         public virtual ICollection<BuoiHoc> BuoiHocs { get; set; }
         public virtual ICollection<LopHoc> LopHocs { get; set; }
         public virtual ICollection<ThongBao> ThongBaos { get; set; }
+    }
+    public static class PasswordHelper
+    {
+        public static string HashPassword(string password)
+        {
+            return BCrypt.Net.BCrypt.HashPassword(password);
+        }
+
+        public static bool VerifyPassword(string password, string hashedPassword)
+        {
+            return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
+        }
     }
 }

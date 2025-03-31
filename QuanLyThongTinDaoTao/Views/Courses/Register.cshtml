@@ -1,0 +1,86 @@
+﻿@model QuanLyThongTinDaoTao.Models.LopHoc
+@{
+    ViewBag.Title = "Đăng Ký Lớp Học";
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+}
+
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Thông tin khóa học -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <img src="@(string.IsNullOrEmpty(Model.KhoaHoc.HinhDaiDienKhoaHoc) ? "/images/default-course.jpg" : Model.KhoaHoc.HinhDaiDienKhoaHoc)"
+                         class="card-img-top"
+                         alt="@Model.KhoaHoc.TenKhoaHoc">
+                    <div class="card-body">
+                        <h5 class="card-title text-center">@Model.KhoaHoc.TenKhoaHoc</h5>
+                        <p class="card-text">@Model.KhoaHoc.MoTa</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form đăng ký lớp học -->
+            <div class="col-lg-8">
+                <div class="bg-light text-center rounded p-4">
+                    <h6 class="mb-3 fs-3">Đăng Ký Lớp Học - @Model.TenLopHoc</h6>
+
+                    <!-- Nếu chưa gửi email OTP, hiển thị form đăng ký -->
+                    <div id="registerForm" style="@(ViewBag.Email != null ? "display:none;" : "")">
+                        @using (Html.BeginForm("Register", "Courses", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.HiddenFor(model => model.KhoaHoc.KhoaHocId)
+                            <div class="mb-3">
+                                <label class="form-label">Họ và Tên:</label>
+                                <input type="text" name="HoVaTen" class="form-control" required />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Email:</label>
+                                <input type="email" name="Email" class="form-control" required />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Ngày Sinh:</label>
+                                <input type="date" name="NgaySinh" class="form-control" required />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Số Điện Thoại:</label>
+                                <input type="tel" name="SoDienThoai" class="form-control" required pattern="[0-9]{10,15}" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Cơ Quan Làm Việc:</label>
+                                <input type="text" name="CoQuanLamViec" class="form-control" required />
+                            </div>
+
+                            <input type="hidden" name="LopHocId" value="@Model.LopHocId" />
+
+                            <button type="submit" class="btn btn-primary mt-3">
+                                <i class="fas fa-envelope"></i> Gửi Mã OTP
+                            </button>
+                        }
+                    </div>
+
+                    <!-- Nếu đã gửi mã OTP, hiển thị form xác thực OTP -->
+                    <div id="otpForm" style="@(ViewBag.Email == null ? "display:none;" : "")">
+                        <h5 class="mb-3">Nhập Mã OTP</h5>
+                        @using (Html.BeginForm("VerifyOTP", "Courses", FormMethod.Post))
+                        {
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden" name="Email" value="@ViewBag.Email" />
+                            <input type="text" name="OTP" class="form-control mb-3" placeholder="Nhập mã OTP" required />
+
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check"></i> Xác nhận OTP
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

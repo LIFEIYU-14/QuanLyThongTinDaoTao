@@ -6,8 +6,6 @@
 
 @{
     var khoaHoc = ViewBag.KhoaHoc as QuanLyThongTinDaoTao.Models.KhoaHoc;
-    var hocVien = ViewBag.HocVien as QuanLyThongTinDaoTao.Models.HocVien;
-
 }
 
 @if (khoaHoc != null)
@@ -15,7 +13,6 @@
     <div class="container-xxl py-5">
         <div class="container">
             <div class="row">
-                <!-- Course Details -->
                 <div class="col-lg-4">
                     <div class="card">
                         <img src="@(string.IsNullOrEmpty(khoaHoc.HinhDaiDienKhoaHoc) ? "/images/default-course.jpg" : khoaHoc.HinhDaiDienKhoaHoc)"
@@ -27,76 +24,46 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Class List -->
                 <div class="col-lg-8">
                     <div class="bg-light text-center rounded p-4">
                         <h6 class="mb-3 fs-3">Danh Sách Lớp Học - @khoaHoc.TenKhoaHoc</h6>
 
                         @if (Model != null && Model.Any())
                         {
-                            <div class="table-responsive">
-                                <table class="table text-start align-middle table-bordered mb-0 fs-5">
-                                    <thead>
-                                        <tr class="text-dark text-center">
-                                            <th scope="col">Tên Lớp Học</th>
-                                            <th scope="col">Số Tín Chỉ</th>
-                                            <th scope="col">Ngày Bắt Đầu</th>
-                                            <th scope="col">Ngày Kết Thúc</th>
-                                            <th scope="col">Trạng Thái</th>
-                                            <th scope="col">Hành Động</th>
+                            <table class="table table-bordered text-center fs-5">
+                                <thead>
+                                    <tr>
+                                        <th>Tên Lớp Học</th>
+                                        <th>Số Tín Chỉ</th>
+                                        <th>Ngày Bắt Đầu</th>
+                                        <th>Ngày Kết Thúc</th>
+                                        <th>Trạng Thái</th>
+                                        <th>Số HV Đã Đăng Ký</th>
+                                        <th>Hành Động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var lophoc in Model)
+                                    {
+                                   
+                                        <tr>
+                                            <td>@lophoc.TenLopHoc</td>
+                                            <td>@lophoc.SoTinChi</td>
+                                            <td>@lophoc.NgayBatDau.ToString("dd/MM/yyyy")</td>
+                                            <td>@lophoc.NgayKetThuc.ToString("dd/MM/yyyy")</td>
+                                            <td>
+                                                @{ string badgeClass = lophoc.TrangThai == "SapMo" ? "primary" : (lophoc.TrangThai == "DangHoc" ? "success" : "secondary"); }
+                                                <span class="badge bg-@badgeClass">@lophoc.TrangThai</span>
+                                            </td>
+                                            <td>
+                                                <a href="@Url.Action("Register", "Courses", new { lopHocId = lophoc.LopHocId })" class="btn btn-sm btn-success">
+                                                    <i class="fas fa-user-plus"></i> Đăng Ký
+                                                </a>
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var lophoc in Model)
-                                        {
-                                            <tr class="text-center">
-                                                <td>@lophoc.TenLopHoc</td>
-                                                <td>@lophoc.SoTinChi</td>
-                                                <td>@lophoc.NgayBatDau.ToString("dd/MM/yyyy")</td>
-                                                <td>@lophoc.NgayKetThuc.ToString("dd/MM/yyyy")</td>
-                                                <td>
-                                                    @{
-                                                        string badgeClass = "secondary";
-                                                        string statusText = "Không xác định";
-
-                                                        switch (lophoc.TrangThai)
-                                                        {
-                                                            case "SapMo":
-                                                                badgeClass = "primary";
-                                                                statusText = "Sắp Mở";
-                                                                break;
-                                                            case "DangHoc":
-                                                                badgeClass = "success";
-                                                                statusText = "Đang Học";
-                                                                break;
-                                                            case "DaKetThuc":
-                                                                badgeClass = "secondary";
-                                                                statusText = "Đã Kết Thúc";
-                                                                break;
-                                                        }
-                                                    }
-                                                    <span class="badge bg-@badgeClass">@statusText</span>
-                                                </td>
-                                                <td>
-                                                    @if (lophoc.IsRegistered)
-                                                    {
-                                                        <button class="btn btn-sm btn-secondary fs-6" disabled>
-                                                            <i class="fas fa-check-circle"></i> Đã Đăng Ký
-                                                        </button>
-                                                    }
-                                                    else
-                                                    {
-                                                        <a href="@Url.Action("Register", "Courses", new { lopHocId = lophoc.LopHocId })" class="btn btn-sm btn-success fs-6">
-                                                            <i class="fas fa-user-plus"></i> Đăng Ký
-                                                        </a>
-                                                    }
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
+                                    }
+                                </tbody>
+                            </table>
                         }
                         else
                         {
@@ -110,6 +77,11 @@
 }
 else
 {
-    <p class="text-danger">Không tìm thấy thông tin khóa học.</p>
+    <div class="container-xxl py-5">
+        <div class="container">
+            <div class="alert alert-danger" role="alert">
+                Không tìm thấy khóa học.
+            </div>
+        </div>
+    </div>
 }
-    

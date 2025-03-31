@@ -39,7 +39,6 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             if (ModelState.IsValid)
             {
                 hocVien.NguoiDungId = Guid.NewGuid();
-                hocVien.MatKhau = PasswordHelper.HashPassword(hocVien.MatKhau); // Mã hóa mật khẩu
                 hocVien.NgayTao = DateTime.Now;
                 hocVien.NgayCapNhat = DateTime.Now;
                 db.HocViens.Add(hocVien);

@@ -50,7 +50,7 @@
                     <div class="nav ">
                         <br />
                         <a href="@Url.Action("Index", "HomeAdmin")" class="nav-item nav-link">
-                        <i class="fa fa-tachometer-alt me-2"></i>Trang chủ
+                            <i class="fa fa-tachometer-alt me-2"></i>Trang chủ
                         </a>
                         <a href="@Url.Action("Index", "KhoaHoc")" class="nav-item nav-link">
                             <i class="fa fa-laptop me-2"></i>Khóa Học
@@ -60,6 +60,12 @@
                         </a>
                         <a href="@Url.Action("Index", "BuoiHoc")" class="nav-item nav-link">
                             <i class="fa fa-keyboard me-2"></i>Buổi Học
+                        </a>
+                        <a href="@Url.Action("Index", "HocVien")" class="nav-item nav-link">
+                            <i class="fa fa-keyboard me-2"></i>Học Viên
+                        </a>
+                        <a href="@Url.Action("Index", "GiangVien")" class="nav-item nav-link">
+                            <i class="fa fa-keyboard me-2"></i>Giảng Viên
                         </a>
                         <div class="sb-sidenav-footer">
                             <div class="small">Logged in as:</div>
@@ -73,7 +79,7 @@
             <main class="">
                 @RenderBody()
             </main>
-            <footer class="py-4 bg-light mt-auto">
+            @*<footer class="py-4 bg-light mt-auto">
                 <div class="container-fluid px-4">
                     <div class="d-flex align-items-center justify-content-between small">
                         <div class="text-muted">Copyright &copy; Nguyễn Công Tiến </div>
@@ -84,7 +90,7 @@
                         </div>
                     </div>
                 </div>
-            </footer>
+            </footer>*@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
