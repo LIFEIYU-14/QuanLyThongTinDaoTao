@@ -18,12 +18,14 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         @Html.LabelFor(model => model.TenLopHoc, "Tên Lớp Học", new { @class = "form-label" })
+                        <span class="text-danger">*</span>
                         @Html.TextBoxFor(model => model.TenLopHoc, new { @class = "form-control", required = "required" })
                         @Html.ValidationMessageFor(model => model.TenLopHoc, "", new { @class = "text-danger" })
                     </div>
 
                     <div class="col-md-6 mb-3">
                         @Html.LabelFor(model => model.SoTinChi, "Số Tín Chỉ", new { @class = "form-label" })
+                        <span class="text-danger">*</span>
                         @Html.TextBoxFor(model => model.SoTinChi, new { @class = "form-control", type = "number", min = 1, required = "required" })
                         @Html.ValidationMessageFor(model => model.SoTinChi, "", new { @class = "text-danger" })
                     </div>
@@ -32,12 +34,14 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         @Html.LabelFor(model => model.NgayBatDau, "Ngày Bắt Đầu", new { @class = "form-label" })
+                        <span class="text-danger">*</span>
                         @Html.TextBoxFor(model => model.NgayBatDau, new { @class = "form-control", type = "date", required = "required" })
                         @Html.ValidationMessageFor(model => model.NgayBatDau, "", new { @class = "text-danger" })
                     </div>
 
                     <div class="col-md-6 mb-3">
                         @Html.LabelFor(model => model.NgayKetThuc, "Ngày Kết Thúc", new { @class = "form-label" })
+                        <span class="text-danger">*</span>
                         @Html.TextBoxFor(model => model.NgayKetThuc, new { @class = "form-control", type = "date", required = "required" })
                         @Html.ValidationMessageFor(model => model.NgayKetThuc, "", new { @class = "text-danger" })
                     </div>
@@ -46,11 +50,13 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         @Html.LabelFor(model => model.TrangThai, "Trạng Thái Lớp Học", new { @class = "form-label" })
-                        @Html.DropDownListFor(model => model.TrangThai, new SelectList(new[] { "SapMo", "DangHoc", "DaKetThuc" }), new { @class = "form-control" })
+                        <span class="text-danger">*</span>
+                        @Html.DropDownListFor(model => model.TrangThai, new SelectList(new[] { "Sắp Mở", "Đang Học", "Đã Kết Thúc" }), new { @class = "form-control" })
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        @Html.LabelFor(model => model.SoLuongToiDa, "Số lượng tối đa", new { @class = "form-label" })
+                        @Html.LabelFor(model => model.SoLuongToiDa, "Số Lượng Tối Đa", new { @class = "form-label" })
+                        <span class="text-danger">*</span>
                         @Html.TextBoxFor(model => model.SoLuongToiDa, new { @class = "form-control", type = "number", min = 1, required = "required" })
                         @Html.ValidationMessageFor(model => model.SoLuongToiDa, "", new { @class = "text-danger" })
                     </div>
@@ -59,6 +65,7 @@
                 <!-- Phần nhập mô tả tích hợp CKEditor -->
                 <div class="mb-3">
                     @Html.LabelFor(model => model.MoTa, "Mô Tả", new { @class = "form-label" })
+                    <span class="text-danger">*</span>
                     @Html.TextAreaFor(model => model.MoTa, new { @class = "form-control", rows = 5, id = "MoTa" })
                     @Html.ValidationMessageFor(model => model.MoTa, "", new { @class = "text-danger" })
                 </div>
@@ -66,6 +73,7 @@
 
                 <div class="col-md-6 mb-3">
                     @Html.Label("KhoaHocId", "Khóa Học", new { @class = "form-label" })
+                    <span class="text-danger">*</span>
                     <select class="form-control" name="KhoaHocId" required>
                         <option value="">-- Chọn Khóa Học --</option>
                         @foreach (var khoaHoc in ViewBag.KhoaHocList)

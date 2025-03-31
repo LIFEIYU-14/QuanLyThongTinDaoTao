@@ -17,6 +17,7 @@
 
                 <div class="mb-3">
                     @Html.Label("LopHocId", "Lớp Học", new { @class = "form-label" })
+                    <span class="text-danger">*</span>
                     <select class="form-control" name="LopHocId" required>
                         <option value="">-- Chọn Lớp Học --</option>
                         @foreach (var lopHoc in ViewBag.LopHocList)
@@ -28,6 +29,7 @@
 
                 <div class="mb-3">
                     @Html.LabelFor(model => model.NgayHoc, "Ngày Học", new { @class = "form-label" })
+                    <span class="text-danger">*</span>
                     @Html.TextBoxFor(model => model.NgayHoc, new { @class = "form-control", type = "date" })
                     @Html.ValidationMessageFor(model => model.NgayHoc, "", new { @class = "text-danger" })
                 </div>
@@ -35,11 +37,13 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         @Html.LabelFor(model => model.GioBatDau, "Giờ Bắt Đầu", new { @class = "form-label" })
+                        <span class="text-danger">*</span>
                         @Html.TextBoxFor(model => model.GioBatDau, new { @class = "form-control", type = "time" })
                         @Html.ValidationMessageFor(model => model.GioBatDau, "", new { @class = "text-danger" })
                     </div>
                     <div class="col-md-6 mb-3">
                         @Html.LabelFor(model => model.GioKetThuc, "Giờ Kết Thúc", new { @class = "form-label" })
+                        <span class="text-danger">*</span>
                         @Html.TextBoxFor(model => model.GioKetThuc, new { @class = "form-control", type = "time" })
                         @Html.ValidationMessageFor(model => model.GioKetThuc, "", new { @class = "text-danger" })
                     </div>
@@ -47,6 +51,7 @@
 
                 <div class="mb-3">
                     @Html.LabelFor(model => model.GhiChu, "Ghi Chú", new { @class = "form-label" })
+                    <span class="text-danger">*</span>
                     @Html.TextAreaFor(model => model.GhiChu, new { @class = "form-control", rows = 5, id = "GhiChu" })
                 </div>
                 <!-- Tệp Đính Kèm -->
