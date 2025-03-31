@@ -11,6 +11,8 @@ namespace QuanLyThongTinDaoTao.Models
     {
         [Key]
         public Guid LopHocId { get; set; } = Guid.NewGuid();
+        [Required]
+        public string MaLopHoc { get; set; }
 
         [Required]
         public string TenLopHoc { get; set; }
@@ -39,10 +41,11 @@ namespace QuanLyThongTinDaoTao.Models
         public DateTime NgayTao { get; set; } = DateTime.Now;
         public DateTime NgayCapNhat { get; set; } = DateTime.Now;
         public virtual KhoaHoc KhoaHoc { get; set; }
-        public virtual ICollection<GiangVien> GiangViens { get; set; }
-        public virtual ICollection<HocVien> HocViens { get; set; }
-        public virtual ICollection<BuoiHoc> BuoiHocs { get; set; }
-        public virtual ICollection<LopHocAttachment> LopHocAttachments { get; set; }
+        public virtual ICollection<GiangVien> GiangViens { get; set; } = new List<GiangVien>();
+        public virtual ICollection<HocVien> HocViens { get; set; } = new List<HocVien>();
+        public virtual ICollection<BuoiHoc> BuoiHocs { get; set; } = new List<BuoiHoc>();
+        public virtual ICollection<LopHocAttachment> LopHocAttachments { get; set; } = new List<LopHocAttachment>();
+
         [NotMapped]
         public bool IsRegistered { get; set; }
         // Phương thức kiểm tra ngày kết thúc phải lớn hơn ngày bắt đầu

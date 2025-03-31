@@ -11,34 +11,26 @@ namespace QuanLyThongTinDaoTao.Models
     {
         [Key]
         public Guid NguoiDungId { get; set; } = Guid.NewGuid();
-
-        [Required(ErrorMessage = "Họ tên bắt buộc nhập")]
-        public string HoVaTen { get; set; }
-
         [Required]
-        public VaiTroNguoiDung VaiTro { get; set; }
-
+        public string TaiKhoan { get; set; }
         [Required]
-        public DateTime? NgaySinh { get; set; }
-
-        [Required]
-        [StringLength(15)]
-        public string SoDienThoai { get; set; }
-
-        [StringLength(100)]
-        [Required(ErrorMessage = "Email không được để trống")]
-        [EmailAddress(ErrorMessage = "Email sai định dạng")]
-        [Index(IsUnique = true)]
-        public string Email { get; set; }
-
+        public string MatKhau { get; set; }
         public DateTime NgayTao { get; set; } = DateTime.Now;
         public DateTime NgayCapNhat { get; set; } = DateTime.Now;
+        public virtual ICollection<PhanQuyen> PhanQuyens { get; set; } = new List<PhanQuyen>();
+
     }
-    public enum VaiTroNguoiDung
+    public static class PasswordHelper
     {
-        Admin,
-        GiangVien,
-        HocVien
+        public static string HashPassword(string password)
+        {
+            return BCrypt.Net.BCrypt.HashPassword(password);
+        }
+
+        public static bool VerifyPassword(string password, string hashedPassword)
+        {
+            return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
+        }
     }
-    
+
 }

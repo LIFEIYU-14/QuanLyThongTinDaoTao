@@ -20,7 +20,6 @@ namespace QuanLyThongTinDaoTao.Models
         public string NoiDung { get; set; }
 
         public DateTime NgayGui { get; set; } = DateTime.Now;
-        public ICollection<HocVien> HocViens { get; set; }
         public ICollection<GiangVien> GiangViens { get; set; }
 
     }

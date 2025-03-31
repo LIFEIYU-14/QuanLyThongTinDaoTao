@@ -1,25 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Web;
+using System.Windows.Data;
 
 namespace QuanLyThongTinDaoTao.Models
 {
-    [Table("DiemDanhs")]
-
-    public class DiemDanh
-    {
+    [Table("DiemDanhs_GV")]
+    public class DiemDanh_GV
+	{
         [Key]
         public Guid DiemDanhId { get; set; } = Guid.NewGuid();
-
+        [Required]
+        public Guid BuoiHocId { get; set; }
+        [ForeignKey("BuoiHocId")]
         public virtual BuoiHoc BuoiHoc { get; set; }
-        public virtual HocVien HocVien { get; set; }    
+        public virtual GiangVien GiangVien { get; set; }
         [Required]
         public DateTime NgayDiemDanh { get; set; }
 
-        public enum TrangThaiDiemDanh
+        public enum TrangThaiDiemDanhGV
         {
             CoMat, // Có mặt
             VangKhongPhep, // Vắng không phép
@@ -27,6 +29,6 @@ namespace QuanLyThongTinDaoTao.Models
         }
 
         [Required]
-        public TrangThaiDiemDanh TrangThai { get; set; }
+        public TrangThaiDiemDanhGV TrangThai { get; set; }
     }
 }

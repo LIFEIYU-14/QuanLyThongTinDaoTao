@@ -53,6 +53,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             if (ModelState.IsValid)
             {
                 model.KhoaHocId = Guid.NewGuid();
+                model.MaKhoaHoc = model.MaKhoaHoc.ToUpper();
                 model.NgayTao = DateTime.Now;
                 model.NgayCapNhat = DateTime.Now;
 
@@ -161,6 +162,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
             // Cập nhật thông tin khác của khóa học
             khoaHoc.TenKhoaHoc = model.TenKhoaHoc;
+            khoaHoc.MaKhoaHoc = model.MaKhoaHoc;
             khoaHoc.MoTa = model.MoTa;
             khoaHoc.ThoiLuong = model.ThoiLuong;
             khoaHoc.NgayCapNhat = DateTime.Now;

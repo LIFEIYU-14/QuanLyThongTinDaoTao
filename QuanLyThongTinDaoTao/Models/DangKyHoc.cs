@@ -17,11 +17,6 @@ namespace QuanLyThongTinDaoTao.Models
         // Khóa ngoài đến LopHoc
         public Guid LopHocId { get; set; }
         public virtual LopHoc LopHoc { get; set; }
-
-        // Khóa ngoài đến KhoaHoc
-        public Guid KhoaHocId { get; set; }
-        public virtual KhoaHoc KhoaHoc { get; set; }
-
         public DateTime NgayDangKy { get; set; } = DateTime.Now;
         public bool IsConfirmed { get; set; } = false;  // Mặc định là chưa xác nhận
         public string ConfirmationToken { get; set; }

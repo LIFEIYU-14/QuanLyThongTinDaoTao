@@ -38,7 +38,8 @@ namespace QuanLyThongTinDaoTao.Models
         public string GhiChu { get; set; }
 
         public virtual LopHoc LopHoc { get; set; }
-        public virtual GiangVien GiangVien { get; set; }
+        // Quan hệ nhiều-nhiều với GiangVien thông qua bảng trung gian
+        public virtual ICollection<GiangVien_BuoiHoc> GiangVien_BuoiHocs { get; set; } = new List<GiangVien_BuoiHoc>();
         public virtual ICollection<BuoiHocAttachment> BuoiHocAttachments { get; set; }
         // Custom Validation cho giờ kết thúc đã có sẵn
         public static ValidationResult ValidateGioKetThuc(TimeSpan gioKetThuc, ValidationContext context)
@@ -51,9 +52,17 @@ namespace QuanLyThongTinDaoTao.Models
             return ValidationResult.Success;
         }
 
-        // Thực hiện validation để kiểm tra NgàyHoc nằm trong khoảng thời gian của lớp học
+        // Thực hiện validation
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            if (GioKetThuc <= GioBatDau)
+            {
+                yield return new ValidationResult(
+                    "Giờ kết thúc phải lớn hơn giờ bắt đầu.",
+                    new[] { "GioKetThuc" }
+                );
+            }
+
             if (LopHoc != null)
             {
                 if (NgayHoc < LopHoc.NgayBatDau || NgayHoc > LopHoc.NgayKetThuc)

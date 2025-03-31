@@ -21,6 +21,8 @@
             <table class="table text-start align-middle table-bordered mb-0 fs-5">
                 <thead>
                     <tr class="text-dark text-center">
+                        <th scope="col">Mã Lớp Học</th>
+
                         <th scope="col">Tên Lớp Học</th>
                         <th scope="col">Số Tín Chỉ</th>
                         <th scope="col">Ngày Bắt Đầu</th>
@@ -33,6 +35,7 @@
                     @foreach (var lophoc in Model)
                     {
                         <tr class="text-center">
+                            <td>@lophoc.MaLopHoc</td>
                             <td>@lophoc.TenLopHoc</td>
                             <td>@lophoc.SoTinChi</td>
                             <td>@lophoc.NgayBatDau.ToString("dd/MM/yyyy")</td>

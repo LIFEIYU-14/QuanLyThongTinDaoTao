@@ -13,9 +13,12 @@ namespace QuanLyThongTinDaoTao.Models
         // Hình đại diện cho khóa học
         [StringLength(500)]
         public string HinhDaiDienKhoaHoc { get; set; }
+        [Required]
+        public string MaKhoaHoc { get; set; }
 
         [Required, StringLength(255)]
         public string TenKhoaHoc { get; set; }
+
 
         [Required, StringLength(255)]
         public string MoTa { get; set; }

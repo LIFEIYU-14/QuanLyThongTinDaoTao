@@ -90,8 +90,7 @@ namespace QuanLyThongTinDaoTao.Controllers
                     NgaySinh = ngaySinh,
                     SoDienThoai = soDienThoai,
                     CoQuanLamViec = coQuanLamViec,
-                    LopHocId = lopHocId,
-                    KhoaHocId = lopHoc?.KhoaHoc?.KhoaHocId ?? Guid.Empty
+                    LopHocId = lopHocId
                 };
 
                 await emailService.SendOtpEmail(email, otp);
@@ -138,7 +137,6 @@ namespace QuanLyThongTinDaoTao.Controllers
                     CoQuanLamViec = hocVienData.CoQuanLamViec,
                     QR_Code_HV = Guid.NewGuid().ToString(),
                     IsConfirmed = true,
-                    VaiTro = VaiTroNguoiDung.HocVien
                 };
 
                 db.HocViens.Add(hocVien);
@@ -165,7 +163,6 @@ namespace QuanLyThongTinDaoTao.Controllers
                 DangKyId = Guid.NewGuid(),
                 NguoiDungId = hocVien.NguoiDungId,
                 LopHocId = hocVienData.LopHocId,
-                KhoaHocId = lopHoc.KhoaHoc.KhoaHocId,
                 IsConfirmed = true
             };
 

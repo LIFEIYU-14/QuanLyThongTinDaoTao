@@ -13,7 +13,6 @@ namespace QuanLyThongTinDaoTao.Models
         public string SoDienThoai { get; set; }
         public string CoQuanLamViec { get; set; }
         public Guid LopHocId { get; set; }
-        public Guid KhoaHocId { get; set; }
     }
 
 }

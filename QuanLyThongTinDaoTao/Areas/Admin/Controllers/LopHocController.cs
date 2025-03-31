@@ -72,6 +72,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
             // Thiết lập ID và thời gian tạo, cập nhật
             model.LopHocId = Guid.NewGuid();
+            model.MaLopHoc = Guid.NewGuid().ToString();
             model.NgayTao = DateTime.Now;
             model.NgayCapNhat = DateTime.Now;
 
@@ -187,6 +188,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
             // Cập nhật các thông tin
             lopHoc.TenLopHoc = model.TenLopHoc;
+            lopHoc.MaLopHoc = model.MaLopHoc;
             lopHoc.SoTinChi = model.SoTinChi;
             lopHoc.NgayBatDau = model.NgayBatDau;
             lopHoc.NgayKetThuc = model.NgayKetThuc;

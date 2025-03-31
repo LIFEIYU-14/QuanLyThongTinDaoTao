@@ -179,7 +179,6 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Areas\Admin\AdminAreaRegistration.cs" />
     <Compile Include="Areas\Admin\Controllers\BuoiHocController.cs" />
-    <Compile Include="Areas\Admin\Controllers\GiangVienController.cs" />
     <Compile Include="Areas\Admin\Controllers\HomeAdminController.cs" />
     <Compile Include="Areas\Admin\Controllers\KhoaHocController.cs" />
     <Compile Include="Areas\Admin\Controllers\LopHocController.cs" />
@@ -191,137 +190,22 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\QRCodeHelper.cs" />
-    <Compile Include="Migrations\202503100906599_UpdateDB.cs" />
-    <Compile Include="Migrations\202503100906599_UpdateDB.Designer.cs">
-      <DependentUpon>202503100906599_UpdateDB.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503130200124_Uo.cs" />
-    <Compile Include="Migrations\202503130200124_Uo.Designer.cs">
-      <DependentUpon>202503130200124_Uo.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503130204299_EditDB.cs" />
-    <Compile Include="Migrations\202503130204299_EditDB.Designer.cs">
-      <DependentUpon>202503130204299_EditDB.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503140233557_1403.cs" />
-    <Compile Include="Migrations\202503140233557_1403.Designer.cs">
-      <DependentUpon>202503140233557_1403.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503160451297_1603.cs" />
-    <Compile Include="Migrations\202503160451297_1603.Designer.cs">
-      <DependentUpon>202503160451297_1603.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503160516313_16GV.cs" />
-    <Compile Include="Migrations\202503160516313_16GV.Designer.cs">
-      <DependentUpon>202503160516313_16GV.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503160526405_d2qjej.cs" />
-    <Compile Include="Migrations\202503160526405_d2qjej.Designer.cs">
-      <DependentUpon>202503160526405_d2qjej.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503160529403_d2qjejd.cs" />
-    <Compile Include="Migrations\202503160529403_d2qjejd.Designer.cs">
-      <DependentUpon>202503160529403_d2qjejd.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503170153535_7dad.cs" />
-    <Compile Include="Migrations\202503170153535_7dad.Designer.cs">
-      <DependentUpon>202503170153535_7dad.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503170210027_7daddadswbbv.cs" />
-    <Compile Include="Migrations\202503170210027_7daddadswbbv.Designer.cs">
-      <DependentUpon>202503170210027_7daddadswbbv.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503170356478_7daddadswbbvfs.cs" />
-    <Compile Include="Migrations\202503170356478_7daddadswbbvfs.Designer.cs">
-      <DependentUpon>202503170356478_7daddadswbbvfs.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503181751456_1903.cs" />
-    <Compile Include="Migrations\202503181751456_1903.Designer.cs">
-      <DependentUpon>202503181751456_1903.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503181759067_32132.cs" />
-    <Compile Include="Migrations\202503181759067_32132.Designer.cs">
-      <DependentUpon>202503181759067_32132.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503200733502_casvas.cs" />
-    <Compile Include="Migrations\202503200733502_casvas.Designer.cs">
-      <DependentUpon>202503200733502_casvas.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503200752452_InitialCreate.cs" />
-    <Compile Include="Migrations\202503200752452_InitialCreate.Designer.cs">
-      <DependentUpon>202503200752452_InitialCreate.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503210727215_21035.cs" />
-    <Compile Include="Migrations\202503210727215_21035.Designer.cs">
-      <DependentUpon>202503210727215_21035.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503210807275_2103585.cs" />
-    <Compile Include="Migrations\202503210807275_2103585.Designer.cs">
-      <DependentUpon>202503210807275_2103585.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503211008019_505s.cs" />
-    <Compile Include="Migrations\202503211008019_505s.Designer.cs">
-      <DependentUpon>202503211008019_505s.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503240339454_2403.cs" />
-    <Compile Include="Migrations\202503240339454_2403.Designer.cs">
-      <DependentUpon>202503240339454_2403.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503240807384_202356.cs" />
-    <Compile Include="Migrations\202503240807384_202356.Designer.cs">
-      <DependentUpon>202503240807384_202356.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503270232351_270dahwuq.cs" />
-    <Compile Include="Migrations\202503270232351_270dahwuq.Designer.cs">
-      <DependentUpon>202503270232351_270dahwuq.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503270836515_4582222.cs" />
-    <Compile Include="Migrations\202503270836515_4582222.Designer.cs">
-      <DependentUpon>202503270836515_4582222.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503270913288_4582wkd.cs" />
-    <Compile Include="Migrations\202503270913288_4582wkd.Designer.cs">
-      <DependentUpon>202503270913288_4582wkd.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503270940164_4gskdc.cs" />
-    <Compile Include="Migrations\202503270940164_4gskdc.Designer.cs">
-      <DependentUpon>202503270940164_4gskdc.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503280219187_fghjklsfd.cs" />
-    <Compile Include="Migrations\202503280219187_fghjklsfd.Designer.cs">
-      <DependentUpon>202503280219187_fghjklsfd.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503280716239_dsm.cs" />
-    <Compile Include="Migrations\202503280716239_dsm.Designer.cs">
-      <DependentUpon>202503280716239_dsm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503291259036_AddConfirmationToDangKyHoc.cs" />
-    <Compile Include="Migrations\202503291259036_AddConfirmationToDangKyHoc.Designer.cs">
-      <DependentUpon>202503291259036_AddConfirmationToDangKyHoc.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503291311531_AddConfirmationToDangKyHoc2.cs" />
-    <Compile Include="Migrations\202503291311531_AddConfirmationToDangKyHoc2.Designer.cs">
-      <DependentUpon>202503291311531_AddConfirmationToDangKyHoc2.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503291337030_AddConfirmationToDangKyHocdahj.cs" />
-    <Compile Include="Migrations\202503291337030_AddConfirmationToDangKyHocdahj.Designer.cs">
-      <DependentUpon>202503291337030_AddConfirmationToDangKyHocdahj.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503300508457_rghdl.cs" />
-    <Compile Include="Migrations\202503300508457_rghdl.Designer.cs">
-      <DependentUpon>202503300508457_rghdl.cs</DependentUpon>
+    <Compile Include="Migrations\202503310928292_NEWUPDATE428.cs" />
+    <Compile Include="Migrations\202503310928292_NEWUPDATE428.Designer.cs">
+      <DependentUpon>202503310928292_NEWUPDATE428.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ModelsService\LoginViewModel.cs" />
     <Compile Include="ModelsService\RegisterViewModel.cs" />
-    <Compile Include="Models\Admin.cs" />
     <Compile Include="Models\Attachment.cs" />
     <Compile Include="Models\BuoiHoc.cs" />
     <Compile Include="Models\BuoiHocAttachment.cs" />
     <Compile Include="Models\DangKyHoc.cs" />
     <Compile Include="Models\DbContextThongTinDaoTao.cs" />
-    <Compile Include="Models\DiemDanh.cs" />
+    <Compile Include="Models\DiemDanh_HV.cs" />
+    <Compile Include="Models\DiemDanh_GV.cs" />
     <Compile Include="Models\GiangVien.cs" />
+    <Compile Include="Models\GiangVien_BuoiHoc.cs" />
     <Compile Include="Models\HocVien.cs" />
     <Compile Include="Models\HocVienTempData.cs" />
     <Compile Include="Models\KhoaHoc.cs" />
@@ -329,6 +213,7 @@
     <Compile Include="Models\LopHoc.cs" />
     <Compile Include="Models\LopHocAttachment.cs" />
     <Compile Include="Models\NguoiDung.cs" />
+    <Compile Include="Models\PhanQuyen.cs" />
     <Compile Include="Models\ThongBao.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\EmailService.cs" />
@@ -650,95 +535,8 @@
     <Content Include="Scripts\jquery-3.7.0.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202503100906599_UpdateDB.resx">
-      <DependentUpon>202503100906599_UpdateDB.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503130200124_Uo.resx">
-      <DependentUpon>202503130200124_Uo.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503130204299_EditDB.resx">
-      <DependentUpon>202503130204299_EditDB.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503140233557_1403.resx">
-      <DependentUpon>202503140233557_1403.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503160451297_1603.resx">
-      <DependentUpon>202503160451297_1603.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503160516313_16GV.resx">
-      <DependentUpon>202503160516313_16GV.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503160526405_d2qjej.resx">
-      <DependentUpon>202503160526405_d2qjej.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503160529403_d2qjejd.resx">
-      <DependentUpon>202503160529403_d2qjejd.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503170153535_7dad.resx">
-      <DependentUpon>202503170153535_7dad.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503170210027_7daddadswbbv.resx">
-      <DependentUpon>202503170210027_7daddadswbbv.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503170356478_7daddadswbbvfs.resx">
-      <DependentUpon>202503170356478_7daddadswbbvfs.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503181751456_1903.resx">
-      <DependentUpon>202503181751456_1903.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503181759067_32132.resx">
-      <DependentUpon>202503181759067_32132.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503200733502_casvas.resx">
-      <DependentUpon>202503200733502_casvas.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503200752452_InitialCreate.resx">
-      <DependentUpon>202503200752452_InitialCreate.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503210727215_21035.resx">
-      <DependentUpon>202503210727215_21035.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503210807275_2103585.resx">
-      <DependentUpon>202503210807275_2103585.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503211008019_505s.resx">
-      <DependentUpon>202503211008019_505s.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503240339454_2403.resx">
-      <DependentUpon>202503240339454_2403.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503240807384_202356.resx">
-      <DependentUpon>202503240807384_202356.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503270232351_270dahwuq.resx">
-      <DependentUpon>202503270232351_270dahwuq.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503270836515_4582222.resx">
-      <DependentUpon>202503270836515_4582222.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503270913288_4582wkd.resx">
-      <DependentUpon>202503270913288_4582wkd.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503270940164_4gskdc.resx">
-      <DependentUpon>202503270940164_4gskdc.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503280219187_fghjklsfd.resx">
-      <DependentUpon>202503280219187_fghjklsfd.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503280716239_dsm.resx">
-      <DependentUpon>202503280716239_dsm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503291259036_AddConfirmationToDangKyHoc.resx">
-      <DependentUpon>202503291259036_AddConfirmationToDangKyHoc.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503291311531_AddConfirmationToDangKyHoc2.resx">
-      <DependentUpon>202503291311531_AddConfirmationToDangKyHoc2.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503291337030_AddConfirmationToDangKyHocdahj.resx">
-      <DependentUpon>202503291337030_AddConfirmationToDangKyHocdahj.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503300508457_rghdl.resx">
-      <DependentUpon>202503300508457_rghdl.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202503310928292_NEWUPDATE428.resx">
+      <DependentUpon>202503310928292_NEWUPDATE428.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
