@@ -33,13 +33,13 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         @Html.LabelFor(model => model.NgayBatDau, "Ngày Bắt Đầu", new { @class = "form-label" })
-                        @Html.TextBoxFor(model => model.NgayBatDau, new { @class = "form-control", type = "date", required = "required" })
+                        @Html.TextBoxFor(model => model.NgayBatDau, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", required = "required" })
                         @Html.ValidationMessageFor(model => model.NgayBatDau, "", new { @class = "text-danger" })
                     </div>
 
                     <div class="col-md-6 mb-3">
                         @Html.LabelFor(model => model.NgayKetThuc, "Ngày Kết Thúc", new { @class = "form-label" })
-                        @Html.TextBoxFor(model => model.NgayKetThuc, new { @class = "form-control", type = "date", required = "required" })
+                        @Html.TextBoxFor(model => model.NgayKetThuc, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", required = "required" })
                         @Html.ValidationMessageFor(model => model.NgayKetThuc, "", new { @class = "text-danger" })
                     </div>
                 </div>
@@ -64,7 +64,7 @@
                 </div>
 
 
-                <div class="col-md-6 mb-3">
+                <div class="col-md-12 mb-3">
                     @Html.Label("KhoaHocId", "Khóa Học", new { @class = "form-label" })
                     <select class="form-control" name="KhoaHocId" required>
                         <option value="">-- Chọn Khóa Học --</option>

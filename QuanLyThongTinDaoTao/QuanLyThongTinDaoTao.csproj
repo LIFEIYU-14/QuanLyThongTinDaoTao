@@ -203,6 +203,26 @@
     <Compile Include="Migrations\202503311003118_NEWUPDATE12.Designer.cs">
       <DependentUpon>202503311003118_NEWUPDATE12.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202504030229171_vbn.cs" />
+    <Compile Include="Migrations\202504030229171_vbn.Designer.cs">
+      <DependentUpon>202504030229171_vbn.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202504030250222_vbnx.cs" />
+    <Compile Include="Migrations\202504030250222_vbnx.Designer.cs">
+      <DependentUpon>202504030250222_vbnx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202504030257286_03042025.cs" />
+    <Compile Include="Migrations\202504030257286_03042025.Designer.cs">
+      <DependentUpon>202504030257286_03042025.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202504030349022_030420251.cs" />
+    <Compile Include="Migrations\202504030349022_030420251.Designer.cs">
+      <DependentUpon>202504030349022_030420251.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202504030353431_030.cs" />
+    <Compile Include="Migrations\202504030353431_030.Designer.cs">
+      <DependentUpon>202504030353431_030.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ModelsService\LoginViewModel.cs" />
     <Compile Include="ModelsService\RegisterViewModel.cs" />
@@ -552,6 +572,21 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202503311003118_NEWUPDATE12.resx">
       <DependentUpon>202503311003118_NEWUPDATE12.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202504030229171_vbn.resx">
+      <DependentUpon>202504030229171_vbn.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202504030250222_vbnx.resx">
+      <DependentUpon>202504030250222_vbnx.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202504030257286_03042025.resx">
+      <DependentUpon>202504030257286_03042025.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202504030349022_030420251.resx">
+      <DependentUpon>202504030349022_030420251.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202504030353431_030.resx">
+      <DependentUpon>202504030353431_030.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

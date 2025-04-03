@@ -8,8 +8,6 @@ namespace QuanLyThongTinDaoTao.Models
     [Table("HocViens")]
     public class HocVien : NguoiDung
     {
-        [Required]
-        [StringLength(20)]
         public string MaHocVien { get; set; }
         [Required(ErrorMessage = "Họ tên bắt buộc nhập")]
         public string HoVaTen { get; set; }
@@ -30,8 +28,8 @@ namespace QuanLyThongTinDaoTao.Models
         public string QR_Code_HV { get; set; } = Guid.NewGuid().ToString();
         public bool IsConfirmed { get; set; } = false; // Chỉ lưu học viên khi xác nhận
         public string XacNhanToken { get; set; } // Token để xác nhận đăng ký
-        public virtual ICollection<LopHoc> LopHocs { get; set; } = new List<LopHoc>();
-        public virtual ICollection<BuoiHoc> BuoiHocs { get; set; } = new List<BuoiHoc>();
+        //public virtual ICollection<LopHoc> LopHocs { get; set; } = new List<LopHoc>();
+        //public virtual ICollection<BuoiHoc> BuoiHocs { get; set; } = new List<BuoiHoc>();
         public virtual ICollection<DangKyHoc> DangKyHocs { get; set; } = new List<DangKyHoc>();
         public virtual ICollection<DiemDanh_HV> DiemDanh_HVs { get; set; } = new List<DiemDanh_HV>();
     }

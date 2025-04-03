@@ -29,5 +29,7 @@ namespace QuanLyThongTinDaoTao.Models
         public DbSet<KhoaHocAttachment> KhoaHocAttachments { get; set; }
         public DbSet<BuoiHocAttachment> BuoiHocAttachments { get; set; }
         public DbSet<PhanQuyen> PhanQuyens { get; set; }
+        
     }
+
 }
