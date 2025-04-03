@@ -66,7 +66,6 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             // Nếu ModelState không hợp lệ (bao gồm ràng buộc ngày qua CustomValidation)
             if (!ModelState.IsValid)
             {
-                ViewBag.KhoaHocList = db.KhoaHocs.ToList();
                 return View(model);
             }
 
@@ -80,7 +79,6 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             if (khoaHoc == null)
             {
                 ModelState.AddModelError("KhoaHocId", "Khóa học không tồn tại.");
-                ViewBag.KhoaHocList = db.KhoaHocs.ToList();
                 return View(model);
             }
             model.KhoaHoc = khoaHoc;

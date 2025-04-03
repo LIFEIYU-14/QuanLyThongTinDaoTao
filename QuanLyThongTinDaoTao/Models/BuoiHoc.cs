@@ -35,6 +35,7 @@ namespace QuanLyThongTinDaoTao.Models
         [Required]
         public TrangThaiBuoiHoc TrangThai { get; set; } = TrangThaiBuoiHoc.SapDienRa;
 
+        [AllowHtml]
         public string GhiChu { get; set; }
 
         public virtual LopHoc LopHoc { get; set; }

@@ -46,6 +46,20 @@
                         @Html.ValidationMessageFor(model => model.GioKetThuc, "", new { @class = "text-danger" })
                     </div>
                 </div>
+                <div class="col-md-12 mb-3">
+                    <label class="form-label">Chọn Giảng Viên</label>
+                    <div class="border rounded p-2" style="max-height: 300px; overflow-y: auto;">
+                        @foreach (var gv in ViewBag.GiangVienList)
+                        {
+                            var isChecked = Model?.GiangVien_BuoiHocs!= null && Model.GiangVien_BuoiHocs.Any(g => g.NguoiDungId == gv.NguoiDungId) ? "checked" : "";
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="selectedGiangViens" value="@gv.NguoiDungId" id="gv_@gv.NguoiDungId" @isChecked />
+                                <label class="form-check-label" for="gv_@gv.NguoiDungId">@gv.HoVaTen</label>
+                            </div>
+                        }
+                    </div>
+                </div>
+
                 <!-- Tệp Đính Kèm -->
                 <div class="mb-3">
                     <label for="attachments" class="form-label">Tệp Đính Kèm (JPG, PNG, PDF, DOCX, TXT)</label>

@@ -7,7 +7,7 @@
 }
 
 <div class="container-fluid pt-4 px-4">
-    <a href="@Url.Action("Create", "BuoiHoc", new { id = ViewBag.LopHocId })"class="btn btn-success mt-3 btn-lg">
+    <a href="@Url.Action("Create", "BuoiHoc", new { id = ViewBag.LopHocId })" class="btn btn-success mt-3 btn-lg">
         <i class="fas fa-plus-circle"></i> Thêm Buổi Học
     </a>
 
@@ -38,7 +38,14 @@
 
                             <a href="@Url.Action("Details", new { id = buoiHoc.BuoiHocId })" class="btn btn-info btn-sm">Chi Tiết</a>
                             <a href="@Url.Action("Edit", new { id = buoiHoc.BuoiHocId })" class="btn btn-warning btn-sm">Sửa</a>
-                            <a href="@Url.Action("Delete", new { id = buoiHoc.BuoiHocId })" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa?');">Xóa</a>
+                            <form action="@Url.Action("Delete", new { id = buoiHoc.BuoiHocId })" method="post" style="display:inline-block;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa buổi học này?');">
+                                @Html.AntiForgeryToken() 
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash-alt"></i> Xóa
+                                </button>
+                            </form>
+
+
                         </div>
                     </div>
                 }

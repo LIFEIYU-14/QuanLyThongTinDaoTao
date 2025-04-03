@@ -191,37 +191,17 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\QRCodeHelper.cs" />
-    <Compile Include="Migrations\202503310933045_NEWUPDATE.cs" />
-    <Compile Include="Migrations\202503310933045_NEWUPDATE.Designer.cs">
-      <DependentUpon>202503310933045_NEWUPDATE.cs</DependentUpon>
+    <Compile Include="Migrations\202504030501237_CreateGiangVienBuoiHocTable.cs" />
+    <Compile Include="Migrations\202504030501237_CreateGiangVienBuoiHocTable.Designer.cs">
+      <DependentUpon>202504030501237_CreateGiangVienBuoiHocTable.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202503310937342_NEWUPDATE1.cs" />
-    <Compile Include="Migrations\202503310937342_NEWUPDATE1.Designer.cs">
-      <DependentUpon>202503310937342_NEWUPDATE1.cs</DependentUpon>
+    <Compile Include="Migrations\202504030530061_1229.cs" />
+    <Compile Include="Migrations\202504030530061_1229.Designer.cs">
+      <DependentUpon>202504030530061_1229.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202503311003118_NEWUPDATE12.cs" />
-    <Compile Include="Migrations\202503311003118_NEWUPDATE12.Designer.cs">
-      <DependentUpon>202503311003118_NEWUPDATE12.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202504030229171_vbn.cs" />
-    <Compile Include="Migrations\202504030229171_vbn.Designer.cs">
-      <DependentUpon>202504030229171_vbn.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202504030250222_vbnx.cs" />
-    <Compile Include="Migrations\202504030250222_vbnx.Designer.cs">
-      <DependentUpon>202504030250222_vbnx.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202504030257286_03042025.cs" />
-    <Compile Include="Migrations\202504030257286_03042025.Designer.cs">
-      <DependentUpon>202504030257286_03042025.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202504030349022_030420251.cs" />
-    <Compile Include="Migrations\202504030349022_030420251.Designer.cs">
-      <DependentUpon>202504030349022_030420251.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202504030353431_030.cs" />
-    <Compile Include="Migrations\202504030353431_030.Designer.cs">
-      <DependentUpon>202504030353431_030.cs</DependentUpon>
+    <Compile Include="Migrations\202504030837126_sss.cs" />
+    <Compile Include="Migrations\202504030837126_sss.Designer.cs">
+      <DependentUpon>202504030837126_sss.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ModelsService\LoginViewModel.cs" />
@@ -564,29 +544,14 @@
     <Content Include="Scripts\jquery-3.7.0.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202503310933045_NEWUPDATE.resx">
-      <DependentUpon>202503310933045_NEWUPDATE.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202504030501237_CreateGiangVienBuoiHocTable.resx">
+      <DependentUpon>202504030501237_CreateGiangVienBuoiHocTable.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503310937342_NEWUPDATE1.resx">
-      <DependentUpon>202503310937342_NEWUPDATE1.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202504030530061_1229.resx">
+      <DependentUpon>202504030530061_1229.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503311003118_NEWUPDATE12.resx">
-      <DependentUpon>202503311003118_NEWUPDATE12.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202504030229171_vbn.resx">
-      <DependentUpon>202504030229171_vbn.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202504030250222_vbnx.resx">
-      <DependentUpon>202504030250222_vbnx.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202504030257286_03042025.resx">
-      <DependentUpon>202504030257286_03042025.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202504030349022_030420251.resx">
-      <DependentUpon>202504030349022_030420251.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202504030353431_030.resx">
-      <DependentUpon>202504030353431_030.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202504030837126_sss.resx">
+      <DependentUpon>202504030837126_sss.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

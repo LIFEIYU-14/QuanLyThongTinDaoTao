@@ -7,13 +7,13 @@ namespace QuanLyThongTinDaoTao.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.5.1")]
-    public sealed partial class _030 : IMigrationMetadata
+    public sealed partial class CreateGiangVienBuoiHocTable : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(_030));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(CreateGiangVienBuoiHocTable));
         
         string IMigrationMetadata.Id
         {
-            get { return "202504030353431_030"; }
+            get { return "202504030501237_CreateGiangVienBuoiHocTable"; }
         }
         
         string IMigrationMetadata.Source

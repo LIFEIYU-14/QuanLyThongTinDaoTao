@@ -29,7 +29,19 @@ namespace QuanLyThongTinDaoTao.Models
         public DbSet<KhoaHocAttachment> KhoaHocAttachments { get; set; }
         public DbSet<BuoiHocAttachment> BuoiHocAttachments { get; set; }
         public DbSet<PhanQuyen> PhanQuyens { get; set; }
-        
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<GiangVien_BuoiHoc>()
+                        .HasRequired(g => g.BuoiHoc)
+                        .WithMany(b => b.GiangVien_BuoiHocs)
+                        .HasForeignKey(g => g.BuoiHocId);
+
+            modelBuilder.Entity<GiangVien_BuoiHoc>()
+                        .HasRequired(g => g.GiangVien)
+                        .WithMany(gv => gv.GiangVien_BuoiHocs)
+                        .HasForeignKey(g => g.NguoiDungId);
+        }
+
     }
 
 }

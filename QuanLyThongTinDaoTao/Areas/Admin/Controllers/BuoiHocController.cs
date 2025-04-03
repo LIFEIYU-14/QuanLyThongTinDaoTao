@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using QuanLyThongTinDaoTao.Models;
@@ -24,17 +25,18 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         public ActionResult Create()
         {
             ViewBag.LopHocList = db.LopHocs.ToList();
+            ViewBag.GiangVienList = db.GiangViens.ToList();
             return View();
         }
 
         // Tạo buổi học (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(BuoiHoc model, Guid LopHocId, HttpPostedFileBase[] attachments)
+        public ActionResult Create(BuoiHoc model, Guid LopHocId, HttpPostedFileBase[] attachments, Guid[] selectedGiangViens)
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.LopHocList = db.LopHocs.ToList();
+         
                 return View(model);
             }
 
@@ -42,19 +44,19 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             if (lopHoc == null)
             {
                 ModelState.AddModelError("LopHocId", "Lớp học không tồn tại.");
-                ViewBag.LopHocList = db.LopHocs.ToList();
+
                 return View(model);
             }
 
-            // Kiểm tra NgayHoc có nằm trong khoảng NgayBatDau - NgayKetThuc của lớp không?
+            // Kiểm tra thời gian hợp lệ
             if (model.NgayHoc < lopHoc.NgayBatDau || model.NgayHoc > lopHoc.NgayKetThuc)
             {
                 ModelState.AddModelError("NgayHoc", "Ngày học phải nằm trong khoảng từ " + lopHoc.NgayBatDau.ToShortDateString() + " đến " + lopHoc.NgayKetThuc.ToShortDateString());
-                ViewBag.LopHocList = db.LopHocs.ToList();
+
                 return View(model);
             }
 
-            // Kiểm tra trùng thời gian với buổi học khác của cùng lớp
+            // Kiểm tra trùng thời gian
             bool isOverlap = db.BuoiHocs.Any(b =>
                 b.LopHoc.LopHocId == LopHocId &&
                 b.NgayHoc == model.NgayHoc &&
@@ -66,16 +68,36 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             if (isOverlap)
             {
                 ModelState.AddModelError("GioBatDau", "Thời gian buổi học bị trùng với một buổi học khác.");
-                ViewBag.LopHocList = db.LopHocs.ToList();
+  
                 return View(model);
             }
 
+            // Thêm buổi học mới
             model.BuoiHocId = Guid.NewGuid();
             model.LopHoc = lopHoc;
-
             db.BuoiHocs.Add(model);
             db.SaveChanges();
 
+            // Thêm giảng viên vào buổi học
+            if (selectedGiangViens != null && selectedGiangViens.Any())
+            {
+                foreach (var giangVienId in selectedGiangViens)
+                {
+                    var giangVien = db.GiangViens.Find(giangVienId);
+                    if (giangVien != null)
+                    {
+                        db.GiangVien_BuoiHoc.Add(new GiangVien_BuoiHoc
+                        {
+                            Id = Guid.NewGuid(),
+                            BuoiHocId = model.BuoiHocId,
+                            NguoiDungId = giangVienId
+                        });
+                    }
+                }
+                db.SaveChanges();
+            }
+
+            // Xử lý tệp đính kèm
             if (attachments != null)
             {
                 UploadAttachments(model.BuoiHocId, attachments);
@@ -84,7 +106,6 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             TempData["Success"] = "Buổi học đã được tạo thành công!";
             return RedirectToAction("Index");
         }
-
         // Chỉnh sửa buổi học (GET)
         public ActionResult Edit(Guid id)
         {
@@ -96,17 +117,18 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 return HttpNotFound();
             }
             ViewBag.LopHocList = db.LopHocs.ToList();
+            ViewBag.GiangVienList = db.GiangViens.ToList();
+            ViewBag.GiangVienDaChon = buoiHoc.GiangVien_BuoiHocs?.Select(g => g.NguoiDungId).ToList();
             return View(buoiHoc);
         }
 
         // Chỉnh sửa buổi học (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(BuoiHoc model, Guid LopHocId, HttpPostedFileBase[] attachments)
+        public ActionResult Edit(BuoiHoc model, Guid LopHocId, HttpPostedFileBase[] attachments, Guid[] selectedGiangViens)
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.LopHocList = db.LopHocs.ToList();
                 return View(model);
             }
 
@@ -120,7 +142,6 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             if (lopHoc == null)
             {
                 ModelState.AddModelError("LopHocId", "Lớp học không tồn tại.");
-                ViewBag.LopHocList = db.LopHocs.ToList();
                 return View(model);
             }
 
@@ -128,7 +149,6 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             if (model.NgayHoc < lopHoc.NgayBatDau || model.NgayHoc > lopHoc.NgayKetThuc)
             {
                 ModelState.AddModelError("NgayHoc", "Ngày học phải nằm trong khoảng từ " + lopHoc.NgayBatDau.ToShortDateString() + " đến " + lopHoc.NgayKetThuc.ToShortDateString());
-                ViewBag.LopHocList = db.LopHocs.ToList();
                 return View(model);
             }
 
@@ -157,7 +177,34 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             buoiHoc.GhiChu = model.GhiChu;
             buoiHoc.LopHoc = lopHoc;
 
+            // --- XỬ LÝ GIẢNG VIÊN ---
+            // Xóa hết danh sách giảng viên đã có cho buổi học hiện tại
+            var existingGiangVienBuoiHoc = db.GiangVien_BuoiHoc.Where(gv => gv.BuoiHocId == model.BuoiHocId).ToList();
+            foreach (var gv in existingGiangVienBuoiHoc)
+            {
+                db.GiangVien_BuoiHoc.Remove(gv);
+            }
             db.SaveChanges();
+
+            // Thêm lại giảng viên theo danh sách được chọn
+            if (selectedGiangViens != null && selectedGiangViens.Any())
+            {
+                foreach (var giangVienId in selectedGiangViens)
+                {
+                    var giangVien = db.GiangViens.Find(giangVienId);
+                    if (giangVien != null)
+                    {
+                        db.GiangVien_BuoiHoc.Add(new GiangVien_BuoiHoc
+                        {
+                            Id = Guid.NewGuid(),
+                            BuoiHocId = model.BuoiHocId,
+                            NguoiDungId = giangVienId
+                        });
+                    }
+                }
+                db.SaveChanges();
+            }
+            // --- KẾT THÚC XỬ LÝ GIẢNG VIÊN ---
 
             if (attachments != null)
             {
@@ -168,30 +215,51 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
-        // Xóa buổi học (GET)
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Delete(Guid id)
         {
-            var buoiHoc = db.BuoiHocs.Find(id);
-            if (buoiHoc == null)
-                return HttpNotFound();
-            return View(buoiHoc);
-        }
-
-        // Xóa buổi học (POST)
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(Guid id)
-        {
-            var buoiHoc = db.BuoiHocs.Find(id);
-            if (buoiHoc != null)
+            if (id == Guid.Empty)
             {
-                db.BuoiHocs.Remove(buoiHoc);
-                db.SaveChanges();
-                TempData["Success"] = "Buổi học đã được xóa thành công!";
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
+            BuoiHoc buoiHoc = db.BuoiHocs.Find(id);
+            if (buoiHoc == null)
+            {
+                TempData["Error"] = "Buổi học không tồn tại!";
+                return RedirectToAction("Index");
+            }
+
+            var giangVienBuoiHocs = db.GiangVien_BuoiHoc.Where(gv => gv.BuoiHocId == id).ToList();
+            db.GiangVien_BuoiHoc.RemoveRange(giangVienBuoiHocs);
+
+            var diemDanhHV = db.DiemDanhs_HVs.Where(dh => dh.BuoiHocId == id).ToList();
+            db.DiemDanhs_HVs.RemoveRange(diemDanhHV);
+
+            var diemDanhGV = db.DiemDanhs_GVs.Where(dg => dg.BuoiHocId == id).ToList();
+            db.DiemDanhs_GVs.RemoveRange(diemDanhGV);
+
+            var buoiHocAttachments = db.BuoiHocAttachments.Where(bha => bha.BuoiHocId == id).ToList();
+            foreach (var attachment in buoiHocAttachments)
+            {
+                var filePath = Server.MapPath(attachment.Attachment.FilePath);
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+                db.Attachments.Remove(attachment.Attachment);
+            }
+            db.BuoiHocAttachments.RemoveRange(buoiHocAttachments);
+
+            // Xóa buổi học khỏi bảng BuoiHocs
+            db.BuoiHocs.Remove(buoiHoc);
+            db.SaveChanges();
+
+            TempData["Success"] = "Xóa buổi học thành công!";
             return RedirectToAction("Index");
         }
-
         // Xem chi tiết buổi học
         public ActionResult Details(Guid id)
         {
@@ -247,6 +315,33 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                     db.SaveChanges();
                 }
             }
+        }
+        public ActionResult DeleteAttachment(Guid attachmentId, Guid buoiHocId)
+        {
+            var attachment = db.Attachments.Find(attachmentId);
+            if (attachment == null)
+            {
+                return HttpNotFound();
+            }
+
+            // Xóa tệp từ thư mục lưu trữ
+            string filePath = Server.MapPath(attachment.FilePath);
+            if (System.IO.File.Exists(filePath))
+            {
+                System.IO.File.Delete(filePath);
+            }
+
+            // Xóa khỏi bảng Attachment và BuoiHocAttachment
+            var buoiHocAttachment = db.BuoiHocAttachments.FirstOrDefault(k => k.AttachmentId == attachmentId);
+            if (buoiHocAttachment != null)
+            {
+                db.BuoiHocAttachments.Remove(buoiHocAttachment);
+            }
+
+            db.Attachments.Remove(attachment);
+            db.SaveChanges();
+
+            return RedirectToAction("Edit", new { id = buoiHocId });
         }
     }
 }

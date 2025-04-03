@@ -135,12 +135,41 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 return RedirectToAction("Index");
             }
 
-            // Thực hiện xóa giảng viên
-            db.GiangViens.Remove(gv);
-            db.SaveChanges();
-            TempData["Success"] = "Xóa giảng viên thành công!";
-            return RedirectToAction("Index");
+            try
+            {
+                // Xóa các bản ghi liên quan trong bảng DiemDanh_GV
+                var diemDanhs = db.DiemDanhs_GVs.Where(d => d.GiangVien.NguoiDungId == gv.NguoiDungId).ToList();
+                db.DiemDanhs_GVs.RemoveRange(diemDanhs);
+
+                // Xóa các bản ghi liên quan trong bảng GiangVien_BuoiHoc
+                var giangVienBuoiHocs = db.GiangVien_BuoiHoc.Where(gvh => gvh.GiangVien.NguoiDungId == gv.NguoiDungId).ToList();
+                db.GiangVien_BuoiHoc.RemoveRange(giangVienBuoiHocs);
+
+                // Xóa các bản ghi liên quan trong bảng ThongBao
+                var thongBaos = db.ThongBaos.Where(t => t.GiangViens.Any(gvItem => gvItem.NguoiDungId == gv.NguoiDungId)).ToList();
+                foreach (var thongBao in thongBaos)
+                {
+                    thongBao.GiangViens.Remove(gv); // Xóa liên kết giảng viên khỏi thông báo
+                    if (!thongBao.GiangViens.Any()) // Nếu không còn giảng viên nào liên kết với thông báo, xóa thông báo
+                    {
+                        db.ThongBaos.Remove(thongBao);
+                    }
+                }
+
+                // Sau khi xóa các bản ghi liên quan, xóa giảng viên
+                db.GiangViens.Remove(gv);
+                db.SaveChanges();
+
+                TempData["Success"] = "Xóa giảng viên thành công!";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Lỗi khi xóa giảng viên: " + ex.Message;
+                return RedirectToAction("Index");
+            }
         }
+
 
 
 
