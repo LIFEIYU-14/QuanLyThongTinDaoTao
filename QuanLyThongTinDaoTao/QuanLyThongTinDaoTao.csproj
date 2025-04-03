@@ -477,6 +477,7 @@
     <Content Include="Areas\Admin\Views\GiangVien\Edit.cshtml" />
     <Content Include="Areas\Admin\Views\LopHoc\_LopHocTablePartial.cshtml" />
     <Content Include="Areas\Admin\Views\KhoaHoc\ThemLopHoc_KhoaHoc.cshtml" />
+    <Content Include="Areas\Admin\Views\HocVien\Edit.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />

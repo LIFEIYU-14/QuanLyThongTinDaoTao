@@ -93,6 +93,37 @@
         resize: vertical;
         overflow-y: auto;
     }
+
+    .form-label {
+        font-weight: bold;
+    }
+
+    .form-control {
+        padding: 0.75rem;
+        font-size: 1rem;
+    }
+
+    .btn-lg {
+        padding: 0.5rem 1.5rem;
+        font-size: 1.125rem;
+    }
+
+    .card-header {
+        font-size: 1.5rem;
+    }
+
+    .text-danger {
+        font-size: 0.875rem;
+    }
+
+    .row {
+        margin-bottom: 1.5rem;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
 </style>
 
 <!-- Tích hợp CKEditor 5 -->
@@ -115,5 +146,9 @@
             .catch(error => {
                 console.error('Lỗi CKEditor:', error);
             });
+    });
+    document.getElementById('submitBtn').addEventListener('click', function () {
+        this.disabled = true;  // Disable the submit button
+        this.innerHTML = '<i class="fa-solid fa-circle-plus"></i> Đang Xử Lý...';  // Optionally change button text
     });
 </script>

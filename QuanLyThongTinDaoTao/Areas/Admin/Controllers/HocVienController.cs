@@ -24,79 +24,96 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
             return View(hocViens.ToList());
         }
-
-        // Hiển thị form thêm học viên
+        // GET: Admin/HocVien/Create
         public ActionResult Create()
         {
             return View();
         }
-
-        // Xử lý thêm học viên
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(HocVien hocVien)
+        public ActionResult Create(HocVien hv)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                hocVien.NguoiDungId = Guid.NewGuid();
-                hocVien.NgayTao = DateTime.Now;
-                hocVien.NgayCapNhat = DateTime.Now;
-                db.HocViens.Add(hocVien);
+                return View(hv);
+            }
+
+            try
+            {
+                // Kiểm tra email trùng
+                if (db.HocViens.Any(g => g.Email == hv.Email))
+                {
+                    ModelState.AddModelError("Email", "Email đã tồn tại trong hệ thống.");
+                    return View(hv);
+                }
+
+                hv.MaHocVien = DateTime.Now.Year + hv.NgaySinh.Year.ToString() + new Random().Next(1000, 9999);
+                // Thiết lập thông tin hocj viên
+                hv.TaiKhoan = hv.MaHocVien;
+                hv.MatKhau = PasswordHelper.HashPassword(hv.MaHocVien + "123456");
+                hv.NguoiDungId = Guid.NewGuid();
+                hv.NgayTao = DateTime.Now;
+                hv.NgayCapNhat = DateTime.Now;
+
+                db.HocViens.Add(hv);
                 db.SaveChanges();
+                TempData["Success"] = "Thêm học viên thành công!";
                 return RedirectToAction("Index");
             }
-            return View(hocVien);
-        }
-
-        // Hiển thị form sửa thông tin học viên
-        public ActionResult Edit(Guid id)
-        {
-            var hocVien = db.HocViens.Find(id);
-            if (hocVien == null)
+            catch (Exception ex)
             {
-                return HttpNotFound();
+                ModelState.AddModelError("", "Lỗi khi thêm học viên: " + ex.Message);
             }
-            return View(hocVien);
+
+            return View(hv);
         }
 
         // Xử lý cập nhật học viên
+        public ActionResult Edit(Guid id)
+        {
+            if (id == Guid.Empty) return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            HocVien hv = db.HocViens.Find(id);
+            if (hv == null) return HttpNotFound();
+            return View(hv);
+        }
+        // POST: Admin/GiangVien/Edit/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(HocVien hocVien)
+        public ActionResult Edit(HocVien hv)
         {
             if (ModelState.IsValid)
             {
-                hocVien.NgayCapNhat = DateTime.Now;
-                db.Entry(hocVien).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                try
+                {
+                    var existingHV = db.HocViens.Find(hv.NguoiDungId);
+                    if (existingHV == null) return HttpNotFound();
+
+                    // Cập nhật thông tin
+                    existingHV.HoVaTen = hv.HoVaTen;
+                    existingHV.NgaySinh = hv.NgaySinh;
+                    existingHV.SoDienThoai = hv.SoDienThoai;
+                    existingHV.Email = hv.Email;
+                    existingHV.CoQuanLamViec = hv.CoQuanLamViec;
+                    existingHV.NgayCapNhat = DateTime.Now;
+
+                    if (!string.IsNullOrEmpty(hv.MatKhau))
+                    {
+                        existingHV.MatKhau = PasswordHelper.HashPassword(hv.MatKhau);
+                    }
+
+                    db.Entry(existingHV).State = EntityState.Modified;
+                    db.SaveChanges();
+                    TempData["Success"] = "Cập nhật học viên thành công!";
+                    return RedirectToAction("Index");
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Lỗi khi cập nhật giảng viên: " + ex.Message);
+                }
             }
-            return View(hocVien);
+            return View(hv);
         }
 
-        // Xác nhận xóa học viên
-        public ActionResult Delete(Guid id)
-        {
-            var hocVien = db.HocViens.Find(id);
-            if (hocVien == null)
-            {
-                return HttpNotFound();
-            }
-            return View(hocVien);
-        }
-
-        // Xử lý xóa học viên
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(Guid id)
-        {
-            var hocVien = db.HocViens.Find(id);
-            if (hocVien != null)
-            {
-                db.HocViens.Remove(hocVien);
-                db.SaveChanges();
-            }
-            return RedirectToAction("Index");
-        }
+        
     }
 }

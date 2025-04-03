@@ -26,10 +26,6 @@ namespace QuanLyThongTinDaoTao.Controllers
 
         public ActionResult DanhSachLopHoc(Guid? id)
         {
-            if (!id.HasValue)
-            {
-                return HttpNotFound("Lớp học không hợp lệ.");
-            }
 
             var khoaHoc = db.KhoaHocs.Include(k => k.LopHocs)
                                      .Include(k => k.KhoaHocAttachments)

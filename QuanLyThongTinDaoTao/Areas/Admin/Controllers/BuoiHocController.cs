@@ -24,6 +24,9 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         // Tạo buổi học (GET)
         public ActionResult Create()
         {
+
+            var lopHocList = db.LopHocs.ToList();  // Fetch the list from the database
+            ViewBag.LopHocList = lopHocList;
             ViewBag.LopHocList = db.LopHocs.ToList();
             ViewBag.GiangVienList = db.GiangViens.ToList();
             return View();

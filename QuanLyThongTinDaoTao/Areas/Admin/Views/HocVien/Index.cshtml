@@ -1,42 +1,116 @@
 ﻿@model IEnumerable<QuanLyThongTinDaoTao.Models.HocVien>
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Danh Sách Học Viên";
     Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
 }
-<h2>Danh sách Học viên</h2>
 
-<p>
-    @Html.ActionLink("Thêm Học viên", "Create", null, new { @class = "btn btn-primary" })
-</p>
+<div class="container-fluid pt-4 px-4">
+    <div class="bg-light rounded p-4 shadow-sm">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h4 class="mb-0 text-primary fw-bold">
+                <i class="fas fa-users"></i> Danh Sách Học Viên
+            </h4>
+            <a href="@Url.Action("Create")" class="btn btn-success fs-5">
+                <i class="fas fa-plus-circle"></i> Thêm Học Viên Mới
+            </a>
+        </div>
 
-<form method="get">
-    <input type="text" name="searchString" placeholder="Tìm kiếm..." />
-    <button type="submit">Tìm</button>
-</form>
+        <div class="table-responsive">
+            <table class="table table-striped align-middle table-bordered">
+                <thead class="table-primary">
+                    <tr class="text-center">
+                        <th>STT</th>
+                        <th>Mã Học Viên</th>
+                        <th>Họ và Tên</th>
+                        <th>Ngày Sinh</th>
+                        <th>Email</th>
+                        <th>Điện Thoại</th>
+                        <th>Cơ Quan Làm Việc</th>
+                        <th>Ngày Tạo</th>
+                        <th>Hành Động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int stt = 1;
+                        foreach (var item in Model)
+                        {
+                            <tr class="text-center">
+                                <td>@stt</td>
+                                <td>@item.MaHocVien</td>
+                                <td>@item.HoVaTen</td>
+                                <td>@item.NgaySinh.ToShortDateString()</td>
+                                <td>@item.Email</td>
+                                <td>@item.SoDienThoai</td>
+                                <td>@item.CoQuanLamViec</td>
+                                <td>@item.NgayTao.ToShortDateString()</td>
+                                <td>
+                                    <a href="@Url.Action("Details", new { id = item.NguoiDungId })" class="btn btn-info btn-sm">
+                                        <i class="fas fa-eye"></i> Xem
+                                    </a>
+                                    <a href="@Url.Action("Edit", new { id = item.NguoiDungId })" class="btn btn-warning btn-sm mx-2">
+                                        <i class="fas fa-edit"></i> Chỉnh Sửa
+                                    </a>
+                                    <a href="@Url.Action("Delete", new { id = item.NguoiDungId })" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa học viên này?');">
+                                        <i class="fas fa-trash-alt"></i> Xóa
+                                    </a>
+                                </td>
+                            </tr>
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Họ và tên</th>
-            <th>Email</th>
-            <th>Điện thoại</th>
-            <th>Ngày tạo</th>
-            <th>Thao tác</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.HoVaTen</td>
-                <td>@item.Email</td>
-                <td>@item.SoDienThoai</td>
-                <td>@item.NgayTao.ToShortDateString()</td>
-                <td>
-                    @Html.ActionLink("Sửa", "Edit", new { id = item.NguoiDungId }, new { @class = "btn btn-warning" })
-                    @Html.ActionLink("Xóa", "Delete", new { id = item.NguoiDungId }, new { @class = "btn btn-danger" })
-                </td>
-            </tr>
+                            stt++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table th, .table td {
+        vertical-align: middle !important;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: #f9f9f9;
+    }
+
+    .table-bordered th, .table-bordered td {
+        border: 1px solid #dee2e6;
+    }
+
+    .btn-sm {
+        font-size: 0.875rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .btn-info {
+        background-color: #17a2b8;
+        border-color: #17a2b8;
+    }
+
+        .btn-info:hover {
+            background-color: #138496;
+            border-color: #117a8b;
         }
-    </tbody>
-</table>
+
+    .btn-warning {
+        background-color: #ffc107;
+        border-color: #ffc107;
+    }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+            border-color: #d39e00;
+        }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+</style>
