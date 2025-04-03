@@ -15,7 +15,7 @@ namespace QuanLyThongTinDaoTao.Models
         [Required(ErrorMessage = "Họ tên bắt buộc nhập")]
         public string HoVaTen { get; set; }
         [Required]
-        public DateTime? NgaySinh { get; set; }
+        public DateTime NgaySinh { get; set; }
         [Required]
         [StringLength(15)]
         public string SoDienThoai { get; set; }

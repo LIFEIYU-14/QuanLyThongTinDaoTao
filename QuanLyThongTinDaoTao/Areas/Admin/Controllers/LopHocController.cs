@@ -212,7 +212,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 UploadAttachments(lopHoc.LopHocId, attachments);
             }
 
-            TempData["SuccessMessage"] = "Cập nhật lớp học thành công!";
+            TempData["Success"] = "Cập nhật lớp học thành công!";
             return RedirectToAction("Index");
         }
 

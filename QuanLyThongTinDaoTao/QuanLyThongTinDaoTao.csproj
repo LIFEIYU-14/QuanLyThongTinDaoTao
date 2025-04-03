@@ -179,6 +179,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Areas\Admin\AdminAreaRegistration.cs" />
     <Compile Include="Areas\Admin\Controllers\BuoiHocController.cs" />
+    <Compile Include="Areas\Admin\Controllers\GiangVienController.cs" />
     <Compile Include="Areas\Admin\Controllers\HomeAdminController.cs" />
     <Compile Include="Areas\Admin\Controllers\KhoaHocController.cs" />
     <Compile Include="Areas\Admin\Controllers\LopHocController.cs" />

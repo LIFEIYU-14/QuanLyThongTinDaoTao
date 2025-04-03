@@ -81,7 +81,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 UploadAttachments(model.BuoiHocId, attachments);
             }
 
-            TempData["SuccessMessage"] = "Buổi học đã được tạo thành công!";
+            TempData["Success"] = "Buổi học đã được tạo thành công!";
             return RedirectToAction("Index");
         }
 
@@ -164,7 +164,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 UploadAttachments(buoiHoc.BuoiHocId, attachments);
             }
 
-            TempData["SuccessMessage"] = "Cập nhật buổi học thành công!";
+            TempData["Success"] = "Cập nhật buổi học thành công!";
             return RedirectToAction("Index");
         }
 
@@ -187,7 +187,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             {
                 db.BuoiHocs.Remove(buoiHoc);
                 db.SaveChanges();
-                TempData["SuccessMessage"] = "Buổi học đã được xóa thành công!";
+                TempData["Success"] = "Buổi học đã được xóa thành công!";
             }
             return RedirectToAction("Index");
         }

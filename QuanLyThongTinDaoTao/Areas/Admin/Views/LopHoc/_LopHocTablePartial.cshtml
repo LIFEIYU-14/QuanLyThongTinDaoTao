@@ -1,10 +1,13 @@
 ﻿@model List<QuanLyThongTinDaoTao.Models.LopHoc>
 
+@{ int stt = 1; }
+
 @foreach (var lophoc in Model)
 {
     <tr class="text-center">
+        <td>@stt</td>
         <td>@lophoc.MaLopHoc</td>
-        <td class="text-start">@lophoc.TenLopHoc</td>
+        <td>@lophoc.TenLopHoc</td>
         <td>@(lophoc.KhoaHoc != null ? lophoc.KhoaHoc.TenKhoaHoc : "Chưa có")</td>
         <td>@lophoc.SoTinChi</td>
         <td>@lophoc.NgayBatDau.ToString("dd/MM/yyyy")</td>
@@ -26,4 +29,5 @@
             </a>
         </td>
     </tr>
+    stt++;
 }

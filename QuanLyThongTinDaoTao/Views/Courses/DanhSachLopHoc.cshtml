@@ -14,56 +14,66 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-4">
-                    <div class="card">
-                        <img src="@(string.IsNullOrEmpty(khoaHoc.HinhDaiDienKhoaHoc) ? "/images/default-course.jpg" : khoaHoc.HinhDaiDienKhoaHoc)"
-                             class="card-img-top"
-                             alt="@khoaHoc.TenKhoaHoc">
-                        <div class="card-body">
-                            <h5 class="card-title text-center">@khoaHoc.TenKhoaHoc</h5>
-                            <p class="card-text">@khoaHoc.MoTa</p>
-                        </div>
+                    <img src="@(string.IsNullOrEmpty(khoaHoc.HinhDaiDienKhoaHoc) ? "/images/default-course.jpg" : khoaHoc.HinhDaiDienKhoaHoc)"
+                         class="img-fluid rounded"
+                         alt="@khoaHoc.TenKhoaHoc">
+                </div>
+                <div class="col-lg-8 d-flex align-items-center">
+
+                    <div>
+                        <h3 class="fw-bold">@khoaHoc.TenKhoaHoc</h3>
+                        <p>NỘI DUNG:@Html.Raw(khoaHoc.MoTa)</p>
                     </div>
                 </div>
-                <div class="col-lg-8">
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12">
                     <div class="bg-light text-center rounded p-4">
-                        <h6 class="mb-3 fs-3">Danh Sách Lớp Học - @khoaHoc.TenKhoaHoc</h6>
+                        <h6 class="mb-3 fs-3">Danh Sách Lớp Học</h6>
 
                         @if (Model != null && Model.Any())
                         {
-                            <table class="table table-bordered text-center fs-5">
-                                <thead>
-                                    <tr>
-                                        <th>Tên Lớp Học</th>
-                                        <th>Số Tín Chỉ</th>
-                                        <th>Ngày Bắt Đầu</th>
-                                        <th>Ngày Kết Thúc</th>
-                                        <th>Trạng Thái</th>
-                                        <th>Số HV Đã Đăng Ký</th>
-                                        <th>Hành Động</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var lophoc in Model)
-                                    {
-                                   
+                            <div class="table-responsive">
+                                <table class="table table-striped align-middle table-bordered">
+                                    <thead class="table-primary">
                                         <tr>
-                                            <td>@lophoc.TenLopHoc</td>
-                                            <td>@lophoc.SoTinChi</td>
-                                            <td>@lophoc.NgayBatDau.ToString("dd/MM/yyyy")</td>
-                                            <td>@lophoc.NgayKetThuc.ToString("dd/MM/yyyy")</td>
-                                            <td>
-                                                @{ string badgeClass = lophoc.TrangThai == "SapMo" ? "primary" : (lophoc.TrangThai == "DangHoc" ? "success" : "secondary"); }
-                                                <span class="badge bg-@badgeClass">@lophoc.TrangThai</span>
-                                            </td>
-                                            <td>
-                                                <a href="@Url.Action("Register", "Courses", new { lopHocId = lophoc.LopHocId })" class="btn btn-sm btn-success">
-                                                    <i class="fas fa-user-plus"></i> Đăng Ký
-                                                </a>
-                                            </td>
+                                            <th>STT</th>
+                                            <th>Mã Lớp Học</th>
+                                            <th>Tên Lớp Học</th>
+                                            <th>Số Tín Chỉ</th>
+                                            <th>Ngày Bắt Đầu</th>
+                                            <th>Ngày Kết Thúc</th>
+                                            <th>Trạng Thái</th>
+                                            <th>Hành Động</th>
                                         </tr>
-                                    }
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        @{ int stt = 1; }
+                                        @foreach (var lophoc in Model)
+                                        {
+                                            <tr>
+                                                <td>@stt</td>
+                                                <td>@lophoc.MaLopHoc</td>
+                                                <td>@lophoc.TenLopHoc</td>
+                                                <td>@lophoc.SoTinChi</td>
+                                                <td>@lophoc.NgayBatDau.ToString("dd/MM/yyyy")</td>
+                                                <td>@lophoc.NgayKetThuc.ToString("dd/MM/yyyy")</td>
+                                                <td>
+                                                    @{ string badgeClass = lophoc.TrangThai == "SapMo" ? "primary" : (lophoc.TrangThai == "DangHoc" ? "success" : "secondary"); }
+                                                    <span class="badge bg-@badgeClass">@lophoc.TrangThai</span>
+                                                </td>
+                                                <td>
+                                                    <a href="@Url.Action("Register", "Courses", new { lopHocId = lophoc.LopHocId })" class="btn btn-sm btn-success">
+                                                        <i class="fas fa-user-plus"></i> Đăng Ký
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            stt++;
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
                         }
                         else
                         {
@@ -85,3 +95,4 @@ else
         </div>
     </div>
 }
+

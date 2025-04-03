@@ -25,12 +25,12 @@
                 <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
                 <div class="dropdown-menu dropdown-menu-left" aria-labelledby="userDropdown">
                     @*<a class="dropdown-item" style="color:red" href="@Url.Action("Details", "NguoiDung", new { id = u.AdminId })">
-                        <i class="fas fa-user"></i> Xin chào: @u.TEN_ADMIN
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="/User/DangXuat">
-                        <i class="fas fa-sign-out-alt"></i> ĐĂNG XUẤT
-                    </a>*@
+                            <i class="fas fa-user"></i> Xin chào: @u.TEN_ADMIN
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/User/DangXuat">
+                            <i class="fas fa-sign-out-alt"></i> ĐĂNG XUẤT
+                        </a>*@
                 </div>
 
             </li>
@@ -82,17 +82,17 @@
                 @RenderBody()
             </main>
             @*<footer class="py-4 bg-light mt-auto">
-                <div class="container-fluid px-4">
-                    <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">Copyright &copy; Nguyễn Công Tiến </div>
-                        <div>
-                            <a href="#">Facebook</a>
-                            &middot;
-                            <a href="#">Địa Chỉ</a>
+                    <div class="container-fluid px-4">
+                        <div class="d-flex align-items-center justify-content-between small">
+                            <div class="text-muted">Copyright &copy; Nguyễn Công Tiến </div>
+                            <div>
+                                <a href="#">Facebook</a>
+                                &middot;
+                                <a href="#">Địa Chỉ</a>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </footer>*@
+                </footer>*@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
@@ -103,5 +103,22 @@
     <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
     <script src="~/Areas/Admin/Asset/js/datatables-simple-demo.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                var message = '@Html.Raw(TempData["Message"])';
+                var error = '@Html.Raw(TempData["Error"])';
+                var success = '@Html.Raw(TempData["Success"])';
+
+                if (message && message !== "null") {
+                    alert(message);
+                }
+                if (error && error !== "null") {
+                    alert(error);
+                }
+                if (success && success !== "null") {
+                    alert(success);
+                }
+            });
+    </script>
 </body>
 </html>
