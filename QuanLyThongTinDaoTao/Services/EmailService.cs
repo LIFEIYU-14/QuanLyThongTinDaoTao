@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.IO;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
@@ -54,14 +55,22 @@ namespace QuanLyThongTinDaoTao.Services
                     mail.From = new MailAddress(smtpUser);
                     mail.To.Add(toEmail);
                     mail.Subject = "Mã QR Code điểm danh";
-                    mail.Body = $"<p>Đây là mã QR Code điểm danh của bạn: <strong>{qrCode}</strong></p>";
-                    mail.IsBodyHtml = true;
+                    mail.Body = "<p>Đây là mã QR Code điểm danh của bạn:</p>";
 
-                    using (var smtp = new SmtpClient(smtpHost, smtpPort))
+                    // Lưu ảnh QR vào một tệp tạm thời
+                    byte[] qrCodeBytes = Convert.FromBase64String(qrCode);
+                    using (var ms = new MemoryStream(qrCodeBytes))
                     {
-                        smtp.Credentials = new NetworkCredential(smtpUser, smtpPass);
-                        smtp.EnableSsl = true;
-                        await smtp.SendMailAsync(mail);
+                        // Đính kèm mã QR như một file ảnh
+                        var attachment = new Attachment(ms, "QRCode.png", "image/png");
+                        mail.Attachments.Add(attachment);
+
+                        using (var smtp = new SmtpClient(smtpHost, smtpPort))
+                        {
+                            smtp.Credentials = new NetworkCredential(smtpUser, smtpPass);
+                            smtp.EnableSsl = true;
+                            await smtp.SendMailAsync(mail);
+                        }
                     }
                 }
             }

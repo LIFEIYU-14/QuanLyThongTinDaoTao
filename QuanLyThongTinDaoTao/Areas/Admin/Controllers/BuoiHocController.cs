@@ -39,7 +39,6 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         {
             if (!ModelState.IsValid)
             {
-         
                 return View(model);
             }
 

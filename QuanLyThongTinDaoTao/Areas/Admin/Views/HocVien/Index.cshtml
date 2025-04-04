@@ -26,7 +26,6 @@
                         <th>Email</th>
                         <th>Điện Thoại</th>
                         <th>Cơ Quan Làm Việc</th>
-                        <th>Ngày Tạo</th>
                         <th>Hành Động</th>
                     </tr>
                 </thead>
@@ -43,7 +42,6 @@
                                 <td>@item.Email</td>
                                 <td>@item.SoDienThoai</td>
                                 <td>@item.CoQuanLamViec</td>
-                                <td>@item.NgayTao.ToShortDateString()</td>
                                 <td>
                                     <a href="@Url.Action("Details", new { id = item.NguoiDungId })" class="btn btn-info btn-sm">
                                         <i class="fas fa-eye"></i> Xem

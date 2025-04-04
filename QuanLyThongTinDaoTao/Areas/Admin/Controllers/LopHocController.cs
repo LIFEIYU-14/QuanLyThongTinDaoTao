@@ -16,7 +16,6 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         // Hiển thị danh sách lớp học
         public ActionResult Index(Guid? KhoaHocId)
         {
-            ViewBag.KhoaHocList = db.KhoaHocs.ToList();
 
             var lopHocs = db.LopHocs.Include(lh => lh.KhoaHoc).ToList();
             var danhSachKhoaHoc = db.KhoaHocs.ToList();

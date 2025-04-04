@@ -13,15 +13,42 @@ namespace QuanLyThongTinDaoTao.Controllers
     {
         private readonly DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
         private readonly EmailService emailService = new EmailService();
+        private readonly HocVienService hocVienService = new HocVienService(new DbContextThongTinDaoTao());
 
-        public ActionResult Index(int? page)
+        public ActionResult Index()
         {
-            int pageSize = 12;
-            int pageNumber = (page ?? 1);
-            var khoaHocs = db.KhoaHocs.Include(k => k.KhoaHocAttachments)
-                                      .OrderByDescending(k => k.NgayTao)
-                                      .ToPagedList(pageNumber, pageSize);
+            var khoaHocs = db.KhoaHocs
+                .Include(k => k.KhoaHocAttachments)
+                .Take(3) // Chỉ lấy 3 khóa học đầu tiên
+                .ToList();
+
             return View(khoaHocs);
+        }
+        public JsonResult LoadMoreCourses(int skip, int take)
+        {
+            var courses = db.KhoaHocs
+                .OrderBy(k => k.KhoaHocId)
+                .Skip(skip)
+                .Take(take)
+                .Include(k => k.KhoaHocAttachments)
+                .ToList()  // Chuyển thành danh sách C# trước
+                .Select(k => new
+                {
+                    KhoaHocId = k.KhoaHocId,
+                    TenKhoaHoc = k.TenKhoaHoc,
+                    ThoiLuong = k.ThoiLuong,
+                    HinhDaiDienKhoaHoc = !string.IsNullOrEmpty(k.HinhDaiDienKhoaHoc)
+                                         ? Url.Content(k.HinhDaiDienKhoaHoc)
+                                         : (k.KhoaHocAttachments?
+                                            .FirstOrDefault(a => a.Attachment != null &&
+                                                 (a.Attachment.FileType.ToLower().Contains("jpg") ||
+                                                  a.Attachment.FileType.ToLower().Contains("png") ||
+                                                  a.Attachment.FileType.ToLower().Contains("jpeg")))?
+                                            .Attachment?.FilePath ?? Url.Content("~/Upload/KhoaHoc/default.png"))
+                })
+                .ToList();
+
+            return Json(courses, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult DanhSachLopHoc(Guid? id)
@@ -174,9 +201,14 @@ namespace QuanLyThongTinDaoTao.Controllers
             try
             {
                 db.SaveChanges();
-                await emailService.SendQrCodeEmail(hocVien.Email, hocVien.QR_Code_HV);
+                // Tạo mã QR cho học viên sau khi đăng ký thành công
+                string qrCode = hocVienService.GenerateQRCodeForStudent(hocVien.NguoiDungId);
+
+                // Gửi QR Code qua email
+                await emailService.SendQrCodeEmail(hocVien.Email, qrCode);
+
                 TempData["Success"] = "Xác nhận thành công";
-                return RedirectToAction("DanhSachLopHoc", "Courses");
+                return RedirectToAction("Index", "Courses");
             }
             catch (System.Data.Entity.Validation.DbEntityValidationException ex)
             {

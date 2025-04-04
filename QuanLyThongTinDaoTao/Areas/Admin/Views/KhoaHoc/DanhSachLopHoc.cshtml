@@ -1,4 +1,5 @@
 ﻿@model List<QuanLyThongTinDaoTao.Models.LopHoc>
+@using QuanLyThongTinDaoTao.Models;
 @{
     ViewBag.Title = "Danh Sách Lớp Học";
     Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
@@ -41,9 +42,17 @@
                             <td>@lophoc.NgayBatDau.ToString("dd/MM/yyyy")</td>
                             <td>@lophoc.NgayKetThuc.ToString("dd/MM/yyyy")</td>
                             <td>
-                                <span class="badge bg-@(lophoc.TrangThai == "SapMo" ? "primary" : (lophoc.TrangThai == "DangHoc" ? "success" : "secondary"))">
-                                    @(lophoc.TrangThai == "SapMo" ? "Sắp Mở" : (lophoc.TrangThai == "DangHoc" ? "Đang Học" : "Đã Kết Thúc"))
-                                </span>
+                                @{
+                                    var trangThaiText = lophoc.TrangThai == TrangThaiLopHoc.SapMo ? "Sắp Mở"
+                                        : lophoc.TrangThai == TrangThaiLopHoc.DangHoc ? "Đang Học"
+                                        : "Đã Kết Thúc";
+
+                                    var badgeClass = lophoc.TrangThai == TrangThaiLopHoc.SapMo ? "bg-primary"
+                                        : lophoc.TrangThai == TrangThaiLopHoc.DangHoc ? "bg-success"
+                                        : "bg-secondary";
+                                }
+
+                                <span class="badge @badgeClass">@trangThaiText</span>
                             </td>
                             <td>
                                 <a href="@Url.Action("Details", "LopHoc", new { id = lophoc.LopHocId })" class="btn btn-sm btn-info fs-6">

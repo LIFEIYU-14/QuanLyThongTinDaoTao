@@ -6,6 +6,13 @@ using System.Web.Mvc;
 
 namespace QuanLyThongTinDaoTao.Models
 {
+    public enum TrangThaiLopHoc
+    {
+        SapMo = 0,    // Giá trị số nguyên
+        DangHoc = 1,
+        DaKetThuc = 2
+    }
+
     [Table("LopHocs")]
     public class LopHoc
     {
@@ -29,7 +36,7 @@ namespace QuanLyThongTinDaoTao.Models
         public DateTime NgayKetThuc { get; set; }
 
         [Required]
-        public string TrangThai { get; set; } // SapMo, DangHoc, DaKetThuc
+        public TrangThaiLopHoc TrangThai { get; set; }
 
         [Required]
         public int SoLuongToiDa { get; set; }

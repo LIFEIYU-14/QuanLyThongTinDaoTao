@@ -179,6 +179,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Areas\Admin\AdminAreaRegistration.cs" />
     <Compile Include="Areas\Admin\Controllers\BuoiHocController.cs" />
+    <Compile Include="Areas\Admin\Controllers\DiemDanhHocVienController.cs" />
     <Compile Include="Areas\Admin\Controllers\GiangVienController.cs" />
     <Compile Include="Areas\Admin\Controllers\HomeAdminController.cs" />
     <Compile Include="Areas\Admin\Controllers\KhoaHocController.cs" />
@@ -190,7 +191,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\QRCodeHelper.cs" />
     <Compile Include="Migrations\202504030501237_CreateGiangVienBuoiHocTable.cs" />
     <Compile Include="Migrations\202504030501237_CreateGiangVienBuoiHocTable.Designer.cs">
       <DependentUpon>202504030501237_CreateGiangVienBuoiHocTable.cs</DependentUpon>
@@ -203,9 +203,15 @@
     <Compile Include="Migrations\202504030837126_sss.Designer.cs">
       <DependentUpon>202504030837126_sss.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202504040205041_903.cs" />
+    <Compile Include="Migrations\202504040205041_903.Designer.cs">
+      <DependentUpon>202504040205041_903.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202504040713286_213.cs" />
+    <Compile Include="Migrations\202504040713286_213.Designer.cs">
+      <DependentUpon>202504040713286_213.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="ModelsService\LoginViewModel.cs" />
-    <Compile Include="ModelsService\RegisterViewModel.cs" />
     <Compile Include="Models\Attachment.cs" />
     <Compile Include="Models\BuoiHoc.cs" />
     <Compile Include="Models\BuoiHocAttachment.cs" />
@@ -226,6 +232,7 @@
     <Compile Include="Models\ThongBao.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\EmailService.cs" />
+    <Compile Include="Services\HocVienService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\Admin\Asset\css\styles.css" />
@@ -478,6 +485,7 @@
     <Content Include="Areas\Admin\Views\LopHoc\_LopHocTablePartial.cshtml" />
     <Content Include="Areas\Admin\Views\KhoaHoc\ThemLopHoc_KhoaHoc.cshtml" />
     <Content Include="Areas\Admin\Views\HocVien\Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\DiemDanhHocVien\Index.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -505,7 +513,6 @@
     <Content Include="Views\Courses\Index.cshtml" />
     <Content Include="Views\Shared\_MainLayout.cshtml" />
     <Content Include="Views\Courses\DanhSachLopHoc.cshtml" />
-    <Content Include="Views\QuanLyHocTap\LopHocDaDangKy.cshtml" />
     <Content Include="Views\QuanLyHocTap\LichHoc.cshtml" />
     <Content Include="Views\QuanLyHocTap\_LichHocPartial.cshtml" />
     <Content Include="Views\Courses\Register.cshtml" />
@@ -553,6 +560,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202504030837126_sss.resx">
       <DependentUpon>202504030837126_sss.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202504040205041_903.resx">
+      <DependentUpon>202504040205041_903.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202504040713286_213.resx">
+      <DependentUpon>202504040713286_213.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

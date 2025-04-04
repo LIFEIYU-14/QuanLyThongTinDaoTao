@@ -1,4 +1,5 @@
 ﻿@model List<QuanLyThongTinDaoTao.Models.LopHoc>
+    @using QuanLyThongTinDaoTao.Models;
 @{
     ViewBag.Title = "Danh Sách Lớp Học";
     Layout = "~/Views/Shared/_MainLayout.cshtml";
@@ -60,8 +61,17 @@
                                                 <td>@lophoc.NgayBatDau.ToString("dd/MM/yyyy")</td>
                                                 <td>@lophoc.NgayKetThuc.ToString("dd/MM/yyyy")</td>
                                                 <td>
-                                                    @{ string badgeClass = lophoc.TrangThai == "SapMo" ? "primary" : (lophoc.TrangThai == "DangHoc" ? "success" : "secondary"); }
-                                                    <span class="badge bg-@badgeClass">@lophoc.TrangThai</span>
+                                                    @{
+                                                        var trangThaiText = lophoc.TrangThai == TrangThaiLopHoc.SapMo ? "Sắp Mở"
+                                                            : lophoc.TrangThai == TrangThaiLopHoc.DangHoc ? "Đang Học"
+                                                            : "Đã Kết Thúc";
+
+                                                        var badgeClass = lophoc.TrangThai == TrangThaiLopHoc.SapMo ? "bg-primary"
+                                                            : lophoc.TrangThai == TrangThaiLopHoc.DangHoc ? "bg-success"
+                                                            : "bg-secondary";
+                                                    }
+
+                                                    <span class="badge @badgeClass">@trangThaiText</span>
                                                 </td>
                                                 <td>
                                                     <a href="@Url.Action("Register", "Courses", new { lopHocId = lophoc.LopHocId })" class="btn btn-sm btn-success">

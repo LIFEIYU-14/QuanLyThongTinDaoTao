@@ -1,9 +1,9 @@
-﻿@model PagedList.IPagedList<QuanLyThongTinDaoTao.Models.KhoaHoc>
-@using PagedList.Mvc;
+﻿@model IEnumerable<QuanLyThongTinDaoTao.Models.KhoaHoc>
 @{
     ViewBag.Title = "Danh sách khóa học";
     Layout = "~/Views/Shared/_MainLayout.cshtml";
 }
+
 <!-- Courses Start -->
 <div class="container-xxl py-5">
     <div class="container">
@@ -11,10 +11,10 @@
             <h6 class="section-title bg-white text-center text-primary px-3"></h6>
             <h1 class="mb-5">DANH SÁCH KHÓA HỌC</h1>
         </div>
-        <div class="row g-4 justify-content-center">
+
+        <div id="course-container" class="row g-4 justify-content-center">
             @foreach (var khoaHoc in Model)
             {
-                // Kiểm tra và ưu tiên hình đại diện
                 var imagePath = !string.IsNullOrEmpty(khoaHoc.HinhDaiDienKhoaHoc)
                     ? Url.Content(khoaHoc.HinhDaiDienKhoaHoc)
                     : (khoaHoc.KhoaHocAttachments?
@@ -23,115 +23,105 @@
                                                || a.Attachment.FileType.ToLower().Contains("png")
                                                || a.Attachment.FileType.ToLower().Contains("jpeg")))?
                           .Attachment?.FilePath ?? Url.Content("~/Upload/KhoaHoc/default.png"));
+
                 <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
                     <div class="course-item bg-light">
                         <div class="position-relative overflow-hidden">
                             <img class="img-fluid" src="@imagePath" alt="@khoaHoc.TenKhoaHoc">
                             <div class="w-100 d-flex justify-content-center position-absolute bottom-0 start-0 mb-4">
-                                <a href="@Url.Action("DanhSachLopHoc", "Courses", new { id = khoaHoc.KhoaHocId })" class="flex-shrink-0 btn btn-sm btn-secondary px-3 border-end" style="border-radius: 30px 0 0 30px;">Thông Tin Chi Tiết</a>
-                                <a href="#" class="flex-shrink-0 btn btn-sm btn-success px-3" style="border-radius: 0 30px 30px 0;">Đăng Ký Học Ngay</a>
+                                <a href="@Url.Action("DanhSachLopHoc", "Courses", new { id = khoaHoc.KhoaHocId })" class="btn btn-sm btn-secondary px-3 border-end">Chi Tiết</a>
+                                <a href="#" class="btn btn-sm btn-success px-3">Đăng Ký</a>
                             </div>
                         </div>
-                        <div class="text-center p-4 pb-0">
-                            @*<h3 class="mb-0">$149.00</h3>
-                                <div class="mb-3">
-                                    <small class="fa fa-star text-primary"></small>
-                                    <small class="fa fa-star text-primary"></small>
-                                    <small class="fa fa-star text-primary"></small>
-                                    <small class="fa fa-star text-primary"></small>
-                                    <small class="fa fa-star text-primary"></small>
-                                    <small>(123)</small>
-                                </div>*@
+                        <div class="text-center p-4">
                             <h5 class="mb-4">@khoaHoc.TenKhoaHoc</h5>
-                        </div>
-                        <div class="d-flex border-top">
-                            @*<small class="flex-fill text-center border-end py-2"><i class="fa fa-user-tie text-primary me-2"></i>số lượng người học</small>*@
-                            <small class="flex-fill text-center border-end py-2">
-                                <i class="fa fa-clock text-success me-2"></i>@khoaHoc.ThoiLuong <span class="fw-bold text-secondary">tiết</span>
-                            </small>
-
-                            <small class="flex-fill text-center py-2"><i class="fa fa-user text-success me-2"></i>số lượng người học</small>
+                            <small class="text-success"><i class="fa fa-clock me-2"></i>@khoaHoc.ThoiLuong tiết</small>
                         </div>
                     </div>
                 </div>
             }
+        </div>
 
+        <!-- Nút "Xem thêm" -->
+        <div class="text-center mt-4">
+            <button id="loadMoreBtn" class="px-4 py-2" onclick="loadCourses()">Xem Thêm Khóa Học</button>
         </div>
     </div>
 </div>
 <!-- Courses End -->
+<script>
+    var skip = 3; // Bắt đầu từ khóa học thứ 3 (vì 3 khóa học đầu đã tải)
+    var take = 6; // Số khóa học tải thêm mỗi lần
 
-<div class="d-flex justify-content-center mt-4">
-    <ul class="pagination custom-pagination">
-        @if (Model.HasPreviousPage)
-        {
-            <li class="page-item">
-                <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.Search, sortBy = ViewBag.SortOrder, page = Model.PageNumber - 1 })">Prev</a>
-            </li>
-        }
-        else
-        {
-            <li class="page-item disabled">
-                <a class="page-link">Prev</a>
-            </li>
-        }
+    function loadCourses() {
+        $.ajax({
+            url: '@Url.Action("LoadMoreCourses", "Courses")',
+            type: 'GET',
+            data: { skip: skip, take: take },
+            success: function (data) {
+                if (data.length === 0) {
+                    $("#loadMoreBtn").hide(); // Ẩn nút khi không còn khóa học
+                    return;
+                }
 
-        @for (int i = 1; i <= Model.PageCount; i++)
-        {
-            <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.Search, sortBy = ViewBag.SortOrder, page = i })">@i</a>
-            </li>
-        }
+                data.forEach(khoaHoc => {
+                    var html = `
+                        <div class="col-lg-4 col-md-6 wow fadeInUp">
+                            <div class="course-item bg-light">
+                                <div class="position-relative overflow-hidden">
+                                    <img class="img-fluid" src="${khoaHoc.HinhDaiDienKhoaHoc}" alt="${khoaHoc.TenKhoaHoc}">
+                                    <div class="w-100 d-flex justify-content-center position-absolute bottom-0 start-0 mb-4">
+                                        <a href="/Courses/DanhSachLopHoc/${khoaHoc.KhoaHocId}" class="btn btn-sm btn-secondary px-3 border-end">Chi Tiết</a>
+                                        <a href="#" class="btn btn-sm btn-success px-3">Đăng Ký</a>
+                                    </div>
+                                </div>
+                                <div class="text-center p-4">
+                                    <h5 class="mb-4">${khoaHoc.TenKhoaHoc}</h5>
+                                    <small class="text-success"><i class="fa fa-clock me-2"></i>${khoaHoc.ThoiLuong} tiết</small>
+                                </div>
+                            </div>
+                        </div>
+                    `;
 
-        @if (Model.HasNextPage)
-        {
-            <li class="page-item">
-                <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.Search, sortBy = ViewBag.SortOrder, page = Model.PageNumber + 1 })">Next</a>
-            </li>
-        }
-        else
-        {
-            <li class="page-item disabled">
-                <a class="page-link">Next</a>
-            </li>
-        }
-    </ul>
-</div>
+                    $("#course-container").append(html);
+                });
+
+                skip += take; // Cập nhật skip để lấy khóa học tiếp theo
+            },
+            error: function () {
+                alert("Lỗi tải thêm khóa học.");
+            }
+        });
+    }
+</script>
+
 <style>
-    .custom-pagination {
-    padding: 8px;
-    border-radius: 8px;
-    display: flex;
-    justify-content: center;
-}
+    #loadMoreBtn {
+        background: none;
+        border: none;
+        color: #007bff; /* Màu xanh giống ảnh */
+        font-size: 16px; /* Điều chỉnh cỡ chữ */
+        font-weight: bold; /* Làm chữ đậm hơn */
+        cursor: pointer;
+        text-decoration: none; /* Không gạch chân */
+        display: inline-flex;
+        align-items: center;
+        gap: 5px; /* Khoảng cách giữa chữ và icon */
+    }
 
-.custom-pagination .page-item {
-    margin: 0 3px;
-}
+        #loadMoreBtn:hover {
+            text-decoration: underline; /* Hiệu ứng khi hover */
+        }
 
-.custom-pagination .page-link {
-    color: white;
-    background-color: #218838; /* Darker green */
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    font-weight: bold;
-    transition: background-color 0.3s;
-}
+        /* Thêm icon mũi tên */
+        #loadMoreBtn::after {
+            content: "›"; /* Ký tự mũi tên */
+            font-size: 18px;
+            transition: transform 0.2s ease-in-out;
+        }
 
-.custom-pagination .page-item.active .page-link {
-    background-color: aqua; /* Màu nổi bật khi active */
-    color: black;
-}
-
-.custom-pagination .page-item.disabled .page-link {
-    color: #ccc;
-    background-color: #6c757d;
-    cursor: not-allowed;
-}
-
-.custom-pagination .page-link:hover {
-    background-color: brown;
-}
+        #loadMoreBtn:hover::after {
+            transform: translateX(3px); /* Mũi tên di chuyển khi hover */
+        }
 
 </style>

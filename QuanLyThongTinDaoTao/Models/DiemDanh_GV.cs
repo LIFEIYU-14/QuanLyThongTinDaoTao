@@ -17,6 +17,9 @@ namespace QuanLyThongTinDaoTao.Models
         public Guid BuoiHocId { get; set; }
         [ForeignKey("BuoiHocId")]
         public virtual BuoiHoc BuoiHoc { get; set; }
+        //[Required]
+        //public Guid NguoiDungId { get; set; }
+        //[ForeignKey("GiangVienId")]
         public virtual GiangVien GiangVien { get; set; }
         [Required]
         public DateTime NgayDiemDanh { get; set; }
