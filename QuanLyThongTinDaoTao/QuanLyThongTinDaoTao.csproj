@@ -211,6 +211,10 @@
     <Compile Include="Migrations\202504040713286_213.Designer.cs">
       <DependentUpon>202504040713286_213.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202504040905547_405.cs" />
+    <Compile Include="Migrations\202504040905547_405.Designer.cs">
+      <DependentUpon>202504040905547_405.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Attachment.cs" />
     <Compile Include="Models\BuoiHoc.cs" />
@@ -486,6 +490,7 @@
     <Content Include="Areas\Admin\Views\KhoaHoc\ThemLopHoc_KhoaHoc.cshtml" />
     <Content Include="Areas\Admin\Views\HocVien\Edit.cshtml" />
     <Content Include="Areas\Admin\Views\DiemDanhHocVien\Index.cshtml" />
+    <Content Include="Areas\Admin\Views\DiemDanhHocVien\_DanhSachHocVienPartial.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -566,6 +571,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202504040713286_213.resx">
       <DependentUpon>202504040713286_213.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202504040905547_405.resx">
+      <DependentUpon>202504040905547_405.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -1,37 +1,17 @@
-﻿@model List<QuanLyThongTinDaoTao.Models.HocVien>
+﻿@model QuanLyThongTinDaoTao.Models.DiemDanh_HV
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Điểm danh học viên";
     Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
-    var lopHoc = ViewBag.LopHoc as QuanLyThongTinDaoTao.Models.LopHoc;
-    var buoiHoc = ViewBag.BuoiHoc as QuanLyThongTinDaoTao.Models.BuoiHoc;
 }
 
-<h3>Attendance for class: @lopHoc.TenLopHoc</h3>
-<h4>Session: @buoiHoc.NgayHoc.ToString("dd/MM/yyyy")</h4>
 
-<form action="@Url.Action("MarkAttendance", "DiemDanhHocVien")" method="post">
-    <input type="hidden" name="lopHocId" value="@lopHoc.LopHocId" />
-    <input type="hidden" name="buoiHocId" value="@buoiHoc.BuoiHocId" />
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Họ Và Tên</th>
-
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var student in Model)
-            {
-                <tr>
-                    <td>@student.HoVaTen</td>
-                    <td>
-                        <input type="checkbox" name="attendance[@student.MaHocVien]" />
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-
-    <button type="submit" class="btn btn-primary">Xác Nhận Điểm Danh</button>
-</form>
+<div id="danhSachHocVien">
+    @if (ViewBag.Students != null)
+    {
+        @Html.Partial("_DanhSachHocVienPartial", new
+        {
+            Students = ViewBag.Students,
+            GroupedSessions = ViewBag.GroupedSessions
+        })
+    }
+</div>

@@ -12,7 +12,6 @@ namespace QuanLyThongTinDaoTao.Models
         DangHoc = 1,
         DaKetThuc = 2
     }
-
     [Table("LopHocs")]
     public class LopHoc
     {
@@ -37,7 +36,7 @@ namespace QuanLyThongTinDaoTao.Models
 
         [Required]
         public TrangThaiLopHoc TrangThai { get; set; }
-
+       
         [Required]
         public int SoLuongToiDa { get; set; }
 

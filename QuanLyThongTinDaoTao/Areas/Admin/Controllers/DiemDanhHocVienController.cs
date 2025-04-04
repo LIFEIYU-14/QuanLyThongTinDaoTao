@@ -1,86 +1,63 @@
 ﻿using QuanLyThongTinDaoTao.Models;
-using System.Collections.Generic;
-using System.Web.Mvc;
 using System;
-using System.Linq;
 using System.Data.Entity;
-using static QuanLyThongTinDaoTao.Models.DiemDanh_HV;
+using System.Linq;
+using System.Web.Mvc;
 
-public class DiemDanhHocVienController : Controller
+namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 {
-    private readonly DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
-
-    // GET: Admin/DiemDanhHocVien/Index
-    public ActionResult Index(Guid lopHocId, Guid buoiHocId)
+    public class DiemDanhHocVienController : Controller
     {
-        // Get the class (LopHoc) by Id
-        var lopHoc = db.LopHocs.FirstOrDefault(lh => lh.LopHocId == lopHocId);
-        if (lopHoc == null)
+        private readonly DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
+
+        // GET: Admin/DiemDanhHocVien
+        public ActionResult Index()
         {
-            return HttpNotFound("Không tìm thấy lớp học !");
+            // Lấy danh sách lớp học
+            var lopHocs = db.LopHocs.ToList();
+            ViewBag.LopHocList = lopHocs;
+
+            return View();
         }
-
-        // Get the list of students enrolled in the class
-        var hocVien = db.DangKyHocs
-                         .Where(dk => dk.LopHocId == lopHocId && dk.IsConfirmed)
-                         .Select(dk => dk.HocVien)
-                         .ToList();
-
-        // Get the session (BuoiHoc) for attendance
-        var buoiHoc = db.BuoiHocs.FirstOrDefault(bh => bh.BuoiHocId == buoiHocId);
-        if (buoiHoc == null)
+        [HttpPost]
+        public ActionResult Index(Guid? LopHocId)
         {
-            return HttpNotFound("Không tìm thấy buổi học.");
-        }
+            // Lấy danh sách lớp học
+            var lopHocs = db.LopHocs.ToList();
+            ViewBag.LopHocList = lopHocs;
 
-        // Pass students and session to the view
-        ViewBag.LopHoc = lopHoc;
-        ViewBag.BuoiHoc = buoiHoc;
-        return View(hocVien);
-    }
-    // POST: Admin/DiemDanhHocVien/Index
-    [HttpPost]
-    public ActionResult MarkAttendance(Guid lopHocId, Guid buoiHocId, Dictionary<Guid, bool> attendance)
-    {
-        var lopHoc = db.LopHocs.FirstOrDefault(lh => lh.LopHocId == lopHocId);
-        if (lopHoc == null)
-        {
-            return HttpNotFound("Class not found.");
-        }
-
-        var buoiHoc = db.BuoiHocs.FirstOrDefault(bh => bh.BuoiHocId == buoiHocId);
-        if (buoiHoc == null)
-        {
-            return HttpNotFound("Session not found.");
-        }
-
-        // Loop through each student's attendance status and save it
-        foreach (var item in attendance)
-        {
-            var studentId = item.Key;
-            var isPresent = item.Value;
-
-            // Create or update attendance record
-            var attendanceRecord = db.DiemDanhs_HVs
-                                     .FirstOrDefault(dh => dh.NguoiDungId == studentId && dh.BuoiHocId == buoiHocId);
-
-            if (attendanceRecord == null)
+            // Nếu lớp học được chọn
+            if (LopHocId.HasValue)
             {
-                attendanceRecord = new DiemDanh_HV
+                // Lấy danh sách học viên đã đăng ký và xác nhận lớp học đã chọn
+                var students = db.DangKyHocs
+                    .Where(d => d.LopHocId == LopHocId.Value && d.IsConfirmed)
+                    .Include(d => d.HocVien) // Đảm bảo lấy thông tin học viên
+                    .ToList();
+
+                // Lấy các buổi học (sessions) của lớp học đã chọn
+                var buoiHocs = db.BuoiHocs
+                    .Where(b => b.LopHoc.LopHocId == LopHocId.Value) // Sửa từ LopHoc.LopHocId thành LopHocId
+                    .OrderBy(b => b.NgayHoc)
+                    .ToList();
+
+                // Truyền dữ liệu vào ViewBag để sử dụng trong View
+                var model = new
                 {
-                    NguoiDungId = studentId,
-                    BuoiHocId = buoiHocId,
-                    TrangThai = isPresent ? TrangThaiDiemDanhHV.CoMat : TrangThaiDiemDanhHV.VangKhongPhep
+                    Students = students,
+                    GroupedSessions = buoiHocs // Truyền trực tiếp danh sách buổi học
                 };
-                db.DiemDanhs_HVs.Add(attendanceRecord);
+
+                // Truyền lại giá trị LopHocId đã chọn vào ViewBag để hiển thị trên dropdown
+                ViewBag.SelectedLopHocId = LopHocId;
+
+                return PartialView("_DanhSachHocVienPartial", model); // Trả lại partial view
             }
-            else
-            {
-                attendanceRecord.TrangThai = isPresent ? TrangThaiDiemDanhHV.CoMat : TrangThaiDiemDanhHV.VangKhongPhep;
-            }
+
+            return View();
         }
 
-        db.SaveChanges();
-        return RedirectToAction("Index", new { lopHocId = lopHocId, buoiHocId = buoiHocId });
+
     }
+
 }

@@ -300,8 +300,5 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             // Nếu không lọc theo khóa học, trả về toàn bộ danh sách lớp học
             return PartialView("_LopHocTablePartial", db.LopHocs.Include(lh => lh.KhoaHoc).ToList());
         }
-       
-
-
     }
 }
