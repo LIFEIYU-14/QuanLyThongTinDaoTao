@@ -12,13 +12,16 @@ namespace QuanLyThongTinDaoTao.Models
         public Guid DangKyId { get; set; } = Guid.NewGuid();
 
         public Guid NguoiDungId { get; set; }
-        public virtual HocVien HocVien { get; set; }
 
-        // Khóa ngoài đến LopHoc
+        [ForeignKey("NguoiDungId")]
+        public virtual HocVien HocVien { get; set; } 
+
         public Guid LopHocId { get; set; }
+        [ForeignKey("LopHocId")]
         public virtual LopHoc LopHoc { get; set; }
+
         public DateTime NgayDangKy { get; set; } = DateTime.Now;
-        public bool IsConfirmed { get; set; } = false;  // Mặc định là chưa xác nhận
+        public bool IsConfirmed { get; set; } = false;
         public string ConfirmationToken { get; set; }
     }
 }

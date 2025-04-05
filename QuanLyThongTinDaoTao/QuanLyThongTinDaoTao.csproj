@@ -191,29 +191,9 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202504030501237_CreateGiangVienBuoiHocTable.cs" />
-    <Compile Include="Migrations\202504030501237_CreateGiangVienBuoiHocTable.Designer.cs">
-      <DependentUpon>202504030501237_CreateGiangVienBuoiHocTable.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202504030530061_1229.cs" />
-    <Compile Include="Migrations\202504030530061_1229.Designer.cs">
-      <DependentUpon>202504030530061_1229.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202504030837126_sss.cs" />
-    <Compile Include="Migrations\202504030837126_sss.Designer.cs">
-      <DependentUpon>202504030837126_sss.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202504040205041_903.cs" />
-    <Compile Include="Migrations\202504040205041_903.Designer.cs">
-      <DependentUpon>202504040205041_903.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202504040713286_213.cs" />
-    <Compile Include="Migrations\202504040713286_213.Designer.cs">
-      <DependentUpon>202504040713286_213.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202504040905547_405.cs" />
-    <Compile Include="Migrations\202504040905547_405.Designer.cs">
-      <DependentUpon>202504040905547_405.cs</DependentUpon>
+    <Compile Include="Migrations\202504051400506_update.cs" />
+    <Compile Include="Migrations\202504051400506_update.Designer.cs">
+      <DependentUpon>202504051400506_update.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Attachment.cs" />
@@ -490,7 +470,8 @@
     <Content Include="Areas\Admin\Views\KhoaHoc\ThemLopHoc_KhoaHoc.cshtml" />
     <Content Include="Areas\Admin\Views\HocVien\Edit.cshtml" />
     <Content Include="Areas\Admin\Views\DiemDanhHocVien\Index.cshtml" />
-    <Content Include="Areas\Admin\Views\DiemDanhHocVien\_DanhSachHocVienPartial.cshtml" />
+    <Content Include="Areas\Admin\Views\DiemDanhHocVien\_HocVienTablePartial.cshtml" />
+    <Content Include="Areas\Admin\Views\DiemDanhHocVien\_HocVienTableEmpty.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -557,23 +538,8 @@
     <Content Include="Scripts\jquery-3.7.0.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202504030501237_CreateGiangVienBuoiHocTable.resx">
-      <DependentUpon>202504030501237_CreateGiangVienBuoiHocTable.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202504030530061_1229.resx">
-      <DependentUpon>202504030530061_1229.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202504030837126_sss.resx">
-      <DependentUpon>202504030837126_sss.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202504040205041_903.resx">
-      <DependentUpon>202504040205041_903.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202504040713286_213.resx">
-      <DependentUpon>202504040713286_213.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202504040905547_405.resx">
-      <DependentUpon>202504040905547_405.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202504051400506_update.resx">
+      <DependentUpon>202504051400506_update.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

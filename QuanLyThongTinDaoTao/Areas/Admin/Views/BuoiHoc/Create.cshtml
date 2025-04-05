@@ -1,5 +1,4 @@
 ﻿@model QuanLyThongTinDaoTao.Models.BuoiHoc
-
 @{
     ViewBag.Title = "Thêm Buổi Học";
     Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
@@ -19,13 +18,14 @@
                     @Html.Label("LopHocId", "Lớp Học", new { @class = "form-label" })
                     <span class="text-danger">*</span>
                     <select class="form-control" name="LopHocId" required>
-                        <option value="">-- Chọn Lớp Học --</option>
+                        <option value=""  class="text-center">-- Chọn Lớp Học --</option>
                         @foreach (var lopHoc in ViewBag.LopHocList)
                         {
-                            <option value="@lopHoc.LopHocId">@lopHoc.TenLopHoc</option>
+                            <option value="@lopHoc.LopHocId"  class="text-center">@lopHoc.TenLopHoc</option>
                         }
                     </select>
                 </div>
+
 
                 <div class="mb-3">
                     @Html.LabelFor(model => model.NgayHoc, "Ngày Học", new { @class = "form-label" })

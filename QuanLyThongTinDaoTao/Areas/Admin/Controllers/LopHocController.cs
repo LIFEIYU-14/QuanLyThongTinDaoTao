@@ -22,6 +22,21 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             ViewBag.KhoaHocList = danhSachKhoaHoc; // Truyền danh sách khóa học vào ViewBag
             return View(lopHocs);
         }
+        public ActionResult FilterByKhoaHoc(Guid? khoaHocId)
+        {
+            if (khoaHocId.HasValue)
+            {
+                var danhSachLopHoc = db.LopHocs
+                    .Include(lh => lh.KhoaHoc) // Đảm bảo load dữ liệu KhoaHoc
+                    .Where(lh => lh.KhoaHoc != null && lh.KhoaHoc.KhoaHocId == khoaHocId.Value)
+                    .ToList();
+
+                return PartialView("_LopHocTablePartial", danhSachLopHoc);
+            }
+
+            // Nếu không lọc theo khóa học, trả về toàn bộ danh sách lớp học
+            return PartialView("_LopHocTablePartial", db.LopHocs.Include(lh => lh.KhoaHoc).ToList());
+        }
 
         // Hiển thị chi tiết lớp học
         public ActionResult Details(Guid id)
@@ -285,20 +300,6 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             return RedirectToAction("Edit", new { id = lopHocId });
         }
 
-        public ActionResult FilterByKhoaHoc(Guid? khoaHocId)
-        {
-            if (khoaHocId.HasValue)
-            {
-                var danhSachLopHoc = db.LopHocs
-                    .Include(lh => lh.KhoaHoc) // Đảm bảo load dữ liệu KhoaHoc
-                    .Where(lh => lh.KhoaHoc != null && lh.KhoaHoc.KhoaHocId == khoaHocId.Value)
-                    .ToList();
-
-                return PartialView("_LopHocTablePartial", danhSachLopHoc);
-            }
-
-            // Nếu không lọc theo khóa học, trả về toàn bộ danh sách lớp học
-            return PartialView("_LopHocTablePartial", db.LopHocs.Include(lh => lh.KhoaHoc).ToList());
-        }
+       
     }
 }

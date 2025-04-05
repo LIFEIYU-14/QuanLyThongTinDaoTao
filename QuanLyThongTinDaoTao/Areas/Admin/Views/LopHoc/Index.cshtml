@@ -18,10 +18,10 @@
 
         <!-- Dropdown chọn khóa học -->
         <select class="form-control mb-3" id="KhoaHocId" name="KhoaHocId">
-            <option value="">-- Tất cả Khóa Học --</option>
+            <option value="" class="text-center">-- Tất cả Khóa Học --</option>
             @foreach (var khoaHoc in ViewBag.KhoaHocList)
             {
-                <option value="@khoaHoc.KhoaHocId">@khoaHoc.TenKhoaHoc</option>
+                <option value="@khoaHoc.KhoaHocId"  class="text-center">@khoaHoc.TenKhoaHoc</option>
             }
         </select>
 

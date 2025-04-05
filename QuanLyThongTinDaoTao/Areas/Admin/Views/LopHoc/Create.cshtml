@@ -84,10 +84,10 @@
                     @Html.Label("KhoaHocId", "Khóa Học", new { @class = "form-label" })
                     <span class="text-danger">*</span>
                     <select class="form-control" name="KhoaHocId" required>
-                        <option value="">-- Chọn Khóa Học --</option>
+                        <option value=""  class="text-center">-- Chọn Khóa Học --</option>
                         @foreach (var khoaHoc in ViewBag.KhoaHocList)
                         {
-                            <option value="@khoaHoc.KhoaHocId">@khoaHoc.TenKhoaHoc</option>
+                            <option value="@khoaHoc.KhoaHocId"  class="text-center">@khoaHoc.TenKhoaHoc</option>
                         }
                     </select>
                 </div>

@@ -18,6 +18,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         public ActionResult Index()
         {
             var buoiHocs = db.BuoiHocs.Include(b => b.LopHoc).ToList();
+
             return View(buoiHocs);
         }
 
@@ -25,13 +26,10 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         public ActionResult Create()
         {
 
-            var lopHocList = db.LopHocs.ToList();  // Fetch the list from the database
-            ViewBag.LopHocList = lopHocList;
             ViewBag.LopHocList = db.LopHocs.ToList();
             ViewBag.GiangVienList = db.GiangViens.ToList();
             return View();
         }
-
         // Tạo buổi học (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]

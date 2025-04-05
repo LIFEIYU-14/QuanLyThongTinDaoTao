@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class CreateGiangVienBuoiHocTable : DbMigration
+    public partial class update : DbMigration
     {
         public override void Up()
         {
@@ -53,11 +53,11 @@
                 "dbo.GiangVien_BuoiHoc",
                 c => new
                     {
-                        GiangVien_BuoiHocId = c.Guid(nullable: false),
+                        Id = c.Guid(nullable: false),
                         BuoiHocId = c.Guid(nullable: false),
                         NguoiDungId = c.Guid(nullable: false),
                     })
-                .PrimaryKey(t => t.GiangVien_BuoiHocId)
+                .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.BuoiHocs", t => t.BuoiHocId, cascadeDelete: true)
                 .ForeignKey("dbo.GiangViens", t => t.NguoiDungId)
                 .Index(t => t.BuoiHocId)
@@ -81,15 +81,15 @@
                     {
                         DiemDanhId = c.Guid(nullable: false),
                         BuoiHocId = c.Guid(nullable: false),
+                        NguoiDungId = c.Guid(nullable: false),
                         NgayDiemDanh = c.DateTime(nullable: false),
                         TrangThai = c.Int(nullable: false),
-                        GiangVien_NguoiDungId = c.Guid(),
                     })
                 .PrimaryKey(t => t.DiemDanhId)
                 .ForeignKey("dbo.BuoiHocs", t => t.BuoiHocId, cascadeDelete: true)
-                .ForeignKey("dbo.GiangViens", t => t.GiangVien_NguoiDungId)
+                .ForeignKey("dbo.GiangViens", t => t.NguoiDungId)
                 .Index(t => t.BuoiHocId)
-                .Index(t => t.GiangVien_NguoiDungId);
+                .Index(t => t.NguoiDungId);
             
             CreateTable(
                 "dbo.PhanQuyens",
@@ -130,7 +130,7 @@
                         SoTinChi = c.Int(nullable: false),
                         NgayBatDau = c.DateTime(nullable: false),
                         NgayKetThuc = c.DateTime(nullable: false),
-                        TrangThai = c.String(nullable: false),
+                        TrangThai = c.Int(nullable: false),
                         SoLuongToiDa = c.Int(nullable: false),
                         MoTa = c.String(),
                         NgayTao = c.DateTime(nullable: false),
@@ -190,15 +190,15 @@
                     {
                         DiemDanhId = c.Guid(nullable: false),
                         BuoiHocId = c.Guid(nullable: false),
+                        NguoiDungId = c.Guid(nullable: false),
                         NgayDiemDanh = c.DateTime(nullable: false),
                         TrangThai = c.Int(nullable: false),
-                        HocVien_NguoiDungId = c.Guid(),
                     })
                 .PrimaryKey(t => t.DiemDanhId)
                 .ForeignKey("dbo.BuoiHocs", t => t.BuoiHocId, cascadeDelete: true)
-                .ForeignKey("dbo.HocViens", t => t.HocVien_NguoiDungId)
+                .ForeignKey("dbo.HocViens", t => t.NguoiDungId)
                 .Index(t => t.BuoiHocId)
-                .Index(t => t.HocVien_NguoiDungId);
+                .Index(t => t.NguoiDungId);
             
             CreateTable(
                 "dbo.ThongBaos",
@@ -268,10 +268,9 @@
         {
             DropForeignKey("dbo.HocViens", "NguoiDungId", "dbo.NguoiDungs");
             DropForeignKey("dbo.GiangViens", "NguoiDungId", "dbo.NguoiDungs");
-            DropForeignKey("dbo.GiangVien_BuoiHoc", "NguoiDungId", "dbo.GiangViens");
             DropForeignKey("dbo.ThongBaoGiangViens", "GiangVien_NguoiDungId", "dbo.GiangViens");
             DropForeignKey("dbo.ThongBaoGiangViens", "ThongBao_ThongBaoId", "dbo.ThongBaos");
-            DropForeignKey("dbo.DiemDanhs_HV", "HocVien_NguoiDungId", "dbo.HocViens");
+            DropForeignKey("dbo.DiemDanhs_HV", "NguoiDungId", "dbo.HocViens");
             DropForeignKey("dbo.DiemDanhs_HV", "BuoiHocId", "dbo.BuoiHocs");
             DropForeignKey("dbo.DangKyHocs", "LopHocId", "dbo.LopHocs");
             DropForeignKey("dbo.LopHoc_Attachments", "LopHocId", "dbo.LopHocs");
@@ -282,7 +281,8 @@
             DropForeignKey("dbo.BuoiHocs", "LopHoc_LopHocId", "dbo.LopHocs");
             DropForeignKey("dbo.DangKyHocs", "NguoiDungId", "dbo.HocViens");
             DropForeignKey("dbo.PhanQuyens", "NguoiDungId", "dbo.NguoiDungs");
-            DropForeignKey("dbo.DiemDanhs_GV", "GiangVien_NguoiDungId", "dbo.GiangViens");
+            DropForeignKey("dbo.GiangVien_BuoiHoc", "NguoiDungId", "dbo.GiangViens");
+            DropForeignKey("dbo.DiemDanhs_GV", "NguoiDungId", "dbo.GiangViens");
             DropForeignKey("dbo.DiemDanhs_GV", "BuoiHocId", "dbo.BuoiHocs");
             DropForeignKey("dbo.GiangVien_BuoiHoc", "BuoiHocId", "dbo.BuoiHocs");
             DropForeignKey("dbo.BuoiHoc_Attachments", "BuoiHocId", "dbo.BuoiHocs");
@@ -292,7 +292,7 @@
             DropIndex("dbo.GiangViens", new[] { "NguoiDungId" });
             DropIndex("dbo.ThongBaoGiangViens", new[] { "GiangVien_NguoiDungId" });
             DropIndex("dbo.ThongBaoGiangViens", new[] { "ThongBao_ThongBaoId" });
-            DropIndex("dbo.DiemDanhs_HV", new[] { "HocVien_NguoiDungId" });
+            DropIndex("dbo.DiemDanhs_HV", new[] { "NguoiDungId" });
             DropIndex("dbo.DiemDanhs_HV", new[] { "BuoiHocId" });
             DropIndex("dbo.LopHoc_Attachments", new[] { "AttachmentId" });
             DropIndex("dbo.LopHoc_Attachments", new[] { "LopHocId" });
@@ -302,7 +302,7 @@
             DropIndex("dbo.DangKyHocs", new[] { "LopHocId" });
             DropIndex("dbo.DangKyHocs", new[] { "NguoiDungId" });
             DropIndex("dbo.PhanQuyens", new[] { "NguoiDungId" });
-            DropIndex("dbo.DiemDanhs_GV", new[] { "GiangVien_NguoiDungId" });
+            DropIndex("dbo.DiemDanhs_GV", new[] { "NguoiDungId" });
             DropIndex("dbo.DiemDanhs_GV", new[] { "BuoiHocId" });
             DropIndex("dbo.GiangVien_BuoiHoc", new[] { "NguoiDungId" });
             DropIndex("dbo.GiangVien_BuoiHoc", new[] { "BuoiHocId" });

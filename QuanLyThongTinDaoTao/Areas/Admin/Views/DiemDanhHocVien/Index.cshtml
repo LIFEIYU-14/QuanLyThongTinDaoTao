@@ -1,17 +1,99 @@
-﻿@model QuanLyThongTinDaoTao.Models.DiemDanh_HV
+﻿@model List<QuanLyThongTinDaoTao.Models.DangKyHoc>
+@using QuanLyThongTinDaoTao.Models;
 @{
-    ViewBag.Title = "Điểm danh học viên";
+    ViewBag.Title = "Index";
     Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
+    var buoiHocs = ViewBag.BuoiHocs as List<BuoiHoc>;
+    var diemDanhs = ViewBag.DiemDanhs as List<DiemDanh_HV>;
+    string[] thuTiengViet = new[] {
+       "Chủ nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"
+   };
 }
+<div class="container-fluid pt-4 px-4">
+    <div class="bg-light rounded p-4 shadow-sm">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h4 class="mb-0 text-primary fw-bold">
+                <i class="fas fa-school"></i> Điểm Danh Học Viên
+            </h4>
+        </div>
 
+        <!-- Dropdown chọn lớp học -->
+        <select class="form-control mb-3 select2" id="LopHocId" name="LopHocId">
+            <option value="" class="text-center">-- Chọn Lớp Học Điểm Danh --</option>
+            @foreach (var lopHoc in ViewBag.LopHocList)
+            {
+                <option value="@lopHoc.LopHocId" class="text-center">@lopHoc.TenLopHoc</option>
+            }
+        </select>
 
-<div id="danhSachHocVien">
-    @if (ViewBag.Students != null)
-    {
-        @Html.Partial("_DanhSachHocVienPartial", new
-        {
-            Students = ViewBag.Students,
-            GroupedSessions = ViewBag.GroupedSessions
-        })
-    }
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered w-100 align-middle text-center" id="diemDanhTable">
+                @Html.Partial("_HocVienTablePartial", Model)
+            </table>
+        </div>
+
+    </div>
 </div>
+
+<script>
+    $("#LopHocId").change(function () {
+        var lopHocId = $(this).val();
+        $.ajax({
+            url: '@Url.Action("FilterByLopHoc", "DiemDanhHocVien")',
+            type: 'GET',
+            data: { lopHocId: lopHocId || null },
+            success: function (data) {
+                $("#diemDanhTable").html(data); // Cập nhật toàn bộ bảng
+            },
+            error: function (xhr) {
+                console.log("Lỗi khi tải dữ liệu: " + xhr.responseText);
+                $("#diemDanhTable").html('<tr><td colspan="100%" class="text-center text-danger"><strong>Lỗi khi tải dữ liệu</strong></td></tr>');
+            }
+        });
+    });
+
+    // điểm danh
+    $('#btnLuuDiemDanh').click(function () {
+        var danhSachDiemDanh = [];
+
+        $('.trang-thai-diem-danh').each(function () {
+            var buoiHocId = $(this).data('buoihoc-id');
+            var hocVienId = $(this).data('hocvien-id');
+            var trangThai = $(this).val();  // Trạng thái điểm danh
+
+            // Tạo đối tượng cho từng dòng trong bảng và đẩy vào mảng
+            danhSachDiemDanh.push({
+                BuoiHocId: buoiHocId,
+                NguoiDungId: hocVienId,
+                TrangThai: trangThai
+            });
+        });
+
+        $.ajax({
+            url: '@Url.Action("LuuDiemDanh", "DiemDanhHocVien")',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(danhSachDiemDanh),  // Truyền đúng dữ liệu JSON
+            success: function (res) {
+                if (res.success) {
+                    alert(res.message || "Lưu điểm danh thành công!");
+
+                    // Update the dropdowns based on the response data
+                    res.updatedAttendance.forEach(function (attendance) {
+                        // Find the dropdown for the specific student and session
+                        var dropdown = $('select[data-hocvien-id="' + attendance.NguoiDungId + '"][data-buoihoc-id="' + attendance.BuoiHocId + '"]');
+
+                        // Update the dropdown value according to the attendance status
+                        dropdown.val(attendance.TrangThai);
+                    });
+                } else {
+                    alert(res.message || "Lỗi khi lưu điểm danh!");
+                }
+            },
+            error: function (err) {
+                alert("Lỗi khi lưu điểm danh!");
+                console.error(err);
+            }
+        });
+    });
+</script>
