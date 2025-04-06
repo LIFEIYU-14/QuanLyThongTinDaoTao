@@ -29,6 +29,12 @@
                     </div>
                     <input type="file" name="hinhDaiDien" id="imageFile" class="form-control" accept="image/*" onchange="previewFile()" />
                 </div>
+                <div class="col-md-12 mb-3">
+                    @Html.LabelFor(model => model.MaKhoaHoc, "Mã Khóa Học", new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.MaKhoaHoc, new { @class = "form-control", @readonly = "readonly" })
+
+
+                </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         @Html.LabelFor(model => model.TenKhoaHoc, "Tên Khóa Học", new { @class = "form-label" })

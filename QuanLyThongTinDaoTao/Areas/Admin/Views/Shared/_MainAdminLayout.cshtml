@@ -16,39 +16,48 @@
 </head>
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-success">
+            <!-- Sidebar Toggle (Luôn hiển thị) -->
+            <button class="btn btn-link btn-sm me-2" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <!-- Toggle Button cho Mobile -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSearch">
+                <i class="fas fa-search"></i> <!-- Hoặc dùng icon khác -->
+            </button>
 
-        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href=""><i class="fas fa-bars"></i></button>
+            <!-- Phần chứa Form tìm kiếm + User Menu -->
+            <div class="collapse navbar-collapse" id="navbarSearch">
+                <!-- Form tìm kiếm (Hiển thị trên cả desktop & mobile) -->
+                <form class="d-flex my-2 my-lg-0 mx-lg-auto" style="max-width: 500px; width: 100%;">
+                    <div class="input-group">
+                        <input type="search" class="form-control border-0" placeholder="🔍 Tìm kiếm..."
+                               aria-label="Search" value="@ViewBag.Search">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
 
-        <!-- Navbar-->
-        <ul class="navbar-nav ms-auto ms-md-0 my-5 me-lg-5">
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
-                <div class="dropdown-menu dropdown-menu-left" aria-labelledby="userDropdown">
-                    @*<a class="dropdown-item" style="color:red" href="@Url.Action("Details", "NguoiDung", new { id = u.AdminId })">
-                        <i class="fas fa-user"></i> Xin chào: @u.TEN_ADMIN
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="/User/DangXuat">
-                        <i class="fas fa-sign-out-alt"></i> ĐĂNG XUẤT
-                    </a>*@
-                </div>
-
-            </li>
-        </ul>
-        <!-- Navbar Search-->
-        <form class="d-none d-md-inline-block form-inline w-50 ms-lg-5">
-            <div class="input-group rounded shadow-sm">
-                <input type="search" class="form-control border-0 py-2 px-3" id="search" name="search"
-                       value="@ViewBag.Search"
-                       placeholder="🔍 Tìm kiếm..." aria-label="Search">
-                <button class="btn btn-outline-light bg-primary text-white px-4" id="btnNavbarSearch" type="submit">
-                    <i class="fas fa-search"></i>
-                </button>
+                <!-- User Dropdown (Luôn ở góc phải) -->
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <!-- Nội dung dropdown -->
+                            <a class="dropdown-item" href="#">
+                                <i class="fas fa-user-circle me-2"></i> Tài khoản
+                            </a>
+                            <a class="dropdown-item" href="#">
+                                <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
+                            </a>
+                        </div>
+                    </li>
+                </ul>
             </div>
-        </form>
-
-    </nav>
-
+        </nav>
     <div id="layoutSidenav">
         <div id="layoutSidenav_nav">
             <nav class="sb-sidenav accordion bg-secondary " id="sidenavAccordion">
@@ -81,7 +90,7 @@
                         </a>
                         <div class="sb-sidenav-footer">
                             @*<div class="small">Logged in as:</div>
-                            Start Bootstrap*@
+                                Start Bootstrap*@
                         </div>
                     </div>
                 </div>

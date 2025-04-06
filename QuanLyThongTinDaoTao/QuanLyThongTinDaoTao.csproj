@@ -179,6 +179,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Areas\Admin\AdminAreaRegistration.cs" />
     <Compile Include="Areas\Admin\Controllers\BuoiHocController.cs" />
+    <Compile Include="Areas\Admin\Controllers\DiemDanhGiangVienController.cs" />
     <Compile Include="Areas\Admin\Controllers\DiemDanhHocVienController.cs" />
     <Compile Include="Areas\Admin\Controllers\GiangVienController.cs" />
     <Compile Include="Areas\Admin\Controllers\HomeAdminController.cs" />
@@ -194,6 +195,10 @@
     <Compile Include="Migrations\202504051400506_update.cs" />
     <Compile Include="Migrations\202504051400506_update.Designer.cs">
       <DependentUpon>202504051400506_update.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202504060520235_1220.cs" />
+    <Compile Include="Migrations\202504060520235_1220.Designer.cs">
+      <DependentUpon>202504060520235_1220.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Attachment.cs" />
@@ -472,6 +477,7 @@
     <Content Include="Areas\Admin\Views\DiemDanhHocVien\Index.cshtml" />
     <Content Include="Areas\Admin\Views\DiemDanhHocVien\_HocVienTablePartial.cshtml" />
     <Content Include="Areas\Admin\Views\DiemDanhHocVien\_HocVienTableEmpty.cshtml" />
+    <Content Include="Areas\Admin\Views\DiemDanhGiangVien\Index.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -540,6 +546,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202504051400506_update.resx">
       <DependentUpon>202504051400506_update.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202504060520235_1220.resx">
+      <DependentUpon>202504060520235_1220.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

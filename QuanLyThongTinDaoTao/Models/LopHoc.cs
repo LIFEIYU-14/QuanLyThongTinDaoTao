@@ -6,12 +6,7 @@ using System.Web.Mvc;
 
 namespace QuanLyThongTinDaoTao.Models
 {
-    public enum TrangThaiLopHoc
-    {
-        SapMo = 0,    // Giá trị số nguyên
-        DangHoc = 1,
-        DaKetThuc = 2
-    }
+    
     [Table("LopHocs")]
     public class LopHoc
     {
@@ -33,7 +28,12 @@ namespace QuanLyThongTinDaoTao.Models
         [DataType(DataType.Date)]
         [CustomValidation(typeof(LopHoc), "ValidateNgayKetThuc")]
         public DateTime NgayKetThuc { get; set; }
-
+        public enum TrangThaiLopHoc
+        {
+            SapMo,    // Giá trị số nguyên
+            DangHoc,
+            DaKetThuc
+        }
         [Required]
         public TrangThaiLopHoc TrangThai { get; set; }
        

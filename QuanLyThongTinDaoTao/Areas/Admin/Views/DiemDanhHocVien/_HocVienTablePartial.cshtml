@@ -15,6 +15,8 @@
     <thead class="table-primary">
         <tr class="text-center">
             <th rowspan="2">STT</th>
+            <th rowspan="2">Mã Học Viên</th>
+
             <th rowspan="2">Tên Học Viên</th>
             @if (buoiHocs != null && buoiHocs.Any())
             {
@@ -38,6 +40,7 @@
         {
             <tr class="text-center">
                 <td>@stt</td>
+                <td>@dangKy.HocVien.MaHocVien</td>
                 <td>@(dangKy.HocVien?.HoVaTen ?? "N/A")</td>
 
                 @foreach (var buoiHoc in buoiHocs)
@@ -49,9 +52,9 @@
                         <select class="form-control form-control-sm trang-thai-diem-danh"
                                 data-hocvien-id="@dangKy.NguoiDungId"
                                 data-buoihoc-id="@buoiHoc.BuoiHocId">
-                            <option value="0" @(diemDanh?.TrangThai == DiemDanh_HV.TrangThaiDiemDanhHV.CoMat ? "selected" : "")>Có mặt</option>
-                            <option value="1" @(diemDanh?.TrangThai == DiemDanh_HV.TrangThaiDiemDanhHV.VangKhongPhep ? "selected" : "")>Vắng không phép</option>
-                            <option value="2" @(diemDanh?.TrangThai == DiemDanh_HV.TrangThaiDiemDanhHV.VangCoPhep ? "selected" : "")>Vắng có phép</option>
+                            <option value="0" class="text-center" @(diemDanh?.TrangThai == DiemDanh_HV.TrangThaiDiemDanhHV.CoMat ? "selected" : "")>Có mặt</option>
+                            <option value="1" class="text-center" @(diemDanh?.TrangThai == DiemDanh_HV.TrangThaiDiemDanhHV.VangKhongPhep ? "selected" : "")>Vắng không phép</option>
+                            <option value="2" class="text-center" @(diemDanh?.TrangThai == DiemDanh_HV.TrangThaiDiemDanhHV.VangCoPhep ? "selected" : "")>Vắng có phép</option>
                         </select>
                     </td>
                 }

@@ -22,7 +22,7 @@
             <option value="" class="text-center">-- Chọn Lớp Học Điểm Danh --</option>
             @foreach (var lopHoc in ViewBag.LopHocList)
             {
-                <option value="@lopHoc.LopHocId" class="text-center">@lopHoc.TenLopHoc</option>
+                <option value="@lopHoc.LopHocId" class="text-center">Lớp : @lopHoc.TenLopHoc</option>
             }
         </select>
 

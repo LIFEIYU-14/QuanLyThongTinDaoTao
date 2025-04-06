@@ -110,6 +110,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         public ActionResult Edit(Guid id)
         {
             var buoiHoc = db.BuoiHocs
+                .Include(k => k.LopHoc)
                 .Include(k => k.BuoiHocAttachments.Select(a => a.Attachment))
                 .FirstOrDefault(k => k.BuoiHocId == id);
             if (buoiHoc == null)
