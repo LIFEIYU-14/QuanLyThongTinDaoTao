@@ -20,13 +20,13 @@
                          alt="@khoaHoc.TenKhoaHoc">
                 </div>
                 <div class="col-lg-8 d-flex align-items-center">
-
-                    <div>
-                        <h3 class="fw-bold">@khoaHoc.TenKhoaHoc</h3>
-                        <p>NỘI DUNG:@Html.Raw(khoaHoc.MoTa)</p>
+                    <div class="w-100 text-center text-lg-start mt-3 mt-lg-0">
+                        <h3 class="fw-bold">Khóa Học : @khoaHoc.TenKhoaHoc</h3>
+                        <p>NỘI DUNG: @Html.Raw(khoaHoc.MoTa)</p>
                     </div>
                 </div>
             </div>
+
 
             <div class="row mt-4">
                 <div class="col-12">
@@ -89,10 +89,14 @@
                                                 </td>
 
                                                 <td>
-                                                    <a href="@Url.Action("Register", "Courses", new { lopHocId = lophoc.LopHocId })" class="btn btn-sm btn-success">
-                                                        <i class="fas fa-user-plus"></i> Đăng Ký
-                                                    </a>
+                                                    @if (lophoc.TrangThai == LopHoc.TrangThaiLopHoc.SapMo)
+                                                    {
+                                                        <a href="@Url.Action("Register", "Courses", new { lopHocId = lophoc.LopHocId })" class="btn btn-sm btn-success">
+                                                            <i class="fas fa-user-plus"></i> Đăng Ký
+                                                        </a>
+                                                    }
                                                 </td>
+
                                             </tr>
                                             stt++;
                                         }

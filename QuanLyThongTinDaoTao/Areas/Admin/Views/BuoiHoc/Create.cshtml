@@ -18,10 +18,16 @@
                     @Html.Label("LopHocId", "Lớp Học", new { @class = "form-label" })
                     <span class="text-danger">*</span>
                     <select class="form-control" name="LopHocId" required>
-                        <option value=""  class="text-center">-- Chọn Lớp Học --</option>
+                        <option value="" class="text-center">-- Chọn Lớp Học --</option>
                         @foreach (var lopHoc in ViewBag.LopHocList)
                         {
-                            <option value="@lopHoc.LopHocId"  class="text-center">@lopHoc.TenLopHoc</option>
+                            var ngayBatDau = lopHoc.NgayBatDau != null ? ((DateTime)lopHoc.NgayBatDau).ToString("dd/MM/yyyy") : "??";
+                            var ngayKetThuc = lopHoc.NgayKetThuc != null ? ((DateTime)lopHoc.NgayKetThuc).ToString("dd/MM/yyyy") : "??";
+
+                            <option value="@lopHoc.LopHocId" @(lopHoc.LopHocId == Model.LopHocId ? "selected" : "")>
+                                @lopHoc.TenLopHoc - (@ngayBatDau - @ngayKetThuc)
+                            </option>
+
                         }
                     </select>
                 </div>

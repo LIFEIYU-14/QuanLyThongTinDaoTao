@@ -193,7 +193,8 @@ namespace QuanLyThongTinDaoTao.Controllers
                 DangKyId = Guid.NewGuid(),
                 NguoiDungId = hocVien.NguoiDungId,
                 LopHocId = hocVienData.LopHocId,
-                IsConfirmed = true
+                IsConfirmed = true,
+                NgayDangKy = DateTime.Now
             };
 
             db.DangKyHocs.Add(dangKyHoc);

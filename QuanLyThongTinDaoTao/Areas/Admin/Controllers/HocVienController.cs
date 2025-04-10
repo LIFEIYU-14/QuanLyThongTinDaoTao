@@ -113,7 +113,54 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             }
             return View(hv);
         }
+        public ActionResult Delete(Guid id)
+        {
+            if (id == Guid.Empty)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
 
-        
+            HocVien hv = db.HocViens.Find(id);
+            if (hv == null)
+            {
+                TempData["Error"] = "Học viên không tồn tại!";
+                return RedirectToAction("Index");
+            }
+
+            try
+            {
+                // Xóa các bản ghi liên quan trong bảng DiemDanh_GV
+                var diemDanhs = db.DiemDanhs_HVs.Where(d => d.HocVien.NguoiDungId == hv.NguoiDungId).ToList();
+                db.DiemDanhs_HVs.RemoveRange(diemDanhs);
+
+                // Xóa các bản ghi liên quan trong bảng GiangVien_BuoiHoc
+                var hocVienDangKy = db.DangKyHocs.Where(gvh => gvh.HocVien.NguoiDungId == hv.NguoiDungId).ToList();
+                db.DangKyHocs.RemoveRange(hocVienDangKy);
+
+                // Xóa các bản ghi liên quan trong bảng ThongBao
+                //var thongBaos = db.ThongBaos.Where(t => t.GiangViens.Any(gvItem => gvItem.NguoiDungId == gv.NguoiDungId)).ToList();
+                //foreach (var thongBao in thongBaos)
+                //{
+                //    thongBao.GiangViens.Remove(gv); // Xóa liên kết giảng viên khỏi thông báo
+                //    if (!thongBao.GiangViens.Any()) // Nếu không còn giảng viên nào liên kết với thông báo, xóa thông báo
+                //    {
+                //        db.ThongBaos.Remove(thongBao);
+                //    }
+                //}
+
+                // Sau khi xóa các bản ghi liên quan, xóa giảng viên
+                db.HocViens.Remove(hv);
+                db.SaveChanges();
+
+                TempData["Success"] = "Xóa học viên thành công!";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Lỗi khi xóa học viên: " + ex.Message;
+                return RedirectToAction("Index");
+            }
+        }
+
     }
 }

@@ -33,9 +33,9 @@
                             <p><strong>🕒 Thời Gian:</strong> @buoiHoc.GioBatDau - @buoiHoc.GioKetThuc</p>
                             <p><strong>📌 Trạng Thái:</strong> <span class="badge @badgeClass">@trangThaiText</span></p>
 
-                            <a href="@Url.Action("Details", new { id = buoiHoc.BuoiHocId })" class="btn btn-info btn-sm">Chi Tiết</a>
-                            <a href="@Url.Action("Edit", new { id = buoiHoc.BuoiHocId })" class="btn btn-warning btn-sm">Sửa</a>
-                            <a href="@Url.Action("Delete", new { id = buoiHoc.BuoiHocId })" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa?');">Xóa</a>
+                            <a href="@Url.Action("Details","BuoiHoc", new { id = buoiHoc.BuoiHocId })" class="btn btn-info btn-sm">Chi Tiết</a>
+                            <a href="@Url.Action("Edit", "BuoiHoc", new { id = buoiHoc.BuoiHocId })" class="btn btn-warning btn-sm">Sửa</a>
+                            <a href="@Url.Action("Delete","BuoiHoc",  new { id = buoiHoc.BuoiHocId })" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa?');">Xóa</a>
 
                         </div>
                     </div>
@@ -104,22 +104,3 @@
         }
 </style>
 
-<!-- JavaScript tìm kiếm -->
-<script>
-    function filterBuoiHoc() {
-        var searchLop = document.getElementById("searchLop").value.toLowerCase();
-        var searchNgay = document.getElementById("searchNgay").value;
-
-        document.querySelectorAll(".timeline-item").forEach(function (item) {
-            var lopHoc = item.getAttribute("data-lop") ? item.getAttribute("data-lop").toLowerCase() : "";
-            var ngayHoc = item.getAttribute("data-ngay");
-
-            if ((searchLop === "" || lopHoc.includes(searchLop)) &&
-                (searchNgay === "" || ngayHoc === searchNgay)) {
-                item.style.display = "block";
-            } else {
-                item.style.display = "none";
-            }
-        });
-    }
-</script>

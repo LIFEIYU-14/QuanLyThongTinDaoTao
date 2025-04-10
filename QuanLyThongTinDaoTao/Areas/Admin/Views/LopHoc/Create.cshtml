@@ -86,10 +86,11 @@
                         <option value="">-- Chọn Khóa Học --</option>
                         @foreach (var khoaHoc in ViewBag.KhoaHocList)
                         {
-                      
-                            <option value="@khoaHoc.KhoaHocId" class="text-center">@khoaHoc.TenKhoaHoc</option>
+                            <option value="@khoaHoc.KhoaHocId")>
+                                @khoaHoc.TenKhoaHoc
+                            </option>
                         }
-                    
+
                     </select>
                 </div>
 

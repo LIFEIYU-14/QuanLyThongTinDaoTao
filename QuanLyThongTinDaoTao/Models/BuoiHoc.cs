@@ -37,7 +37,9 @@ namespace QuanLyThongTinDaoTao.Models
 
         [AllowHtml]
         public string GhiChu { get; set; }
-
+        [Required]
+        public Guid LopHocId { get; set; }
+        [ForeignKey("LopHocId")]
         public virtual LopHoc LopHoc { get; set; }
         public virtual ICollection<GiangVien_BuoiHoc> GiangVien_BuoiHocs { get; set; } = new List<GiangVien_BuoiHoc>();
         public virtual ICollection<BuoiHocAttachment> BuoiHocAttachments { get; set; }

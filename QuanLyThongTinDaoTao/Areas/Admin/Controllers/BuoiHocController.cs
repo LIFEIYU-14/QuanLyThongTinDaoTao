@@ -13,14 +13,13 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
     public class BuoiHocController : Controller
     {
         private DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
-
+       
         // Hiển thị toàn bộ danh sách buổi học
         public ActionResult Index()
         {
             // Cập nhật trạng thái của tất cả các buổi học theo thời gian thực
             UpdateTrangThaiBuoiHocs();
             var buoiHocs = db.BuoiHocs.Include(b => b.LopHoc).ToList();
-
             return View(buoiHocs);
         }
 
@@ -123,6 +122,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             {
                 return HttpNotFound();
             }
+   
             ViewBag.LopHocList = db.LopHocs.ToList();
             ViewBag.GiangVienList = db.GiangViens.ToList();
             ViewBag.GiangVienDaChon = buoiHoc.GiangVien_BuoiHocs?.Select(g => g.NguoiDungId).ToList();
@@ -136,12 +136,16 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         {
             if (!ModelState.IsValid)
             {
+                ViewBag.LopHocList = db.LopHocs.ToList();
+                ViewBag.GiangVienList = db.GiangViens.ToList();
                 return View(model);
             }
 
             var buoiHoc = db.BuoiHocs.Find(model.BuoiHocId);
             if (buoiHoc == null)
             {
+                ViewBag.LopHocList = db.LopHocs.ToList();
+                ViewBag.GiangVienList = db.GiangViens.ToList();
                 return HttpNotFound();
             }
 
@@ -149,6 +153,8 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             if (lopHoc == null)
             {
                 ModelState.AddModelError("LopHocId", "Lớp học không tồn tại.");
+                ViewBag.LopHocList = db.LopHocs.ToList();
+                ViewBag.GiangVienList = db.GiangViens.ToList();
                 return View(model);
             }
 
@@ -156,6 +162,8 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             if (model.NgayHoc < lopHoc.NgayBatDau || model.NgayHoc > lopHoc.NgayKetThuc)
             {
                 ModelState.AddModelError("NgayHoc", "Ngày học phải nằm trong khoảng từ " + lopHoc.NgayBatDau.ToShortDateString() + " đến " + lopHoc.NgayKetThuc.ToShortDateString());
+                ViewBag.LopHocList = db.LopHocs.ToList();
+                ViewBag.GiangVienList = db.GiangViens.ToList();
                 return View(model);
             }
 
@@ -173,6 +181,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             {
                 ModelState.AddModelError("GioBatDau", "Thời gian buổi học bị trùng với một buổi học khác.");
                 ViewBag.LopHocList = db.LopHocs.ToList();
+                ViewBag.GiangVienList = db.GiangViens.ToList();
                 return View(model);
             }
 

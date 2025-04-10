@@ -19,12 +19,13 @@
 
         </div>
         <div class="table-responsive">
-            <table class="table text-start align-middle table-bordered mb-0 fs-5">
+            <table class="table align-middle table-bordered">
                 <thead>
                     <tr class="text-dark text-center">
+                        <th>STT</th>
                         <th scope="col">Mã Lớp Học</th>
-
                         <th scope="col">Tên Lớp Học</th>
+                        <th scope="col">Tên Khóa Học</th>
                         <th scope="col">Số Tín Chỉ</th>
                         <th scope="col">Ngày Bắt Đầu</th>
                         <th scope="col">Ngày Kết Thúc</th>
@@ -33,9 +34,13 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @{
+                        int stt = 1;
+                    }
                     @foreach (var lophoc in Model)
                     {
                         <tr class="text-center">
+                            <td>@stt</td> <!-- STT column -->
                             <td>@lophoc.MaLopHoc</td>
                             <td>@lophoc.TenLopHoc</td>
                             <td>@(lophoc.KhoaHoc != null ? lophoc.KhoaHoc.TenKhoaHoc : "Chưa có")</td>
@@ -45,46 +50,47 @@
                             <td>
                                 @{
                                     string trangThaiText = "";
+                                    string badgeClass = "";
+
                                     if (lophoc.TrangThai == LopHoc.TrangThaiLopHoc.SapMo)
                                     {
                                         trangThaiText = "Sắp mở";
+                                        badgeClass = "bg-primary";
                                     }
                                     else if (lophoc.TrangThai == LopHoc.TrangThaiLopHoc.DaBatDau)
                                     {
                                         trangThaiText = "Đang học";
+                                        badgeClass = "bg-success";
                                     }
                                     else if (lophoc.TrangThai == LopHoc.TrangThaiLopHoc.DaKetThuc)
                                     {
                                         trangThaiText = "Kết thúc";
+                                        badgeClass = "bg-secondary";
                                     }
                                     else
                                     {
                                         trangThaiText = "Không xác định";
+                                        badgeClass = "bg-dark";
                                     }
-
-                                    var badgeClass = lophoc.TrangThai == LopHoc.TrangThaiLopHoc.SapMo ? "bg-primary"
-                                        : lophoc.TrangThai == LopHoc.TrangThaiLopHoc.DaBatDau ? "bg-success"
-                                        : "bg-secondary";
                                 }
-
                                 <span class="badge @badgeClass">@trangThaiText</span>
                             </td>
-
-
                             <td>
-                                <a href="@Url.Action("Details", new { id = lophoc.LopHocId })" class="btn btn-info btn-sm m-2">
+                                <a href="@Url.Action("Details","LopHoc" ,new { id = lophoc.LopHocId })" class="btn btn-info btn-sm m-2">
                                     <i class="fas fa-eye"></i> Chi Tiết
                                 </a>
-                                <a href="@Url.Action("Edit", new { id = lophoc.LopHocId })" class="btn btn-warning btn-sm m-2">
+                                <a href="@Url.Action("Edit","LopHoc" ,new { id = lophoc.LopHocId })" class="btn btn-warning btn-sm m-2">
                                     <i class="fas fa-edit"></i> Sửa
                                 </a>
-                                <a href="@Url.Action("Delete", new { id = lophoc.LopHocId })" class="btn btn-danger btn-sm m-2" onclick="return confirm('Bạn có chắc chắn muốn xóa lớp học này?');">
+                                <a href="@Url.Action("Delete","LopHoc", new { id = lophoc.LopHocId })" class="btn btn-danger btn-sm m-2" onclick="return confirm('Bạn có chắc chắn muốn xóa lớp học này?');">
                                     <i class="fas fa-trash-alt"></i> Xóa
                                 </a>
                             </td>
                         </tr>
+                        stt++; <!-- increment STT -->
                     }
                 </tbody>
+
             </table>
         </div>
     </div>

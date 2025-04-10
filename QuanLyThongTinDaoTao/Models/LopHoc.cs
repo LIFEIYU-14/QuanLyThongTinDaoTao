@@ -46,6 +46,9 @@ namespace QuanLyThongTinDaoTao.Models
         public string MoTa { get; set; }
         public DateTime NgayTao { get; set; } = DateTime.Now;
         public DateTime NgayCapNhat { get; set; } = DateTime.Now;
+        [Required]
+        public Guid KhoaHocId { get; set; }
+        [ForeignKey("KhoaHocId")]
         public virtual KhoaHoc KhoaHoc { get; set; }
         //public virtual ICollection<GiangVien> GiangViens { get; set; } = new List<GiangVien>();
         //public virtual ICollection<HocVien> HocViens { get; set; } = new List<HocVien>();

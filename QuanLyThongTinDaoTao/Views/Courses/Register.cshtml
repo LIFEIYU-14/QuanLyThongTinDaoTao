@@ -1,6 +1,7 @@
 ﻿@model QuanLyThongTinDaoTao.Models.LopHoc
+
 @{
-    ViewBag.Title = "Đăng Ký Lớp Học";
+    ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_MainLayout.cshtml";
 }
 
@@ -20,76 +21,105 @@
                 </div>
             </div>
 
-            <!-- Form đăng ký lớp học -->
+            <!-- Form đăng ký -->
             <div class="col-lg-8">
                 <div class="bg-light rounded p-4 shadow-lg">
                     <h6 class="mb-4 fs-4 text-secondary text-center">Đăng Ký Lớp Học - @Model.TenLopHoc</h6>
 
-                    <!-- Nếu chưa gửi email OTP, hiển thị form đăng ký -->
-                    <div id="registerForm" style="@(ViewBag.Email != null ? "display:none;" : "")">
-                        @using (Html.BeginForm("Register", "Courses", FormMethod.Post, new { enctype = "multipart/form-data" }))
-                        {
-                            @Html.AntiForgeryToken()
-                            @Html.HiddenFor(model => model.KhoaHoc.KhoaHocId)
-
-                            <div class="mb-3">
-                                <label class="form-label" for="HoVaTen">Họ và Tên:</label>
-                                <input type="text" id="HoVaTen" name="HoVaTen" class="form-control" placeholder="Nhập họ và tên" required />
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label" for="Email">Email:</label>
-                                <input type="email" id="Email" name="Email" class="form-control" placeholder="Nhập email" required />
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label" for="NgaySinh">Ngày Sinh:</label>
-                                <input type="date" id="NgaySinh" name="NgaySinh" class="form-control" required />
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label" for="SoDienThoai">Số Điện Thoại:</label>
-                                <input type="tel" id="SoDienThoai" name="SoDienThoai" class="form-control" required pattern="[0-9]{10,15}" placeholder="Nhập số điện thoại" />
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label" for="CoQuanLamViec">Cơ Quan Làm Việc:</label>
-                                <input type="text" id="CoQuanLamViec" name="CoQuanLamViec" class="form-control" placeholder="Nhập cơ quan làm việc" required />
-                            </div>
-
-                            <input type="hidden" name="LopHocId" value="@Model.LopHocId" />
-
-                            <button type="submit" class="btn btn-success w-100 mt-3 py-2" style=" border-radius: 50px;">
-                                <i class="fas fa-envelope"></i> Gửi Mã OTP
-                            </button>
-                        }
+                    <!-- Form Đăng ký -->
+                    <div id="registerForm">
+                        <div class="mb-3">
+                            <label class="form-label" for="HoVaTen">Họ và Tên</label>
+                            <input type="text" id="HoVaTen" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="Email">Email</label>
+                            <input type="email" id="Email" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="NgaySinh">Ngày Sinh</label>
+                            <input type="date" id="NgaySinh" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="SoDienThoai">Số Điện Thoại</label>
+                            <input type="tel" id="SoDienThoai" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="CoQuanLamViec">Cơ Quan Làm Việc</label>
+                            <input type="text" id="CoQuanLamViec" class="form-control" required />
+                        </div>
+                        <input type="hidden" id="LopHocId" value="@Model.LopHocId" />
+                        <button id="sendOtpBtn" class="btn btn-success w-100 mt-3">Gửi Mã OTP</button>
                     </div>
 
-                    <!-- Nếu đã gửi mã OTP, hiển thị form xác thực OTP -->
-                    <div id="otpForm" style="@(ViewBag.Email == null ? "display:none;" : "")">
+                    <!-- Form OTP -->
+                    <div id="otpForm" style="display:none;">
                         <h5 class="mb-3 text-success">Nhập Mã OTP</h5>
-                        @using (Html.BeginForm("VerifyOTP", "Courses", FormMethod.Post))
-                        {
-                            @Html.AntiForgeryToken()
-
-                            <input type="hidden" name="Email" value="@ViewBag.Email" />
-                            <input type="text" name="OTP" class="form-control mb-3" placeholder="Nhập mã OTP" required />
-
-                            <button type="submit" class="btn btn-success w-100 py-2">
-                                <i class="fas fa-check"></i> Xác nhận OTP
-                            </button>
-                        }
+                        <input type="hidden" id="otpEmail" />
+                        <input type="text" id="Otp" class="form-control mb-3" placeholder="Nhập mã OTP" required />
+                        <button id="verifyOtpBtn" class="btn btn-primary w-100">Xác Nhận OTP</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<style>
-    /* Custom border styles for form input fields */
-    .form-control {
-        border-radius: 50px;
-        transition: border-color 0.3s ease;
-    }
 
-</style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+        $(document).ready(function () {
+            // Gửi OTP
+            $('#sendOtpBtn').click(function (e) {
+                e.preventDefault();
+
+                const data = {
+                    HoVaTen: $('#HoVaTen').val(),
+                    Email: $('#Email').val(),
+                    NgaySinh: $('#NgaySinh').val(),
+                    SoDienThoai: $('#SoDienThoai').val(),
+                    CoQuanLamViec: $('#CoQuanLamViec').val(),
+                    LopHocId: $('#LopHocId').val()
+                };
+
+                $.ajax({
+                    type: "POST",
+                    url: "/api/dangky/start",
+                    contentType: "application/json",
+                    data: JSON.stringify(data),
+                    success: function (response) {
+                        alert(response.message);
+                        $('#registerForm').hide();
+                        $('#otpForm').show();
+                        $('#otpEmail').val(data.Email);
+                    },
+                    error: function (xhr) {
+                        alert("Lỗi: " + xhr.responseText);
+                    }
+                });
+            });
+
+            // Xác thực OTP
+            $('#verifyOtpBtn').click(function (e) {
+                e.preventDefault();
+
+                const verifyData = {
+                    Email: $('#otpEmail').val(),
+                    Otp: $('#Otp').val()
+                };
+
+                $.ajax({
+                    type: "POST",
+                    url: "/api/dangky/verify",
+                    contentType: "application/json",
+                    data: JSON.stringify(verifyData),
+                    success: function (response) {
+                        alert(response.message);
+                        window.location.href = response.redirectUrl;
+                    },
+                    error: function (xhr) {
+                        alert("Xác thực thất bại: " + xhr.responseText);
+                    }
+                });
+            });
+        });
+</script>
