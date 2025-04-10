@@ -55,12 +55,12 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-md-6 mb-3">
+                    @*<div class="col-md-6 mb-3">
                         @Html.LabelFor(m => m.TrangThai, "Trạng Thái", new { @class = "form-label" })
                         <span class="text-danger">*</span>
                         @Html.EnumDropDownListFor(m => m.TrangThai, new { @class = "form-control" })
                         @Html.ValidationMessageFor(m => m.TrangThai, "", new { @class = "text-danger" })
-                    </div>
+                    </div>*@
 
 
                     <div class="col-md-6 mb-3">
@@ -86,11 +86,10 @@
                         <option value="">-- Chọn Khóa Học --</option>
                         @foreach (var khoaHoc in ViewBag.KhoaHocList)
                         {
-                            <option value="@khoaHoc.KhoaHocId"
-                                    @(Model.KhoaHoc != null && Model.KhoaHoc.KhoaHocId == khoaHoc.KhoaHocId ? "selected" : "")>
-                                @khoaHoc.TenKhoaHoc
-                            </option>
+                      
+                            <option value="@khoaHoc.KhoaHocId" class="text-center">@khoaHoc.TenKhoaHoc</option>
                         }
+                    
                     </select>
                 </div>
 

@@ -69,4 +69,26 @@
             });
         });
     });
+    function capNhatTrangThaiLopHoc() {
+        $.ajax({
+            url: '@Url.Action("GetTrangThaiLopHoc", "LopHoc")',
+            method: 'GET',
+            success: function (data) {
+                data.forEach(function (lop) {
+                    var row = $('#row-' + lop.LopHocId);
+                    var badge = '<span class="badge ' + lop.BadgeClass + '">' + lop.TrangThai + '</span>';
+                    row.find('.trang-thai').html(badge);
+                });
+            },
+            error: function () {
+                console.error("Lỗi khi cập nhật trạng thái lớp học.");
+            }
+        });
+    }
+
+    // Tự động gọi cập nhật trạng thái mỗi 30s
+    setInterval(capNhatTrangThaiLopHoc, 30000);
+    $(document).ready(function () {
+        capNhatTrangThaiLopHoc();
+    });
 </script>

@@ -17,6 +17,11 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         public ActionResult Index(Guid? KhoaHocId)
         {
             var lopHocs = db.LopHocs.Include(lh => lh.KhoaHoc).ToList();
+            foreach (var lopHoc in lopHocs)
+            {
+                CapNhatTrangThaiLopHoc(lopHoc);
+            }
+            db.SaveChanges(); // lưu thay đổi trạng thái
             ViewBag.KhoaHocList = db.KhoaHocs.ToList();
             return View(lopHocs);
         }
@@ -285,5 +290,74 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 }
             }
         }
+        private void CapNhatTrangThaiLopHoc(LopHoc lopHoc)
+        {
+            var now = DateTime.Now;
+
+            if (lopHoc.NgayBatDau > now)
+            {
+                lopHoc.TrangThai = LopHoc.TrangThaiLopHoc.SapMo;
+            }
+            else if (lopHoc.NgayBatDau <= now && lopHoc.NgayKetThuc >= now)
+            {
+                lopHoc.TrangThai = LopHoc.TrangThaiLopHoc.DaBatDau;
+            }
+            else if (lopHoc.NgayKetThuc < now)
+            {
+                lopHoc.TrangThai = LopHoc.TrangThaiLopHoc.DaKetThuc;
+            }
+        }
+
+        [HttpGet]
+        public JsonResult GetTrangThaiLopHoc()
+        {
+            var lopHocs = db.LopHocs.ToList();
+            foreach (var lopHoc in lopHocs)
+            {
+                CapNhatTrangThaiLopHoc(lopHoc);
+            }
+            db.SaveChanges();
+
+            var data = lopHocs.Select(lh => new
+            {
+                LopHocId = lh.LopHocId,
+                TrangThai = GetTrangThaiText(lh.TrangThai),
+                BadgeClass = GetBadgeClass(lh.TrangThai)
+            });
+
+            return Json(data, JsonRequestBehavior.AllowGet);
+        }
+
+        private string GetTrangThaiText(LopHoc.TrangThaiLopHoc trangThai)
+        {
+            switch (trangThai)
+            {
+                case LopHoc.TrangThaiLopHoc.SapMo:
+                    return "Sắp mở";
+                case LopHoc.TrangThaiLopHoc.DaBatDau:
+                    return "Đã Bắt Đầu";
+                case LopHoc.TrangThaiLopHoc.DaKetThuc:
+                    return "Kết thúc";
+                default:
+                    return "Không xác định";
+            }
+        }
+
+        private string GetBadgeClass(LopHoc.TrangThaiLopHoc trangThai)
+        {
+            switch (trangThai)
+            {
+                case LopHoc.TrangThaiLopHoc.SapMo:
+                    return "bg-primary";
+                case LopHoc.TrangThaiLopHoc.DaBatDau:
+                    return "bg-success";
+                case LopHoc.TrangThaiLopHoc.DaKetThuc:
+                    return "bg-secondary";
+                default:
+                    return "bg-dark";
+            }
+        }
+
+
     }
 }

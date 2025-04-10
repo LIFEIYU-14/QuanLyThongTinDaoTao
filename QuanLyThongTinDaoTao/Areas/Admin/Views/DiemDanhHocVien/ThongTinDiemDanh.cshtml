@@ -1,0 +1,105 @@
+﻿@model List<QuanLyThongTinDaoTao.Models.DangKyHoc>
+@using QuanLyThongTinDaoTao.Models;
+@{
+    ViewBag.Title = "Điểm danh buổi học";
+    Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
+
+    // Lấy thông tin buổi học từ ViewBag
+    var buoiHoc = ViewBag.BuoiHoc as BuoiHoc;
+    var diemDanhs = ViewBag.DiemDanhs as List<DiemDanh_HV>;
+    int stt = 1;
+}
+
+<div class="container-fluid pt-4 px-4">
+    <div class="bg-light rounded p-4 shadow-sm">
+        <h4 class="text-primary fw-bold"><i class="fas fa-calendar-check"></i> Điểm Danh Buổi Học</h4>
+        <!-- Thông tin buổi học -->
+        <div class="mb-3">
+            <strong>Lớp học:</strong> @buoiHoc.LopHoc.TenLopHoc <br />
+            <strong>Ngày học:</strong> @buoiHoc.NgayHoc.ToString("dddd, dd/MM/yyyy") <br />
+            @if (!string.IsNullOrEmpty(buoiHoc.GhiChu))
+            {
+                <strong>Ghi chú:</strong> @buoiHoc.GhiChu
+            }
+        </div>
+
+        <!-- Danh sách học viên -->
+        <table class="table table-bordered table-hover">
+            <thead class="table-success text-center">
+                <tr>
+                    <th>STT</th>
+                    <th>Mã HV</th>
+                    <th>Họ Tên</th>
+                    <th>Trạng Thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var hv in Model)
+                {
+                    var diemDanh = diemDanhs?.FirstOrDefault(dd => dd.NguoiDungId == hv.NguoiDungId && dd.BuoiHocId == buoiHoc.BuoiHocId);
+                    <tr class="text-center">
+                        <td>@stt</td>
+                        <td>@hv.HocVien.MaHocVien</td>
+                        <td>@hv.HocVien.HoVaTen</td>
+                        <td>
+                            <select class="form-control form-control-sm trang-thai-diem-danh"
+                                    data-hocvien-id="@hv.NguoiDungId"
+                                    data-buoihoc-id="@buoiHoc.BuoiHocId">
+                                <option value="-1" class="text-center" @(diemDanh == null ? "selected" : "")>Chưa điểm danh</option>
+                                <option value="0" class="text-center" @(diemDanh?.TrangThai == DiemDanh_HV.TrangThaiDiemDanhHV.CoMat ? "selected" : "")>Có mặt</option>
+                                <option value="1" class="text-center" @(diemDanh?.TrangThai == DiemDanh_HV.TrangThaiDiemDanhHV.VangKhongPhep ? "selected" : "")>Vắng không phép</option>
+                                <option value="2" class="text-center" @(diemDanh?.TrangThai == DiemDanh_HV.TrangThaiDiemDanhHV.VangCoPhep ? "selected" : "")>Vắng có phép</option>
+                            </select>
+                        </td>
+                    </tr>
+                    stt++;
+                }
+            </tbody>
+        </table>
+
+        <div class="text-end">
+            <button class="btn btn-success" id="btnLuuDiemDanh">Lưu điểm danh</button>
+        </div>
+    </div>
+</div>
+
+<script>
+     $('#btnLuuDiemDanh').click(function () {
+    var danhSachDiemDanh = [];
+
+    $('.trang-thai-diem-danh').each(function () {
+        var hocVienId = $(this).data('hocvien-id');
+        var buoiHocId = $(this).data('buoihoc-id');
+        var trangThai = $(this).val();
+
+        // ⚠ Bỏ qua nếu chưa điểm danh
+        if (trangThai == -1) return;
+
+        danhSachDiemDanh.push({
+            NguoiDungId: hocVienId,
+            BuoiHocId: buoiHocId,
+            TrangThai: trangThai
+        });
+    });
+
+    if (danhSachDiemDanh.length === 0) {
+        alert("Không có dữ liệu để lưu.");
+        return;
+    }
+
+    $.ajax({
+        url: '@Url.Action("LuuDiemDanh")',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(danhSachDiemDanh),
+        success: function (res) {
+            alert(res.message || (res.success ? "Lưu điểm danh thành công." : "Lưu điểm danh thất bại."));
+        },
+        error: function () {
+            alert("Có lỗi xảy ra khi lưu điểm danh.");
+        }
+    });
+});
+
+</script>
+

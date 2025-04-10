@@ -62,17 +62,32 @@
                                                 <td>@lophoc.NgayKetThuc.ToString("dd/MM/yyyy")</td>
                                                 <td>
                                                     @{
-                                                        var trangThaiText = lophoc.TrangThai == TrangThaiLopHoc.SapMo ? "Sắp Mở"
-                                                            : lophoc.TrangThai == TrangThaiLopHoc.DangHoc ? "Đang Học"
-                                                            : "Đã Kết Thúc";
+                                                        string trangThaiText = "";
+                                                        if (lophoc.TrangThai == LopHoc.TrangThaiLopHoc.SapMo)
+                                                        {
+                                                            trangThaiText = "Sắp mở";
+                                                        }
+                                                        else if (lophoc.TrangThai == LopHoc.TrangThaiLopHoc.DaBatDau)
+                                                        {
+                                                            trangThaiText = "Đã Bắt Đầu";
+                                                        }
+                                                        else if (lophoc.TrangThai == LopHoc.TrangThaiLopHoc.DaKetThuc)
+                                                        {
+                                                            trangThaiText = "Kết thúc";
+                                                        }
+                                                        else
+                                                        {
+                                                            trangThaiText = "Không xác định";
+                                                        }
 
-                                                        var badgeClass = lophoc.TrangThai == TrangThaiLopHoc.SapMo ? "bg-primary"
-                                                            : lophoc.TrangThai == TrangThaiLopHoc.DangHoc ? "bg-success"
+                                                        var badgeClass = lophoc.TrangThai == LopHoc.TrangThaiLopHoc.SapMo ? "bg-primary"
+                                                            : lophoc.TrangThai == LopHoc.TrangThaiLopHoc.DaBatDau ? "bg-success"
                                                             : "bg-secondary";
                                                     }
 
                                                     <span class="badge @badgeClass">@trangThaiText</span>
                                                 </td>
+
                                                 <td>
                                                     <a href="@Url.Action("Register", "Courses", new { lopHocId = lophoc.LopHocId })" class="btn btn-sm btn-success">
                                                         <i class="fas fa-user-plus"></i> Đăng Ký

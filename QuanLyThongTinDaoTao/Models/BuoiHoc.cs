@@ -39,7 +39,6 @@ namespace QuanLyThongTinDaoTao.Models
         public string GhiChu { get; set; }
 
         public virtual LopHoc LopHoc { get; set; }
-        // Quan hệ nhiều-nhiều với GiangVien thông qua bảng trung gian
         public virtual ICollection<GiangVien_BuoiHoc> GiangVien_BuoiHocs { get; set; } = new List<GiangVien_BuoiHoc>();
         public virtual ICollection<BuoiHocAttachment> BuoiHocAttachments { get; set; }
         // Custom Validation cho giờ kết thúc đã có sẵn
@@ -73,6 +72,25 @@ namespace QuanLyThongTinDaoTao.Models
                         new[] { "NgayHoc" }
                     );
                 }
+            }
+        }
+        // Thuộc tính tính toán trạng thái buổi học theo thời gian thực
+        [NotMapped]
+        public TrangThaiBuoiHoc CurrentTrangThai
+        {
+            get
+            {
+                // Ghép ngày và giờ để tạo DateTime thực tế của buổi học
+                DateTime startDateTime = NgayHoc.Date.Add(GioBatDau);
+                DateTime endDateTime = NgayHoc.Date.Add(GioKetThuc);
+                DateTime now = DateTime.Now;
+
+                if (now < startDateTime)
+                    return TrangThaiBuoiHoc.SapDienRa;
+                else if (now >= startDateTime && now < endDateTime)
+                    return TrangThaiBuoiHoc.DangDienRa;
+                else
+                    return TrangThaiBuoiHoc.DaKetThuc;
             }
         }
     }

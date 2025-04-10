@@ -31,7 +31,7 @@ namespace QuanLyThongTinDaoTao.Models
         public enum TrangThaiLopHoc
         {
             SapMo,    // Giá trị số nguyên
-            DangHoc,
+            DaBatDau,
             DaKetThuc
         }
         [Required]

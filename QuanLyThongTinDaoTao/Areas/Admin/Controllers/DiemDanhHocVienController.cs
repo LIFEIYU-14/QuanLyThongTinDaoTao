@@ -25,34 +25,49 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             return View();
         }
 
-        // This action filters students based on the selected class (LopHoc)
-        public ActionResult FilterByLopHoc(Guid? lopHocId)
+        // Lấy danh sách buổi học theo lớp học
+        public ActionResult FilterByLopHoc(Guid? lopHocId , string startDate)
         {
             if (!lopHocId.HasValue)
+                return PartialView("_BuoiHocEmpty");
+            DateTime parsedStartDate;
+            if (!DateTime.TryParse(startDate, out parsedStartDate))
             {
-                // Không chọn lớp học => trả về view rỗng hoặc thông báo
-                return PartialView("_HocVienTableEmpty");
+                parsedStartDate = DateTime.Today;
+                int dow = (int)parsedStartDate.DayOfWeek;
+                dow = dow == 0 ? 7 : dow;
+                parsedStartDate = parsedStartDate.AddDays(1 - dow);
             }
-
-            var danhSachHocVien = db.DangKyHocs
-                .Include(lh => lh.LopHoc)
-                .Include(hv => hv.HocVien)
-                .Where(lh => lh.LopHoc.LopHocId == lopHocId.Value)
-                .ToList();
 
             var buoiHocs = db.BuoiHocs
                 .Where(b => b.LopHoc.LopHocId == lopHocId.Value)
                 .OrderBy(b => b.NgayHoc)
                 .ToList();
-            // Get the attendance data from DiemDanh_HV
-            var diemDanhs = db.DiemDanhs_HVs
-                .Where(dd => dd.BuoiHoc.LopHoc.LopHocId == lopHocId.Value)
+
+            ViewBag.LopHocId = lopHocId.Value;
+            return PartialView("_BuoiHocListPartial", buoiHocs);
+        }
+        // Trang điểm danh chi tiết: hiển thị thông tin buổi học và danh sách học viên
+        public ActionResult ThongTinDiemDanh(Guid buoiHocId)
+        {
+            var buoiHoc = db.BuoiHocs
+                .Include(b => b.LopHoc)
+                .FirstOrDefault(b => b.BuoiHocId == buoiHocId);
+            if (buoiHoc == null)
+                return HttpNotFound();
+
+            var danhSachHocVien = db.DangKyHocs
+                .Include(dk => dk.HocVien)
+                .Where(dk => dk.LopHocId == buoiHoc.LopHoc.LopHocId)
                 .ToList();
 
-            ViewBag.BuoiHocs = buoiHocs;
-            ViewBag.DiemDanhs = diemDanhs;
+            var diemDanhs = db.DiemDanhs_HVs
+                .Where(dd => dd.BuoiHocId == buoiHocId)
+                .ToList();
 
-            return PartialView("_HocVienTablePartial", danhSachHocVien);
+            ViewBag.BuoiHoc = buoiHoc;
+            ViewBag.DiemDanhs = diemDanhs;
+            return View(danhSachHocVien);
         }
 
         // POST: Lưu điểm danh

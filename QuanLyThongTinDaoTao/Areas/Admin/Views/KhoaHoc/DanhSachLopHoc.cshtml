@@ -38,29 +38,47 @@
                         <tr class="text-center">
                             <td>@lophoc.MaLopHoc</td>
                             <td>@lophoc.TenLopHoc</td>
+                            <td>@(lophoc.KhoaHoc != null ? lophoc.KhoaHoc.TenKhoaHoc : "Chưa có")</td>
                             <td>@lophoc.SoTinChi</td>
                             <td>@lophoc.NgayBatDau.ToString("dd/MM/yyyy")</td>
                             <td>@lophoc.NgayKetThuc.ToString("dd/MM/yyyy")</td>
                             <td>
                                 @{
-                                    var trangThaiText = lophoc.TrangThai == TrangThaiLopHoc.SapMo ? "Sắp Mở"
-                                        : lophoc.TrangThai == TrangThaiLopHoc.DangHoc ? "Đang Học"
-                                        : "Đã Kết Thúc";
+                                    string trangThaiText = "";
+                                    if (lophoc.TrangThai == LopHoc.TrangThaiLopHoc.SapMo)
+                                    {
+                                        trangThaiText = "Sắp mở";
+                                    }
+                                    else if (lophoc.TrangThai == LopHoc.TrangThaiLopHoc.DaBatDau)
+                                    {
+                                        trangThaiText = "Đang học";
+                                    }
+                                    else if (lophoc.TrangThai == LopHoc.TrangThaiLopHoc.DaKetThuc)
+                                    {
+                                        trangThaiText = "Kết thúc";
+                                    }
+                                    else
+                                    {
+                                        trangThaiText = "Không xác định";
+                                    }
 
-                                    var badgeClass = lophoc.TrangThai == TrangThaiLopHoc.SapMo ? "bg-primary"
-                                        : lophoc.TrangThai == TrangThaiLopHoc.DangHoc ? "bg-success"
+                                    var badgeClass = lophoc.TrangThai == LopHoc.TrangThaiLopHoc.SapMo ? "bg-primary"
+                                        : lophoc.TrangThai == LopHoc.TrangThaiLopHoc.DaBatDau ? "bg-success"
                                         : "bg-secondary";
                                 }
 
                                 <span class="badge @badgeClass">@trangThaiText</span>
                             </td>
+
+
                             <td>
-                                <a href="@Url.Action("Details", "LopHoc", new { id = lophoc.LopHocId })" class="btn btn-sm btn-info fs-6">
+                                <a href="@Url.Action("Details", new { id = lophoc.LopHocId })" class="btn btn-info btn-sm m-2">
                                     <i class="fas fa-eye"></i> Chi Tiết
                                 </a>
-
-                                <a href="@Url.Action("Edit","LopHoc", new { id = lophoc.LopHocId })" class="btn btn-sm btn-warning fs-6"><i class="fas fa-edit"></i> Sửa</a>
-                                <a href="@Url.Action("Delete", new { id = lophoc.LopHocId })" class="btn btn-sm btn-danger fs-6" onclick="return confirm('Bạn có chắc chắn muốn xóa lớp học này?');">
+                                <a href="@Url.Action("Edit", new { id = lophoc.LopHocId })" class="btn btn-warning btn-sm m-2">
+                                    <i class="fas fa-edit"></i> Sửa
+                                </a>
+                                <a href="@Url.Action("Delete", new { id = lophoc.LopHocId })" class="btn btn-danger btn-sm m-2" onclick="return confirm('Bạn có chắc chắn muốn xóa lớp học này?');">
                                     <i class="fas fa-trash-alt"></i> Xóa
                                 </a>
                             </td>

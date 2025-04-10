@@ -17,6 +17,8 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         // Hiển thị toàn bộ danh sách buổi học
         public ActionResult Index()
         {
+            // Cập nhật trạng thái của tất cả các buổi học theo thời gian thực
+            UpdateTrangThaiBuoiHocs();
             var buoiHocs = db.BuoiHocs.Include(b => b.LopHoc).ToList();
 
             return View(buoiHocs);
@@ -25,7 +27,6 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         // Tạo buổi học (GET)
         public ActionResult Create()
         {
-
             ViewBag.LopHocList = db.LopHocs.ToList();
             ViewBag.GiangVienList = db.GiangViens.ToList();
             return View();
@@ -37,6 +38,8 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         {
             if (!ModelState.IsValid)
             {
+                ViewBag.LopHocList = db.LopHocs.ToList();
+                ViewBag.GiangVienList = db.GiangViens.ToList();
                 return View(model);
             }
 
@@ -44,7 +47,8 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             if (lopHoc == null)
             {
                 ModelState.AddModelError("LopHocId", "Lớp học không tồn tại.");
-
+                ViewBag.LopHocList = db.LopHocs.ToList();
+                ViewBag.GiangVienList = db.GiangViens.ToList();
                 return View(model);
             }
 
@@ -52,7 +56,8 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             if (model.NgayHoc < lopHoc.NgayBatDau || model.NgayHoc > lopHoc.NgayKetThuc)
             {
                 ModelState.AddModelError("NgayHoc", "Ngày học phải nằm trong khoảng từ " + lopHoc.NgayBatDau.ToShortDateString() + " đến " + lopHoc.NgayKetThuc.ToShortDateString());
-
+                ViewBag.LopHocList = db.LopHocs.ToList();
+                ViewBag.GiangVienList = db.GiangViens.ToList();
                 return View(model);
             }
 
@@ -68,7 +73,8 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             if (isOverlap)
             {
                 ModelState.AddModelError("GioBatDau", "Thời gian buổi học bị trùng với một buổi học khác.");
-  
+                ViewBag.LopHocList = db.LopHocs.ToList();
+                ViewBag.GiangVienList = db.GiangViens.ToList();
                 return View(model);
             }
 
@@ -178,13 +184,58 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             buoiHoc.GhiChu = model.GhiChu;
             buoiHoc.LopHoc = lopHoc;
 
+            //// --- XỬ LÝ GIẢNG VIÊN ---
+            //// Xóa hết danh sách giảng viên đã có cho buổi học hiện tại
+            //var existingGiangVienBuoiHoc = db.GiangVien_BuoiHoc.Where(gv => gv.BuoiHocId == model.BuoiHocId).ToList();
+            //foreach (var gv in existingGiangVienBuoiHoc)
+            //{
+            //    db.GiangVien_BuoiHoc.Remove(gv);
+            //}
+            //db.SaveChanges();
+
+            //// Thêm lại giảng viên theo danh sách được chọn
+            //if (selectedGiangViens != null && selectedGiangViens.Any())
+            //{
+            //    foreach (var giangVienId in selectedGiangViens)
+            //    {
+            //        var giangVien = db.GiangViens.Find(giangVienId);
+            //        if (giangVien != null)
+            //        {
+            //            db.GiangVien_BuoiHoc.Add(new GiangVien_BuoiHoc
+            //            {
+            //                Id = Guid.NewGuid(),
+            //                BuoiHocId = model.BuoiHocId,
+            //                NguoiDungId = giangVienId
+            //            });
+            //        }
+            //    }
+            //    db.SaveChanges();
+            //}
             // --- XỬ LÝ GIẢNG VIÊN ---
-            // Xóa hết danh sách giảng viên đã có cho buổi học hiện tại
-            var existingGiangVienBuoiHoc = db.GiangVien_BuoiHoc.Where(gv => gv.BuoiHocId == model.BuoiHocId).ToList();
-            foreach (var gv in existingGiangVienBuoiHoc)
+            // Lấy danh sách giảng viên hiện tại của buổi học
+            var existingGiangVienBuoiHoc = db.GiangVien_BuoiHoc
+                .Where(gv => gv.BuoiHocId == model.BuoiHocId)
+                .ToList();
+
+            // Lấy danh sách ID giảng viên sẽ bị xóa (có trong DB nhưng không có trong danh sách chọn)
+            var giangVienIdsToRemove = existingGiangVienBuoiHoc
+                .Where(gv => selectedGiangViens == null || !selectedGiangViens.Contains(gv.NguoiDungId))
+                .Select(gv => gv.NguoiDungId)
+                .ToList();
+
+            // Xóa điểm danh của các giảng viên bị xóa khỏi buổi học
+            if (giangVienIdsToRemove.Any())
             {
-                db.GiangVien_BuoiHoc.Remove(gv);
+                var diemDanhToRemove = db.DiemDanhs_GVs
+                    .Where(d => d.BuoiHocId == model.BuoiHocId &&
+                           giangVienIdsToRemove.Contains(d.NguoiDungId))
+                    .ToList();
+
+                db.DiemDanhs_GVs.RemoveRange(diemDanhToRemove);
             }
+
+            // Xóa hết danh sách giảng viên đã có cho buổi học hiện tại
+            db.GiangVien_BuoiHoc.RemoveRange(existingGiangVienBuoiHoc);
             db.SaveChanges();
 
             // Thêm lại giảng viên theo danh sách được chọn
@@ -344,5 +395,30 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
             return RedirectToAction("Edit", new { id = buoiHocId });
         }
+        public void UpdateTrangThaiBuoiHocs()
+        {
+            var buoiHocs = db.BuoiHocs.ToList();
+            DateTime now = DateTime.Now;
+            foreach (var buoiHoc in buoiHocs)
+            {
+                DateTime startDateTime = buoiHoc.NgayHoc.Date.Add(buoiHoc.GioBatDau);
+                DateTime endDateTime = buoiHoc.NgayHoc.Date.Add(buoiHoc.GioKetThuc);
+
+                if (now < startDateTime && buoiHoc.TrangThai != TrangThaiBuoiHoc.SapDienRa)
+                {
+                    buoiHoc.TrangThai = TrangThaiBuoiHoc.SapDienRa;
+                }
+                else if (now >= startDateTime && now < endDateTime && buoiHoc.TrangThai != TrangThaiBuoiHoc.DangDienRa)
+                {
+                    buoiHoc.TrangThai = TrangThaiBuoiHoc.DangDienRa;
+                }
+                else if (now >= endDateTime && buoiHoc.TrangThai != TrangThaiBuoiHoc.DaKetThuc)
+                {
+                    buoiHoc.TrangThai = TrangThaiBuoiHoc.DaKetThuc;
+                }
+            }
+            db.SaveChanges();
+        }
+
     }
 }

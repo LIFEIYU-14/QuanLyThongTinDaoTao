@@ -475,9 +475,10 @@
     <Content Include="Areas\Admin\Views\KhoaHoc\ThemLopHoc_KhoaHoc.cshtml" />
     <Content Include="Areas\Admin\Views\HocVien\Edit.cshtml" />
     <Content Include="Areas\Admin\Views\DiemDanhHocVien\Index.cshtml" />
-    <Content Include="Areas\Admin\Views\DiemDanhHocVien\_HocVienTablePartial.cshtml" />
-    <Content Include="Areas\Admin\Views\DiemDanhHocVien\_HocVienTableEmpty.cshtml" />
     <Content Include="Areas\Admin\Views\DiemDanhGiangVien\Index.cshtml" />
+    <Content Include="Areas\Admin\Views\DiemDanhHocVien\_BuoiHocListPartial.cshtml" />
+    <Content Include="Areas\Admin\Views\DiemDanhHocVien\ThongTinDiemDanh.cshtml" />
+    <Content Include="Areas\Admin\Views\DiemDanhHocVien\_BuoiHocEmpty.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
