@@ -9,7 +9,6 @@ namespace QuanLyThongTinDaoTao.APIControllers
     public class LopHocChieuSinhController : ApiController
     {
         private DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
-
         [HttpGet]
         [Route("api/lophoc/chieusinh")]
         public IHttpActionResult GetLopHocChieuSinh()

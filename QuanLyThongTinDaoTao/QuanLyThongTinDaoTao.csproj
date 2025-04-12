@@ -516,6 +516,8 @@
     <Content Include="Areas\Admin\Views\DiemDanhHocVien\_BuoiHocListPartial.cshtml" />
     <Content Include="Areas\Admin\Views\DiemDanhHocVien\ThongTinDiemDanh.cshtml" />
     <Content Include="Areas\Admin\Views\DiemDanhHocVien\_BuoiHocEmpty.cshtml" />
+    <Content Include="Areas\Admin\Views\BuoiHoc\DanhSachHocVien.cshtml" />
+    <Content Include="Areas\Admin\Views\BuoiHoc\_BuoiHocPartial.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />

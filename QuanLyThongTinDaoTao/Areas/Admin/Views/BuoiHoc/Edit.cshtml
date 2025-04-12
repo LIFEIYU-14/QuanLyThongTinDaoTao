@@ -28,9 +28,6 @@
                             <option value="@lopHoc.LopHocId" @(lopHoc.LopHocId == Model.LopHocId ? "selected" : "")>
                                 @lopHoc.TenLopHoc - (@ngayBatDau - @ngayKetThuc)
                             </option>
-
-
-
                         }
 
                     </select>
@@ -58,15 +55,18 @@
                 </div>
                 <div class="col-md-12 mb-3">
                     <label class="form-label">Chọn Giảng Viên</label>
-                    <div class="border rounded p-2" style="max-height: 300px; overflow-y: auto;">
-                        @foreach (var gv in ViewBag.GiangVienList)
-                        {
-                            var isChecked = Model?.GiangVien_BuoiHocs!= null && Model.GiangVien_BuoiHocs.Any(g => g.NguoiDungId == gv.NguoiDungId) ? "checked" : "";
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="selectedGiangViens" value="@gv.NguoiDungId" id="gv_@gv.NguoiDungId" @isChecked />
-                                <label class="form-check-label" for="gv_@gv.NguoiDungId">@gv.HoVaTen</label>
-                            </div>
-                        }
+                    @*<div class="border rounded p-2" style="max-height: 300px; overflow-y: auto;">
+            @foreach (var gv in ViewBag.GiangVienList)
+            {
+                var isChecked = Model?.GiangVien_BuoiHocs!= null && Model.GiangVien_BuoiHocs.Any(g => g.NguoiDungId == gv.NguoiDungId) ? "checked" : "";
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="selectedGiangViens" value="@gv.NguoiDungId" id="gv_@gv.NguoiDungId" @isChecked />
+                    <label class="form-check-label" for="gv_@gv.NguoiDungId">@gv.HoVaTen</label>
+                </div>
+            }
+        </div>*@
+                    <div id="giangVienContainer" class="border rounded p-2" style="max-height: 300px; overflow-y: auto;">
+                        <!-- Sẽ được cập nhật bằng JS -->
                     </div>
                 </div>
 
@@ -156,5 +156,67 @@
             .catch(error => {
                 console.error('Lỗi CKEditor:', error);
             });
+    });
+   function fetchAvailableGiangViens() {
+        const ngayHoc = document.querySelector('[name="NgayHoc"]').value;
+        const gioBatDau = document.querySelector('[name="GioBatDau"]').value;
+        const gioKetThuc = document.querySelector('[name="GioKetThuc"]').value;
+        const buoiHocId = document.querySelector('[name="BuoiHocId"]').value;
+
+        if (!ngayHoc || !gioBatDau || !gioKetThuc) return;
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("GetAvailableGiangViens", "BuoiHoc")',
+            data: {
+                ngayHoc: ngayHoc,
+                gioBatDau: gioBatDau,
+                gioKetThuc: gioKetThuc,
+                buoiHocId: buoiHocId
+            },
+            success: function (data) {
+                const container = $('#giangVienContainer');
+                container.empty();
+
+                data.forEach(gv => {
+                    const isChecked = gv.IsSelected === true || gv.IsSelected === "True" ? 'checked' : '';
+                    let html = '';
+
+                    if (gv.IsBusy && gv.IsSelected) {
+                        html = `
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="selectedGiangViens" value="${gv.NguoiDungId}" id="gv_${gv.NguoiDungId}" ${isChecked} />
+                                <label class="form-check-label text-warning" for="gv_${gv.NguoiDungId}">${gv.HoVaTen} (bận - đã chọn)</label>
+                            </div>`;
+                    } else if (gv.IsBusy) {
+                        html = `
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" disabled />
+                                <label class="form-check-label text-muted">${gv.HoVaTen} (bận)</label>
+                            </div>`;
+                    } else {
+                        html = `
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="selectedGiangViens" value="${gv.NguoiDungId}" id="gv_${gv.NguoiDungId}" ${isChecked} />
+                                <label class="form-check-label" for="gv_${gv.NguoiDungId}">${gv.HoVaTen}</label>
+                            </div>`;
+                    }
+
+                    container.append(html);
+                });
+            },
+            error: function (err) {
+                console.error("Lỗi khi tải danh sách giảng viên:", err);
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelector('[name="NgayHoc"]').addEventListener('change', fetchAvailableGiangViens);
+        document.querySelector('[name="GioBatDau"]').addEventListener('change', fetchAvailableGiangViens);
+        document.querySelector('[name="GioKetThuc"]').addEventListener('change', fetchAvailableGiangViens);
+
+        // Gọi khi trang load
+        fetchAvailableGiangViens();
     });
 </script>

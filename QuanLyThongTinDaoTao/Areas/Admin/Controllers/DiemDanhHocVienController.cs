@@ -110,7 +110,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                     });
                 }
 
-                db.SaveChanges(); // Commit the transaction
+                db.SaveChanges();
 
                 return Json(new { success = true, message = "Điểm danh đã được lưu thành công.", updatedAttendance });
             }

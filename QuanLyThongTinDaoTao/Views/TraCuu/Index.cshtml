@@ -3,23 +3,30 @@
     Layout = "~/Views/Shared/_MainLayout.cshtml";
 }
 
-<div class="container">
-    <h2> Danh sách lớp học đang chiêu sinh</h2>
-    <table class="table table-bordered" id="table-lop-hoc">
-        <thead>
-            <tr>
-                <th>Tên lớp</th>
-                <th>Mã lớp</th>
-                <th>Tín chỉ</th>
-                <th>Ngày bắt đầu</th>
-                <th>Ngày kết thúc</th>
-                <th>Số lượng tối đa</th>
-                <th>Mô tả</th>
-                <th>Khoá học</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="bg-light text-center rounded p-4">
+            <h6 class="mb-3 fs-3">Danh sách lớp học đang chiêu sinh</h6>
+            <div class="table-responsive">
+                <table class="table table-striped align-middle table-bordered" id="table-lop-hoc">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>STT</th>
+                            <th>Mã Lớp Học</th>
+                            <th>Tên Lớp Học</th>
+                            <th>Số Tín Chỉ</th>
+                            <th>Ngày Bắt Đầu</th>
+                            <th>Ngày Kết Thúc</th>
+                            <th>Số Lượng Tối Đa</th>
+                            <th>Khoá Học</th>
+                            <th>Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -32,21 +39,28 @@
                 var tbody = $('#table-lop-hoc tbody');
                 tbody.empty();
                 if (data.length === 0) {
-                    tbody.append('<tr><td colspan="8">Không có lớp học nào đang chiêu sinh.</td></tr>');
+                    tbody.append('<tr><td colspan="9" class="text-danger text-center">Không có lớp học nào đang chiêu sinh.</td></tr>');
                     return;
                 }
 
                 $.each(data, function (i, item) {
-                    var row = `
+                    let ngayBatDau = formatDate(item.NgayBatDau);
+                    let ngayKetThuc = formatDate(item.NgayKetThuc);
+                    let row = `
                         <tr>
-                            <td>${item.TenLopHoc}</td>
+                            <td>${i + 1}</td>
                             <td>${item.MaLopHoc}</td>
+                            <td>${item.TenLopHoc}</td>
                             <td>${item.SoTinChi}</td>
-                            <td>${formatDate(item.NgayBatDau)}</td>
-                            <td>${formatDate(item.NgayKetThuc)}</td>
+                            <td>${ngayBatDau}</td>
+                            <td>${ngayKetThuc}</td>
                             <td>${item.SoLuongToiDa}</td>
-                            <td>${item.MoTa}</td>
                             <td>${item.KhoaHoc}</td>
+                            <td>
+                                <a href="/Courses/Register?lopHocId=${item.LopHocId}" class="btn btn-sm btn-success">
+                                    <i class="fas fa-user-plus"></i> Đăng Ký
+                                </a>
+                            </td>
                         </tr>`;
                     tbody.append(row);
                 });

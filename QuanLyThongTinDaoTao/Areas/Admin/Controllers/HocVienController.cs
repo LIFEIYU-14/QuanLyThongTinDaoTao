@@ -129,11 +129,11 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
             try
             {
-                // Xóa các bản ghi liên quan trong bảng DiemDanh_GV
+                // Xóa các bản ghi liên quan trong bảng DiemDanh_hV
                 var diemDanhs = db.DiemDanhs_HVs.Where(d => d.HocVien.NguoiDungId == hv.NguoiDungId).ToList();
                 db.DiemDanhs_HVs.RemoveRange(diemDanhs);
 
-                // Xóa các bản ghi liên quan trong bảng GiangVien_BuoiHoc
+                // Xóa các bản ghi liên quan trong bảng DangKyHoc
                 var hocVienDangKy = db.DangKyHocs.Where(gvh => gvh.HocVien.NguoiDungId == hv.NguoiDungId).ToList();
                 db.DangKyHocs.RemoveRange(hocVienDangKy);
 

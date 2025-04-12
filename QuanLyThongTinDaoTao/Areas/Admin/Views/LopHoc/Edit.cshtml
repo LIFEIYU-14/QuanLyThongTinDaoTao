@@ -51,14 +51,6 @@
                 </div>
 
                 <div class="row">
-                    @*<div class="col-md-6 mb-3">
-                        @Html.LabelFor(m => m.TrangThai, "Trạng Thái", new { @class = "form-label" })
-                        <span class="text-danger">*</span>
-                        @Html.EnumDropDownListFor(m => m.TrangThai, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(m => m.TrangThai, "", new { @class = "text-danger" })
-                    </div>*@
-
-
                     <div class="col-md-6 mb-3">
                         @Html.LabelFor(model => model.SoLuongToiDa, "Số lượng tối đa", new { @class = "form-label" })
                         @Html.TextBoxFor(model => model.SoLuongToiDa, new { @class = "form-control", type = "number", min = 1, required = "required" })
@@ -71,6 +63,7 @@
                     @Html.TextAreaFor(model => model.MoTa, new { @class = "form-control", rows = 5, id = "MoTa" })
                     @Html.ValidationMessageFor(model => model.MoTa, "", new { @class = "text-danger" })
                 </div>
+
 
 
                 <div class="col-md-12 mb-3">
@@ -129,6 +122,7 @@
         resize: vertical; /* Cho phép kéo theo chiều dọc */
         overflow-y: auto;
     }
+
     .form-label {
         font-weight: bold;
     }
@@ -162,29 +156,20 @@
 </style>
 <!-- Tích hợp CKEditor 5 -->
 <script>
-    $(document).ready(function () {
-        // Xử lý form submission
-        $('#editForm').on('submit', function (e) {
-            var submitBtn = $('#submitBtn');
-            submitBtn.prop('disabled', true);
-            submitBtn.html('<i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý...');
-        });
     function deleteAttachment(attachmentId) {
-    if (confirm('Bạn có chắc chắn muốn xóa tệp này?')) {
-        window.location.href = '/Admin/LopHoc/DeleteAttachment?attachmentId=' + attachmentId + '&lopHocId=@Model.LopHocId';
+        if (confirm('Bạn có chắc chắn muốn xóa tệp này?')) {
+            window.location.href = '/Admin/LopHoc/DeleteAttachment?attachmentId=' + attachmentId + '&lopHocId=@Model.LopHocId';
+        }
     }
-}
+
     document.addEventListener('DOMContentLoaded', function () {
         // Khởi tạo CKEditor
         ClassicEditor
             .create(document.querySelector('#MoTa'))
             .then(editor => {
-                console.log('CKEditor đã khởi tạo thành công.');
-
                 const editorElement = editor.ui.view.editable.element;
                 editorElement.style.overflowY = 'auto';
 
-                // Điều chỉnh chiều cao tự động
                 function adjustHeight() {
                     editorElement.style.height = 'auto';
                     editorElement.style.height = Math.min(editorElement.scrollHeight, 500) + 'px';
@@ -196,9 +181,13 @@
             .catch(error => {
                 console.error('Lỗi CKEditor:', error);
             });
-    });
-    document.getElementById('submitBtn').addEventListener('click', function () {
-        this.disabled = true;  // Disable the submit button
-        this.innerHTML = '<i class="fa-solid fa-circle-plus"></i> Đang Xử Lý...';  // Optionally change button text
+
+        // Xử lý form submission
+        $('#editForm').on('submit', function () {
+            const submitBtn = $(this).find('button[type=submit]');
+            submitBtn.prop('disabled', true);
+            submitBtn.html('<i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý...');
+        });
     });
 </script>
+

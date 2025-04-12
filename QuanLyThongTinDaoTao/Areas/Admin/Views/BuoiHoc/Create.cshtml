@@ -8,7 +8,7 @@
     <div class="card shadow-lg">
         <div class="card-header bg-primary text-white text-center">
             <h3><i class="fa-solid fa-calendar-plus"></i> Thêm Buổi Học</h3>
-        </div>
+        </div> 
         <div class="card-body">
             @using (Html.BeginForm("Create", "BuoiHoc", FormMethod.Post, new { enctype = "multipart/form-data" }))
             {
@@ -24,10 +24,10 @@
                             var ngayBatDau = lopHoc.NgayBatDau != null ? ((DateTime)lopHoc.NgayBatDau).ToString("dd/MM/yyyy") : "??";
                             var ngayKetThuc = lopHoc.NgayKetThuc != null ? ((DateTime)lopHoc.NgayKetThuc).ToString("dd/MM/yyyy") : "??";
 
-                            <option value="@lopHoc.LopHocId" @(lopHoc.LopHocId == Model.LopHocId ? "selected" : "")>
+                            <option value="@lopHoc.LopHocId">
                                 @lopHoc.TenLopHoc - (@ngayBatDau - @ngayKetThuc)
                             </option>
-
+                         
                         }
                     </select>
                 </div>
@@ -62,15 +62,18 @@
                 </div>
                 <div class="col-md-12 mb-3">
                     <label class="form-label">Chọn Giảng Viên</label>
-                    <div class="border rounded p-2" style="max-height: 300px; overflow-y: auto;">
-                        @foreach (var gv in ViewBag.GiangVienList)
-                        {
-                            var isChecked = Model?.GiangVien_BuoiHocs != null && Model.GiangVien_BuoiHocs.Any(g => g.NguoiDungId == gv.NguoiDungId) ? "checked" : "";
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="selectedGiangViens" value="@gv.NguoiDungId" id="gv_@gv.NguoiDungId" @isChecked />
-                                <label class="form-check-label" for="gv_@gv.NguoiDungId">@gv.HoVaTen</label>
-                            </div>
-                        }
+                    @*<div class="border rounded p-2" style="max-height: 300px; overflow-y: auto;">
+            @foreach (var gv in ViewBag.GiangVienList)
+            {
+                var isChecked = Model?.GiangVien_BuoiHocs != null && Model.GiangVien_BuoiHocs.Any(g => g.NguoiDungId == gv.NguoiDungId) ? "checked" : "";
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="selectedGiangViens" value="@gv.NguoiDungId" id="gv_@gv.NguoiDungId" @isChecked />
+                    <label class="form-check-label" for="gv_@gv.NguoiDungId">@gv.HoVaTen</label>
+                </div>
+            }
+        </div>*@
+                    <div id="giangVienContainer" class="border rounded p-2" style="max-height: 300px; overflow-y: auto;">
+                        <!-- Sẽ được cập nhật bằng JS -->
                     </div>
                 </div>
                 <!-- Tệp Đính Kèm -->
@@ -157,4 +160,67 @@
         this.disabled = true;  // Disable the submit button
         this.innerHTML = '<i class="fa-solid fa-circle-plus"></i> Đang Xử Lý...';  // Optionally change button text
     });
+    function fetchAvailableGiangViens() {
+        const ngayHoc = document.querySelector('[name="NgayHoc"]').value;
+        const gioBatDau = document.querySelector('[name="GioBatDau"]').value;
+        const gioKetThuc = document.querySelector('[name="GioKetThuc"]').value;
+
+        if (!ngayHoc || !gioBatDau || !gioKetThuc) return;
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("GetAvailableGiangViens", "BuoiHoc")',
+            data: {
+                ngayHoc: ngayHoc,
+                gioBatDau: gioBatDau,
+                gioKetThuc: gioKetThuc
+            },
+            success: function (data) {
+                const container = $('#giangVienContainer');
+                container.empty();
+
+                data.forEach(gv => {
+                    let html = '';
+                    const isChecked = gv.IsSelected ? 'checked' : '';
+
+                    // Nếu bận nhưng đã được chọn trước => hiển thị và giữ checked
+                    if (gv.IsBusy && gv.IsSelected) {
+                        html = `
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="selectedGiangViens" value="${gv.NguoiDungId}" id="gv_${gv.NguoiDungId}" ${isChecked} />
+                    <label class="form-check-label text-warning" for="gv_${gv.NguoiDungId}">${gv.HoVaTen} (bận - đã chọn)</label>
+                </div>`;
+                    }
+                    // Nếu bận và chưa được chọn => disable
+                    else if (gv.IsBusy && !gv.IsSelected) {
+                        html = `
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" disabled />
+                    <label class="form-check-label text-muted">${gv.HoVaTen} (bận)</label>
+                </div>`;
+                    }
+                    // Bình thường
+                    else {
+                        html = `
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="selectedGiangViens" value="${gv.NguoiDungId}" id="gv_${gv.NguoiDungId}" ${isChecked} />
+                    <label class="form-check-label" for="gv_${gv.NguoiDungId}">${gv.HoVaTen}</label>
+                </div>`;
+                    }
+
+                    container.append(html);
+                });
+            },
+            error: function (err) {
+                console.error("Lỗi khi tải danh sách giảng viên:", err);
+            }
+        });
+    }
+
+    document.querySelector('[name="NgayHoc"]').addEventListener('change', fetchAvailableGiangViens);
+    document.querySelector('[name="GioBatDau"]').addEventListener('change', fetchAvailableGiangViens);
+    document.querySelector('[name="GioKetThuc"]').addEventListener('change', fetchAvailableGiangViens);
+
+    // Nếu cần load sẵn ban đầu (ví dụ khi chỉnh sửa), gọi luôn
+    // fetchAvailableGiangViens();
 </script>

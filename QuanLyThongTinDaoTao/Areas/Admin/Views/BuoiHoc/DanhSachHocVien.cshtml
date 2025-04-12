@@ -1,0 +1,51 @@
+﻿@model IEnumerable<QuanLyThongTinDaoTao.Models.HocVien>
+@{
+    ViewBag.Title = "DanhSachHocVien";
+    Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
+    var buoiHoc = ViewBag.BuoiHoc as QuanLyThongTinDaoTao.Models.BuoiHoc;
+}
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">
+            Danh sách học viên - Buổi học: @buoiHoc.NgayHoc.ToString("dd/MM/yyyy") (@buoiHoc.GioBatDau.ToString(@"hh\:mm") - @buoiHoc.GioKetThuc.ToString(@"hh\:mm"))
+            <br />
+            Lớp học: @buoiHoc.LopHoc.TenLopHoc
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Mã HV</th>
+                        <th>Họ và tên</th>
+                        <th>Email</th>
+                        <th>SĐT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{ int stt = 1; }
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@stt</td>
+                            <td>@item.MaHocVien</td>
+                            <td>@item.HoVaTen</td>
+                            <td>@item.Email</td>
+                            <td>@item.SoDienThoai</td>
+                           
+                        </tr>
+                        stt++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div>
+    <a href="@Url.Action("Index", new { id = buoiHoc.BuoiHocId })" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Quay lại
+    </a>
+</div>

@@ -3,9 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 using QuanLyThongTinDaoTao.Models;
-using QuanLyThongTinDaoTao.ModelsHelper; // Chứa các lớp DangKyHocRequest và VerifyOtpRequest
+using QuanLyThongTinDaoTao.ModelsHelper;
 using QuanLyThongTinDaoTao.Services;
-using QuanLyThongTinDaoTao.Helpers;       // Sử dụng OtpCache
+using QuanLyThongTinDaoTao.Helpers;   
 
 namespace QuanLyThongTinDaoTao.APIControllers
 {

@@ -20,9 +20,46 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             // Cập nhật trạng thái của tất cả các buổi học theo thời gian thực
             UpdateTrangThaiBuoiHocs();
             var buoiHocs = db.BuoiHocs.Include(b => b.LopHoc).ToList();
+            ViewBag.LopHocList = db.LopHocs.ToList();
             return View(buoiHocs);
         }
+        public ActionResult FilterByLopHoc(Guid? lopHocId)
+        {
+            if (lopHocId.HasValue)
+            {
+                var danhSachBuoiHoc = db.BuoiHocs
+                    .Include(lh => lh.LopHoc)
+                    .Where(lh => lh.LopHoc != null && lh.LopHoc.LopHocId == lopHocId.Value)
+                    .ToList();
 
+                return PartialView("_BuoiHocPartial", danhSachBuoiHoc);
+            }
+
+            return PartialView("_BuoiHocPartial", db.BuoiHocs.Include(lh => lh.LopHoc).ToList());
+        }
+        // Hiển thị danh sách học viên của buổi học
+        public ActionResult DanhSachHocVien(Guid id)
+        {
+            // Kiểm tra buổi học có tồn tại không
+            var buoiHoc = db.BuoiHocs
+                .Include(b => b.LopHoc)
+                .FirstOrDefault(b => b.BuoiHocId == id);
+
+            if (buoiHoc == null)
+            {
+                return HttpNotFound();
+            }
+
+            // Lấy danh sách học viên đã đăng ký và xác nhận
+ 
+            var danhSachHocVien = db.DangKyHocs
+                    .Include(dk => dk.HocVien)
+                    .Where(dk => dk.LopHocId == buoiHoc.LopHoc.LopHocId)
+                    .Select(dk => dk.HocVien) // Lấy ra học viên
+                    .ToList();
+            ViewBag.BuoiHoc = buoiHoc;
+            return View(danhSachHocVien); // Trả đúng List<HocVien>
+        }
         // Tạo buổi học (GET)
         public ActionResult Create()
         {
@@ -75,6 +112,30 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 ViewBag.LopHocList = db.LopHocs.ToList();
                 ViewBag.GiangVienList = db.GiangViens.ToList();
                 return View(model);
+            }
+
+            // Kiểm tra trùng lịch giảng viên
+            if (selectedGiangViens != null && selectedGiangViens.Any())
+            {
+                foreach (var giangVienId in selectedGiangViens)
+                {
+                    bool isGiangVienBusy = db.GiangVien_BuoiHoc
+                        .Include(gv => gv.BuoiHoc)
+                        .Any(gv => gv.NguoiDungId == giangVienId &&
+                              gv.BuoiHoc.NgayHoc == model.NgayHoc &&
+                              ((model.GioBatDau >= gv.BuoiHoc.GioBatDau && model.GioBatDau < gv.BuoiHoc.GioKetThuc) ||
+                               (model.GioKetThuc > gv.BuoiHoc.GioBatDau && model.GioKetThuc <= gv.BuoiHoc.GioKetThuc) ||
+                               (model.GioBatDau <= gv.BuoiHoc.GioBatDau && model.GioKetThuc >= gv.BuoiHoc.GioKetThuc)));
+
+                    if (isGiangVienBusy)
+                    {
+                        var busyGiangVien = db.GiangViens.Find(giangVienId);
+                        ModelState.AddModelError("", $"Giảng viên {busyGiangVien.HoVaTen} đã có lịch dạy trùng thời gian này.");
+                        ViewBag.LopHocList = db.LopHocs.ToList();
+                        ViewBag.GiangVienList = db.GiangViens.ToList();
+                        return View(model);
+                    }
+                }
             }
 
             // Thêm buổi học mới
@@ -184,7 +245,30 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 ViewBag.GiangVienList = db.GiangViens.ToList();
                 return View(model);
             }
+            // Kiểm tra trùng lịch giảng viên (trừ buổi học hiện tại)
+            if (selectedGiangViens != null && selectedGiangViens.Any())
+            {
+                foreach (var giangVienId in selectedGiangViens)
+                {
+                    bool isGiangVienBusy = db.GiangVien_BuoiHoc
+                        .Include(gv => gv.BuoiHoc)
+                        .Any(gv => gv.NguoiDungId == giangVienId &&
+                              gv.BuoiHoc.NgayHoc == model.NgayHoc &&
+                              gv.BuoiHoc.BuoiHocId != model.BuoiHocId && // Loại trừ buổi học hiện tại
+                              ((model.GioBatDau >= gv.BuoiHoc.GioBatDau && model.GioBatDau < gv.BuoiHoc.GioKetThuc) ||
+                               (model.GioKetThuc > gv.BuoiHoc.GioBatDau && model.GioKetThuc <= gv.BuoiHoc.GioKetThuc) ||
+                               (model.GioBatDau <= gv.BuoiHoc.GioBatDau && model.GioKetThuc >= gv.BuoiHoc.GioKetThuc)));
 
+                    if (isGiangVienBusy)
+                    {
+                        var busyGiangVien = db.GiangViens.Find(giangVienId);
+                        ModelState.AddModelError("", $"Giảng viên {busyGiangVien.HoVaTen} đã có lịch dạy trùng thời gian này.");
+                        ViewBag.LopHocList = db.LopHocs.ToList();
+                        ViewBag.GiangVienList = db.GiangViens.ToList();
+                        return View(model);
+                    }
+                }
+            }
             // Cập nhật thông tin buổi học
             buoiHoc.NgayHoc = model.NgayHoc;
             buoiHoc.GioBatDau = model.GioBatDau;
@@ -428,6 +512,39 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             }
             db.SaveChanges();
         }
+        [HttpPost]
+        public JsonResult GetAvailableGiangViens(DateTime ngayHoc, TimeSpan gioBatDau, TimeSpan gioKetThuc, Guid? buoiHocId = null)
+        {
+            var allGVs = db.GiangViens.ToList();
+
+            var selectedGVIds = buoiHocId != null
+                ? db.GiangVien_BuoiHoc
+                    .Where(x => x.BuoiHocId == buoiHocId)
+                    .Select(x => x.NguoiDungId)
+                    .ToList()
+                : new List<Guid>();
+
+            var danhSach = allGVs.Select(gv => new
+            {
+                gv.NguoiDungId,
+                gv.HoVaTen,
+                IsSelected = selectedGVIds.Contains(gv.NguoiDungId),
+                IsBusy = db.BuoiHocs.Any(b =>
+                    b.BuoiHocId != buoiHocId && // bỏ qua chính nó
+                    b.NgayHoc == ngayHoc &&
+                    (
+                        (gioBatDau >= b.GioBatDau && gioBatDau < b.GioKetThuc) ||
+                        (gioKetThuc > b.GioBatDau && gioKetThuc <= b.GioKetThuc) ||
+                        (gioBatDau <= b.GioBatDau && gioKetThuc >= b.GioKetThuc)
+                    ) &&
+                    b.GiangVien_BuoiHocs.Any(g => g.NguoiDungId == gv.NguoiDungId)
+                )
+            });
+
+            return Json(danhSach);
+        }
+
+
 
     }
 }

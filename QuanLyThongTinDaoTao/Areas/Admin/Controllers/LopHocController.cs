@@ -221,11 +221,38 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
             return RedirectToAction("Index");
         }
+        public ActionResult DeleteAttachment(Guid attachmentId, Guid lopHocId)
+        {
+            var attachment = db.Attachments.Find(attachmentId);
+            if (attachment == null)
+            {
+                return HttpNotFound();
+            }
+
+            // Xóa tệp từ thư mục lưu trữ
+            string filePath = Server.MapPath(attachment.FilePath);
+            if (System.IO.File.Exists(filePath))
+            {
+                System.IO.File.Delete(filePath);
+            }
+
+            // Xóa khỏi bảng Attachment và LopHocAttachment
+            var lopHocAttachment = db.LopHocAttachments.FirstOrDefault(l => l.AttachmentId == attachmentId);
+            if (lopHocAttachment != null)
+            {
+                db.LopHocAttachments.Remove(lopHocAttachment);
+            }
+
+            db.Attachments.Remove(attachment);
+            db.SaveChanges();
+
+            return RedirectToAction("Edit", new { id = lopHocId });
+        }
 
         [HttpGet]
         public ActionResult DeleteAllAttachments(Guid lopHocId)
         {
-            var attachments = db.LopHocAttachments.Where(k => k.LopHocId == lopHocId).ToList();
+            var attachments = db.LopHocAttachments.Where(l => l.LopHocId == lopHocId).ToList();
             if (!attachments.Any())
             {
                 return HttpNotFound("Không có tài liệu nào để xóa.");
