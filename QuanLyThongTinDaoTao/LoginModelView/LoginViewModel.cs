@@ -8,12 +8,13 @@ namespace QuanLyThongTinDaoTao.LoginModelView
 {
     public class LoginViewModel
     {
-        [Required]
+        [Required(ErrorMessage = "Vui lòng nhập tài khoản hoặc email")]
+        [Display(Name = "Tài khoản hoặc Email")]
         public string TaiKhoanOrEmail { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Vui lòng nhập mật khẩu")]
         [DataType(DataType.Password)]
+        [Display(Name = "Mật khẩu")]
         public string MatKhau { get; set; }
     }
-
 }

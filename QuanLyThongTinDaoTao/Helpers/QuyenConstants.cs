@@ -19,9 +19,9 @@ namespace QuanLyThongTinDaoTao.Helpers
         };
         public static Dictionary<string, string> TenQuyenTiengViet = new Dictionary<string, string>
         {
-            { HOCVIEN, "Học viên" },
-            { GIANGVIEN, "Giảng viên" },
-            { ADMIN, "Quản trị" }
+            { HOCVIEN, "Học Viên" },
+            { GIANGVIEN, "Giảng Viên" },
+            { ADMIN, "Quản Trị" }
         };
     }
 }

@@ -34,6 +34,7 @@ namespace QuanLyThongTinDaoTao.Models
         //public virtual ICollection<LopHoc> LopHocs { get; set; }
         public virtual ICollection<ThongBao> ThongBaos { get; set; }
         public ICollection<GiangVien_BuoiHoc> GiangVien_BuoiHocs { get; internal set; }
+
     }
     
 }

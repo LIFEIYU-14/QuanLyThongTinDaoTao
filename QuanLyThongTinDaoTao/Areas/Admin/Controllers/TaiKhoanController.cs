@@ -25,24 +25,26 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             if (!ModelState.IsValid) return View(model);
 
             // Tìm theo tài khoản hoặc email
-            var nguoiDung = db.NguoiDungs
-                .Include("PhanQuyens")
+            var nguoiDungList = db.NguoiDungs
+         .Include("PhanQuyens")
+         .ToList();
+
+            var nguoiDung = nguoiDungList
                 .FirstOrDefault(n => n.TaiKhoan == model.TaiKhoanOrEmail ||
-                                     (n is GiangVien && ((GiangVien)n).Email == model.TaiKhoanOrEmail));
+                                     (n is GiangVien gv && gv.Email == model.TaiKhoanOrEmail));
+
 
             if (nguoiDung != null && PasswordHelper.VerifyPassword(model.MatKhau, nguoiDung.MatKhau))
             {
                 var quyen = nguoiDung.PhanQuyens.FirstOrDefault()?.TenQuyen;
                 Session["TaiKhoan"] = nguoiDung.TaiKhoan;
                 Session["TenQuyen"] = quyen;
+                Session["NguoiDungId"] = nguoiDung.NguoiDungId;
+                // Chuyển hướng tùy theo quyền
+                if (quyen == "Admin" || quyen == "GiangVien")
+                    return RedirectToAction("Index", "HomeAdmin", new { area = "Admin" });
 
-                // Điều hướng dựa vào quyền
-                if (quyen == "Admin")
-                    return RedirectToAction("Index", "HomeAdmin", new { area = "Admin" });
-                else if (quyen == "GiangVien")
-                    return RedirectToAction("Index", "HomeAdmin", new { area = "Admin" });
-         
-         
+
                 return RedirectToAction("Index", "Home");
             }
 

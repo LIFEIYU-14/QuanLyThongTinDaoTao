@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var role = Session["TenQuyen"] as string;
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -16,81 +20,96 @@
 </head>
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-success">
-            <!-- Sidebar Toggle (Luôn hiển thị) -->
-            <button class="btn btn-link btn-sm me-2" id="sidebarToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            <!-- Toggle Button cho Mobile -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSearch">
-                <i class="fas fa-search"></i> <!-- Hoặc dùng icon khác -->
-            </button>
+        <!-- Sidebar Toggle (Luôn hiển thị) -->
+        <button class="btn btn-link btn-sm me-2" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <!-- Toggle Button cho Mobile -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSearch">
+            <i class="fas fa-search"></i> <!-- Hoặc dùng icon khác -->
+        </button>
 
-            <!-- Phần chứa Form tìm kiếm + User Menu -->
-            <div class="collapse navbar-collapse" id="navbarSearch">
-                <!-- Form tìm kiếm (Hiển thị trên cả desktop & mobile) -->
-                <form class="d-flex my-2 my-lg-0 mx-lg-auto" style="max-width: 500px; width: 100%;">
-                    <div class="input-group">
-                        <input type="search" class="form-control border-0" placeholder="🔍 Tìm kiếm..."
-                               aria-label="Search" value="@ViewBag.Search">
-                        <button class="btn btn-primary" type="submit">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </form>
+        <!-- Phần chứa Form tìm kiếm + User Menu -->
+        <div class="collapse navbar-collapse" id="navbarSearch">
+            <!-- Form tìm kiếm (Hiển thị trên cả desktop & mobile) -->
+            <form class="d-flex my-2 my-lg-0 mx-lg-auto" style="max-width: 500px; width: 100%;">
+                <div class="input-group">
+                    <input type="search" class="form-control border-0" placeholder="🔍 Tìm kiếm..."
+                           aria-label="Search" value="@ViewBag.Search">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
 
-                <!-- User Dropdown (Luôn ở góc phải) -->
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown"
-                           data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-user"></i>
+            <!-- User Dropdown (Luôn ở góc phải) -->
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user me-1"></i> @Session["TaiKhoan"]
+                    </a>
+
+                    <div class="dropdown-menu dropdown-menu-end">
+                        <!-- Nội dung dropdown -->
+                        <a class="dropdown-item" href="#">
+                            <i class="fas fa-user-circle me-2"></i> Tài khoản
                         </a>
-                        <div class="dropdown-menu dropdown-menu-end">
-                            <!-- Nội dung dropdown -->
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-user-circle me-2"></i> Tài khoản
-                            </a>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
-                            </a>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+                        <a class="dropdown-item" href="@Url.Action("DangXuat", "TaiKhoan", new { area = "Admin" })">
+                            <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
     <div id="layoutSidenav">
         <div id="layoutSidenav_nav">
             <nav class="sb-sidenav accordion bg-secondary " id="sidenavAccordion">
                 <div class="sb-sidenav-menu text-bg-light">
                     <div class="nav ">
                         <br />
-                        <a href="@Url.Action("Index", "HomeAdmin")" class="nav-item nav-link">
-                            <i class="fa fa-tachometer-alt me-2"></i>Trang chủ
-                        </a>
-                        <a href="@Url.Action("Index", "KhoaHoc")" class="nav-item nav-link">
-                            <i class="fa fa-laptop me-2"></i>Khóa Học
-                        </a>
-                        <a href="@Url.Action("Index", "LopHoc")" class="nav-item nav-link">
-                            <i class="fa fa-th me-2"></i>Lớp Học
-                        </a>
-                        <a href="@Url.Action("Index", "BuoiHoc")" class="nav-item nav-link">
-                            <i class="fas fa-calendar-alt me-2"></i>Buổi Học
-                        </a>
-                        <a href="@Url.Action("Index", "HocVien")" class="nav-item nav-link">
-                            <i class="fa fa-keyboard me-2"></i>Học Viên
-                        </a>
-                        <a href="@Url.Action("Index", "GiangVien")" class="nav-item nav-link">
-                            <i class="fa fa-keyboard me-2"></i>Giảng Viên
-                        </a>
-                        <a href="@Url.Action("Index", "DiemDanhGiangVien")" class="nav-item nav-link">
-                            <i class="fa fa-keyboard me-2"></i>Điểm Danh Giảng Viên
-                        </a>
-                        <a href="@Url.Action("Index", "DiemDanhHocVien")" class="nav-item nav-link">
-                            <i class="fa fa-keyboard me-2"></i>Điểm Danh Học Viên
-                        </a>
-                        <a href="@Url.Action("Index", "PhanQuyen")" class="nav-item nav-link">
-                            <i class="fa fa-keyboard me-2"></i>Phân Quyền Người Dùng
-                        </a>
+                        @if (role == "Admin")
+                        {
+                            <a href="@Url.Action("Index", "HomeAdmin")" class="nav-item nav-link">
+                                <i class="fa fa-tachometer-alt me-2"></i>Trang chủ
+                            </a>
+                            <a href="@Url.Action("Index", "KhoaHoc")" class="nav-item nav-link">
+                                <i class="fa fa-laptop me-2"></i>Khóa Học
+                            </a>
+                            <a href="@Url.Action("Index", "LopHoc")" class="nav-item nav-link">
+                                <i class="fa fa-th me-2"></i>Lớp Học
+                            </a>
+                            <a href="@Url.Action("Index", "BuoiHoc")" class="nav-item nav-link">
+                                <i class="fas fa-calendar-alt me-2"></i>Buổi Học
+                            </a>
+                            <a href="@Url.Action("Index", "HocVien")" class="nav-item nav-link">
+                                <i class="fa fa-keyboard me-2"></i>Học Viên
+                            </a>
+                            <a href="@Url.Action("Index", "GiangVien")" class="nav-item nav-link">
+                                <i class="fa fa-keyboard me-2"></i>Giảng Viên
+                            </a>
+                            <a href="@Url.Action("Index", "DiemDanhHocVien")" class="nav-item nav-link">
+                                <i class="fas fa-check-circle me-2"></i>Điểm danh Học Viên
+                            </a>
+                            <a href="@Url.Action("Index", "DiemDanhGiangVien")" class="nav-item nav-link">
+                                <i class="fas fa-check-circle me-2"></i>Điểm danh Giảng Viên
+                            </a>
+                            <a href="@Url.Action("Index", "PhanQuyen")" class="nav-item nav-link">
+                                <i class="fa fa-keyboard me-2"></i>Phân Quyền Người Dùng
+                            </a>
+                        }
+                        else if (role == "GiangVien")
+                        {
+                            <a href="@Url.Action("Index", "HomeAdmin")" class="nav-item nav-link">
+                                <i class="fa fa-tachometer-alt me-2"></i>Trang chủ
+                            </a>
+                            <a href="@Url.Action("DanhSachBuoiDay", "DiemDanhHocVien")" class="nav-item nav-link">
+                                <i class="fas fa-calendar-alt me-2"></i>Buổi học của tôi
+                            </a>
+
+                        }
+
                         <div class="sb-sidenav-footer">
                             @*<div class="small">Logged in as:</div>
             Start Bootstrap*@
@@ -103,18 +122,7 @@
             <main>
                 @RenderBody()
             </main>
-            @*<footer class="py-4 bg-light mt-auto">
-                    <div class="container-fluid px-4">
-                        <div class="d-flex align-items-center justify-content-between small">
-                            <div class="text-muted">Copyright &copy; Nguyễn Công Tiến </div>
-                            <div>
-                                <a href="#">Facebook</a>
-                                &middot;
-                                <a href="#">Địa Chỉ</a>
-                            </div>
-                        </div>
-                    </div>
-                </footer>*@
+      
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>

@@ -7,11 +7,28 @@ using System.Web.Mvc;
 
 namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 {
+    [RoleAuthorize("Admin", "GiangVien")]
     public class DiemDanhHocVienController : Controller
     {
         private readonly DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
 
         // GET: Admin/DiemDanhHocVien
+        public ActionResult DanhSachBuoiDay()
+        {
+            var currentUser = Session["TaiKhoan"]?.ToString();
+            var role = Session["TenQuyen"]?.ToString();
+            if (role == "GiangVien")
+            {
+                // Only retrieve the classes (buổi học) taught by the current teacher
+                var buoiHoc = db.GiangVien_BuoiHoc
+                                .Where(gb => gb.GiangVien.TaiKhoan == currentUser)
+                                .Select(gb => gb.BuoiHoc)
+                                .ToList();
+                return View("DanhSachBuoiDayGV", buoiHoc);
+            }
+
+            return View("DanhSachTatCaBuoiHoc", db.BuoiHocs.ToList());
+        }
         public ActionResult Index()
         {
             // Lấy danh sách lớp học

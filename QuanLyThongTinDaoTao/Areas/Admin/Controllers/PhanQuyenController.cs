@@ -15,45 +15,67 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         // GET: Admin/PhanQuyen
         public ActionResult Index()
         {
-            // Lấy danh sách quyền người dùng từ bảng PhanQuyens
-            var danhSach = db.PhanQuyens
-                .Include(p => p.NguoiDung) // Liên kết với bảng NguoiDung
-                .ToList(); // Lấy tất cả dữ liệu
+            var nguoiDungKhongPhaiHocVien = db.NguoiDungs
+                .Where(nd => !db.HocViens.Any(hv => hv.NguoiDungId == nd.NguoiDungId))
+                .Include(nd => nd.PhanQuyens)
+                .ToList();
 
-            // Truyền danh sách vào ViewBag để sử dụng trong view
-            ViewBag.DanhSach = danhSach;
-            return View();
+            return View(nguoiDungKhongPhaiHocVien);
         }
 
-        // GET: Admin/PhanQuyen/Delete/{id}
-        public ActionResult Delete(Guid id)
+        // GET: Admin/PhanQuyen/Edit/{nguoiDungId}
+        public ActionResult Edit(Guid nguoiDungId)
         {
-            var quyen = db.PhanQuyens.Include(p => p.NguoiDung).FirstOrDefault(p => p.PhanQuyenId == id);
-            if (quyen == null) return HttpNotFound();
+            var nguoiDung = db.NguoiDungs
+                .Include(nd => nd.PhanQuyens)
+                .FirstOrDefault(nd => nd.NguoiDungId == nguoiDungId);
 
-            // Truyền thông tin quyền vào ViewBag
-            ViewBag.TenQuyenTiengViet = QuyenConstants.TenQuyenTiengViet.ContainsKey(quyen.TenQuyen)
-                ? QuyenConstants.TenQuyenTiengViet[quyen.TenQuyen]
-                : quyen.TenQuyen;
+            if (nguoiDung == null) return HttpNotFound();
 
-            return View(quyen);
+            ViewBag.DanhSachQuyen = new SelectList(QuyenConstants.TenQuyenTiengViet, "Key", "Value");
+            return View(nguoiDung);
         }
 
-        [HttpPost, ActionName("Delete")]
+        // POST: Admin/PhanQuyen/Edit
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(Guid id)
+        public ActionResult Edit(Guid nguoiDungId, string TenQuyen)
         {
-            var quyen = db.PhanQuyens.Find(id);
-            if (quyen != null)
+            var nguoiDung = db.NguoiDungs
+                .Include(nd => nd.PhanQuyens)
+                .FirstOrDefault(nd => nd.NguoiDungId == nguoiDungId);
+
+            if (nguoiDung == null) return HttpNotFound();
+
+            var quyenCu = nguoiDung.PhanQuyens.FirstOrDefault();
+            if (quyenCu != null) db.PhanQuyens.Remove(quyenCu);
+
+            if (!string.IsNullOrEmpty(TenQuyen))
             {
-                db.PhanQuyens.Remove(quyen);
-                db.SaveChanges();
-                TempData["Success"] = "Xóa quyền thành công!";
+                db.PhanQuyens.Add(new PhanQuyen
+                {
+                    PhanQuyenId = Guid.NewGuid(),
+                    NguoiDungId = nguoiDungId,
+                    TenQuyen = TenQuyen
+                });
             }
+
+            db.SaveChanges();
+            TempData["Success"] = "Cập nhật quyền thành công!";
             return RedirectToAction("Index");
         }
 
-        // Dọn dẹp tài nguyên khi controller không sử dụng nữa
+        // POST: Admin/PhanQuyen/Delete/{phanQuyenId}
+        [HttpPost]
+        public ActionResult Delete(Guid phanQuyenId)
+        {
+            var quyen = db.PhanQuyens.Find(phanQuyenId);
+            if (quyen == null) return HttpNotFound();
+
+            db.PhanQuyens.Remove(quyen);
+            db.SaveChanges();
+            return Json(new { success = true, message = "Xóa quyền thành công!" });
+        }
         protected override void Dispose(bool disposing)
         {
             if (disposing) db.Dispose();

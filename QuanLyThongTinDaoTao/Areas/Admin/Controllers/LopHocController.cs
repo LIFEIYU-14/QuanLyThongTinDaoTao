@@ -10,6 +10,7 @@ using QuanLyThongTinDaoTao.Models;
 namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 {
     // Updated LopHocController
+    [RoleAuthorize("Admin")]
     public class LopHocController : Controller
     {
         private readonly DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();

@@ -217,13 +217,13 @@
     <Compile Include="Areas\Admin\Controllers\HocVienController.cs" />
     <Compile Include="Areas\Admin\Controllers\PhanQuyenController.cs" />
     <Compile Include="Areas\Admin\Controllers\TaiKhoanController.cs" />
-    <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CoursesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\TraCuuController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\CustomAuthorizeAttribute.cs" />
     <Compile Include="Helpers\OtpCache.cs" />
     <Compile Include="Helpers\QuyenConstants.cs" />
     <Compile Include="LoginModelView\LoginViewModel.cs" />
@@ -238,6 +238,18 @@
     <Compile Include="Migrations\202504100810548_5da5.cs" />
     <Compile Include="Migrations\202504100810548_5da5.Designer.cs">
       <DependentUpon>202504100810548_5da5.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202504140653028_UpAdmin.cs" />
+    <Compile Include="Migrations\202504140653028_UpAdmin.Designer.cs">
+      <DependentUpon>202504140653028_UpAdmin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202504140727495_UpAad.cs" />
+    <Compile Include="Migrations\202504140727495_UpAad.Designer.cs">
+      <DependentUpon>202504140727495_UpAad.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202504140739174_FixPhanQuyenNguoiDungRelationship.cs" />
+    <Compile Include="Migrations\202504140739174_FixPhanQuyenNguoiDungRelationship.Designer.cs">
+      <DependentUpon>202504140739174_FixPhanQuyenNguoiDungRelationship.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ModelsHelper\DangKyHocRequest.cs" />
@@ -523,6 +535,9 @@
     <Content Include="Areas\Admin\Views\BuoiHoc\DanhSachHocVien.cshtml" />
     <Content Include="Areas\Admin\Views\BuoiHoc\_BuoiHocPartial.cshtml" />
     <Content Include="Areas\Admin\Views\PhanQuyen\Index.cshtml" />
+    <Content Include="Areas\Admin\Views\PhanQuyen\Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\TaiKhoan\DangNhap.cshtml" />
+    <Content Include="Areas\Admin\Views\DiemDanhHocVien\DanhSachBuoiDayGV.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -534,6 +549,8 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="Style\css\bootstrap.min.css" />
+    <Content Include="Style\css\style.css" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -556,11 +573,9 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Areas\Admin\Data\" />
-    <Folder Include="Areas\Admin\Views\TaiKhoan\" />
     <Folder Include="Upload\BuoiHoc\" />
     <Folder Include="Upload\KhoaHoc\" />
     <Folder Include="Upload\LopHoc\" />
-    <Folder Include="Views\DangKyLopHoc\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />
@@ -598,6 +613,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202504100810548_5da5.resx">
       <DependentUpon>202504100810548_5da5.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202504140653028_UpAdmin.resx">
+      <DependentUpon>202504140653028_UpAdmin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202504140727495_UpAad.resx">
+      <DependentUpon>202504140727495_UpAad.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202504140739174_FixPhanQuyenNguoiDungRelationship.resx">
+      <DependentUpon>202504140739174_FixPhanQuyenNguoiDungRelationship.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

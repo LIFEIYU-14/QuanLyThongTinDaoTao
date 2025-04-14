@@ -10,10 +10,12 @@ using QuanLyThongTinDaoTao.Models;
 
 namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 {
+    [RoleAuthorize("Admin", "GiangVien")]
     public class BuoiHocController : Controller
     {
         private DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
-       
+
+    
         // Hiển thị toàn bộ danh sách buổi học
         public ActionResult Index()
         {

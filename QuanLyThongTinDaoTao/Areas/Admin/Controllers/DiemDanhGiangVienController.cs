@@ -7,6 +7,7 @@ using QuanLyThongTinDaoTao.Models;
 
 namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 {
+    [RoleAuthorize("Admin")]
     public class DiemDanhGiangVienController : Controller
     {
         private DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();

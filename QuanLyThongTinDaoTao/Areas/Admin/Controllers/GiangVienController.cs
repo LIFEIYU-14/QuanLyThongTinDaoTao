@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 {
+    [RoleAuthorize("Admin")]
     public class GiangVienController : Controller
     {
         private DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
