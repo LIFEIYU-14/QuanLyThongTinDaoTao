@@ -86,5 +86,38 @@ namespace QuanLyThongTinDaoTao.Services
             }
         }
 
+        public async Task SendAccountInfoEmail(string toEmail, string taiKhoan, string matKhau)
+        {
+            try
+            {
+                using (var mail = new MailMessage())
+                {
+                    mail.From = new MailAddress(smtpUser);
+                    mail.To.Add(toEmail);
+                    mail.Subject = "Thông tin tài khoản giảng viên";
+                    mail.Body = $"<p>Chào bạn,</p>" +
+                                $"<p>Hệ thống đã tạo tài khoản giảng viên cho bạn với thông tin sau:</p>" +
+                                $"<ul>" +
+                                $"<li><strong>Tài khoản:</strong> {taiKhoan}</li>" +
+                                $"<li><strong>Mật khẩu:</strong> {matKhau}</li>" +
+                                $"</ul>" +
+                                $"<p>Vui lòng đăng nhập và đổi mật khẩu sau lần đăng nhập đầu tiên.</p>";
+                    mail.IsBodyHtml = true;
+
+                    using (var smtp = new SmtpClient(smtpHost, smtpPort))
+                    {
+                        smtp.Credentials = new NetworkCredential(smtpUser, smtpPass);
+                        smtp.EnableSsl = true;
+                        await smtp.SendMailAsync(mail);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi gửi email tài khoản: {ex.Message}");
+                throw;
+            }
+        }
+
     }
 }

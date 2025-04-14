@@ -1,0 +1,42 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
+    var danhSach = ViewBag.DanhSach as List<QuanLyThongTinDaoTao.Models.PhanQuyen>;
+
+}
+
+@if (danhSach != null)
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Tài khoản</th>
+                <th>Quyền</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in danhSach)
+            {
+                <tr>
+                    <!-- Hiển thị Tài khoản người dùng -->
+                    <td>@item.NguoiDung.TaiKhoan</td>
+
+                    <!-- Hiển thị quyền người dùng -->
+                    <td>
+                        @* Kiểm tra và hiển thị tên quyền bằng tiếng Việt *@
+                        @(QuanLyThongTinDaoTao.Helpers.QuyenConstants.TenQuyenTiengViet.ContainsKey(item.TenQuyen)
+                            ? QuanLyThongTinDaoTao.Helpers.QuyenConstants.TenQuyenTiengViet[item.TenQuyen]
+                            : item.TenQuyen)
+                    </td>
+
+                    <!-- Thao tác Xóa quyền -->
+                    <td>
+                        @Html.ActionLink("Chỉnh Sửa Quyền", "Edit", new { id = item.PhanQuyenId }, new { @class = "btn btn-danger btn-sm" })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

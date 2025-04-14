@@ -14,13 +14,13 @@
             @using (Html.BeginForm("Create", "LopHoc", FormMethod.Post, new { enctype = "multipart/form-data" }))
             {
                 @Html.AntiForgeryToken()
+
+                <!-- Mã Lớp Học (readonly) -->
                 <div class="col-md-6 mb-3">
-                    @Html.LabelFor(model => model.MaLopHoc, "Mã Lớp Học", new { @class = "form-label" })
-                    <span class="text-danger">*</span>
-                    @Html.TextBoxFor(model => model.MaLopHoc, new { @class = "form-control", required = "required" })
+                    @Html.LabelFor(model => model.MaLopHoc, new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.MaLopHoc, new { @class = "form-control", @readonly = "readonly" })
                     @Html.ValidationMessageFor(model => model.MaLopHoc, "", new { @class = "text-danger" })
                 </div>
-
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
@@ -55,14 +55,6 @@
                 </div>
 
                 <div class="row">
-                    @*<div class="col-md-6 mb-3">
-                        @Html.LabelFor(m => m.TrangThai, "Trạng Thái", new { @class = "form-label" })
-                        <span class="text-danger">*</span>
-                        @Html.EnumDropDownListFor(m => m.TrangThai, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(m => m.TrangThai, "", new { @class = "text-danger" })
-                    </div>*@
-
-
                     <div class="col-md-6 mb-3">
                         @Html.LabelFor(model => model.SoLuongToiDa, "Số Lượng Tối Đa", new { @class = "form-label" })
                         <span class="text-danger">*</span>
@@ -86,7 +78,7 @@
                         <option value="">-- Chọn Khóa Học --</option>
                         @foreach (var khoaHoc in ViewBag.KhoaHocList)
                         {
-                            <option value="@khoaHoc.KhoaHocId")>
+                            <option value="@khoaHoc.KhoaHocId" )>
                                 @khoaHoc.TenKhoaHoc
                             </option>
                         }
@@ -152,28 +144,31 @@
 
 <!-- Tích hợp CKEditor 5 -->
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Khởi tạo CKEditor
-        ClassicEditor
-            .create(document.querySelector('#MoTa'))
-            .then(editor => {
-                console.log('CKEditor đã khởi tạo thành công.');
-
-                const editorElement = editor.ui.view.editable.element;
-                editorElement.style.overflowY = 'auto';
-
-                // Điều chỉnh chiều cao tự động
-                function adjustHeight() {
-                    editorElement.style.height = 'auto';
-                    editorElement.style.height = Math.min(editorElement.scrollHeight, 500) + 'px';
+        document.addEventListener('DOMContentLoaded', function () {
+    ClassicEditor
+        .create(document.querySelector('#MoTa'), {
+            ckfinder: {
+                uploadUrl: '@Url.Action("UploadImage", "LopHoc", new { area = "Admin" })',
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
                 }
-
-                editor.model.document.on('change:data', adjustHeight);
-                adjustHeight();
-            })
-            .catch(error => {
-                console.error('Lỗi CKEditor:', error);
-            });
-    });
+            },
+            toolbar: {
+                items: [
+                    'heading', '|',
+                    'bold', 'italic', 'link', '|',
+                    'bulletedList', 'numberedList', '|',
+                    'imageUpload', 'blockQuote', 'undo', 'redo'
+                ]
+            },
+            language: 'vi'
+        })
+        .then(editor => {
+            window.editor = editor;
+        })
+        .catch(error => {
+            console.error('CKEditor lỗi:', error);
+        });
+});
 
 </script>

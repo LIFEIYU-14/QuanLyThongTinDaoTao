@@ -154,26 +154,30 @@
             window.location.href = '/Admin/KhoaHoc/DeleteAttachment?attachmentId=' + attachmentId + '&khoaHocId=@Model.KhoaHocId';
         }
     }
-
     document.addEventListener('DOMContentLoaded', function () {
-        ClassicEditor
-            .create(document.querySelector('#MoTa'))
-            .then(editor => {
-                console.log('CKEditor đã khởi tạo thành công.');
-
-                const editorElement = editor.ui.view.editable.element;
-                editorElement.style.overflowY = 'auto';
-
-                function adjustHeight() {
-                    editorElement.style.height = 'auto';
-                    editorElement.style.height = Math.min(editorElement.scrollHeight, 500) + 'px';
+    ClassicEditor
+        .create(document.querySelector('#MoTa'), {
+            ckfinder: {
+                uploadUrl: '@Url.Action("UploadImage", "KhoaHoc", new { area = "Admin" })',
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
                 }
-
-                editor.model.document.on('change:data', adjustHeight);
-                adjustHeight();
-            })
-            .catch(error => {
-                console.error('Lỗi CKEditor:', error);
-            });
-    });
+            },
+            toolbar: {
+                items: [
+                    'heading', '|',
+                    'bold', 'italic', 'link', '|',
+                    'bulletedList', 'numberedList', '|',
+                    'imageUpload', 'blockQuote', 'undo', 'redo'
+                ]
+            },
+            language: 'vi'
+        })
+        .then(editor => {
+            window.editor = editor;
+        })
+        .catch(error => {
+            console.error('CKEditor lỗi:', error);
+        });
+});
 </script>

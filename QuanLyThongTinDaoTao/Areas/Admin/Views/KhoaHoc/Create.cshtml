@@ -24,13 +24,13 @@
                     </div>
                     <input type="file" name="hinhDaiDien" id="imageFile" class="form-control" accept=".jpg,.jpeg,.png" onchange="previewFile()" />
                 </div>
+
+                <!-- Mã Khóa Học (readonly) -->
                 <div class="mb-3">
-                    @Html.LabelFor(model => model.MaKhoaHoc, "Mã Khóa Học", new { @class = "form-label" })
-                    <span class="text-danger">*</span>
-                    @Html.TextBoxFor(model => model.MaKhoaHoc, new { @class = "form-control", placeholder = "Nhập mã khóa học" })
+                    @Html.LabelFor(model => model.MaKhoaHoc,"Mã Khóa Học",new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.MaKhoaHoc, new { @class = "form-control", @readonly = "readonly" })
                     @Html.ValidationMessageFor(model => model.MaKhoaHoc, "", new { @class = "text-danger" })
                 </div>
-
 
                 <!-- Tên Khóa Học -->
                 <div class="mb-3">
@@ -43,9 +43,7 @@
                 <!-- Mô Tả Khóa Học -->
                 <div class="mb-3">
                     @Html.LabelFor(model => model.MoTa, "Mô Tả", new { @class = "form-label" })
-                    <span class="text-danger">*</span>
                     @Html.TextAreaFor(model => model.MoTa, new { @class = "form-control", rows = 5, id = "MoTa" })
-
                     @Html.ValidationMessageFor(model => model.MoTa, "", new { @class = "text-danger" })
                 </div>
 
@@ -77,32 +75,34 @@
     </div>
 </div>
 
-
 <!-- Tích hợp CKEditor 5 -->
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Khởi tạo CKEditor
-        ClassicEditor
-            .create(document.querySelector('#MoTa'))
-            .then(editor => {
-                console.log('CKEditor đã khởi tạo thành công.');
-
-                const editorElement = editor.ui.view.editable.element;
-                editorElement.style.overflowY = 'auto';
-
-                // Điều chỉnh chiều cao tự động
-                function adjustHeight() {
-                    editorElement.style.height = 'auto';
-                    editorElement.style.height = Math.min(editorElement.scrollHeight, 500) + 'px';
-                }
-
-                editor.model.document.on('change:data', adjustHeight);
-                adjustHeight();
-            })
-            .catch(error => {
-                console.error('Lỗi CKEditor:', error);
-            });
-    });
+     document.addEventListener('DOMContentLoaded', function () {
+      ClassicEditor
+          .create(document.querySelector('#MoTa'), {
+              ckfinder: {
+                  uploadUrl: '@Url.Action("UploadImage", "KhoaHoc", new { area = "Admin" })',
+                  headers: {
+                      'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                  }
+              },
+              toolbar: {
+                  items: [
+                      'heading', '|',
+                      'bold', 'italic', 'link', '|',
+                      'bulletedList', 'numberedList', '|',
+                      'imageUpload', 'blockQuote', 'undo', 'redo'
+                  ]
+              },
+              language: 'vi'
+          })
+          .then(editor => {
+              window.editor = editor;
+          })
+          .catch(error => {
+              console.error('CKEditor lỗi:', error);
+          });
+  });
     function previewFile() {
         var preview = document.getElementById("previewImage");
         var file = document.getElementById("imageFile").files[0];
@@ -116,7 +116,6 @@
             reader.readAsDataURL(file);
         }
     }
-
 </script>
 <style>
     .form-label {

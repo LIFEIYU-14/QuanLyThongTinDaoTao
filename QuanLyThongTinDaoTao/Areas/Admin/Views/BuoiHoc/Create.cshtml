@@ -137,25 +137,32 @@
 
 <!-- Tích hợp CKEditor 5 -->
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        ClassicEditor
-            .create(document.querySelector('#GhiChu'))
-            .then(editor => {
-                console.log('CKEditor đã khởi tạo thành công.');
-                const editorElement = editor.ui.view.editable.element;
-                editorElement.style.overflowY = 'auto';
-
-                function adjustHeight() {
-                    editorElement.style.height = 'auto';
-                    editorElement.style.height = Math.min(editorElement.scrollHeight, 500) + 'px';
+        document.addEventListener('DOMContentLoaded', function () {
+    ClassicEditor
+        .create(document.querySelector('#GhiChu'), {
+            ckfinder: {
+                uploadUrl: '@Url.Action("UploadImage", "BuoiHoc", new { area = "Admin" })',
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
                 }
-                editor.model.document.on('change:data', adjustHeight);
-                adjustHeight();
-            })
-            .catch(error => {
-                console.error('Lỗi CKEditor:', error);
-            });
-    });
+            },
+            toolbar: {
+                items: [
+                    'heading', '|',
+                    'bold', 'italic', 'link', '|',
+                    'bulletedList', 'numberedList', '|',
+                    'imageUpload', 'blockQuote', 'undo', 'redo'
+                ]
+            },
+            language: 'vi'
+        })
+        .then(editor => {
+            window.editor = editor;
+        })
+        .catch(error => {
+            console.error('CKEditor lỗi:', error);
+        });
+});
     document.getElementById('submitBtn').addEventListener('click', function () {
         this.disabled = true;  // Disable the submit button
         this.innerHTML = '<i class="fa-solid fa-circle-plus"></i> Đang Xử Lý...';  // Optionally change button text

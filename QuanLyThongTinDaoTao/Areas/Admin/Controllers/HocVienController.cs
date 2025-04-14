@@ -56,6 +56,8 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 hv.NgayCapNhat = DateTime.Now;
 
                 db.HocViens.Add(hv);
+                hv.PhanQuyens.Add(new PhanQuyen { TenQuyen = "HocVien" });
+
                 db.SaveChanges();
                 TempData["Success"] = "Thêm học viên thành công!";
                 return RedirectToAction("Index");

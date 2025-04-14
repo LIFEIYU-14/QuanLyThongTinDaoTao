@@ -50,8 +50,7 @@ namespace QuanLyThongTinDaoTao.Models
         public Guid KhoaHocId { get; set; }
         [ForeignKey("KhoaHocId")]
         public virtual KhoaHoc KhoaHoc { get; set; }
-        //public virtual ICollection<GiangVien> GiangViens { get; set; } = new List<GiangVien>();
-        //public virtual ICollection<HocVien> HocViens { get; set; } = new List<HocVien>();
+
         public virtual ICollection<BuoiHoc> BuoiHocs { get; set; } = new List<BuoiHoc>();
         public virtual ICollection<LopHocAttachment> LopHocAttachments { get; set; } = new List<LopHocAttachment>();
 

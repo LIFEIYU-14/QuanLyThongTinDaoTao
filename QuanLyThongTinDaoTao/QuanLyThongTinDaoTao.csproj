@@ -215,6 +215,8 @@
     <Compile Include="Areas\Admin\Controllers\KhoaHocController.cs" />
     <Compile Include="Areas\Admin\Controllers\LopHocController.cs" />
     <Compile Include="Areas\Admin\Controllers\HocVienController.cs" />
+    <Compile Include="Areas\Admin\Controllers\PhanQuyenController.cs" />
+    <Compile Include="Areas\Admin\Controllers\TaiKhoanController.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CoursesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -223,6 +225,8 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\OtpCache.cs" />
+    <Compile Include="Helpers\QuyenConstants.cs" />
+    <Compile Include="LoginModelView\LoginViewModel.cs" />
     <Compile Include="Migrations\202504051400506_update.cs" />
     <Compile Include="Migrations\202504051400506_update.Designer.cs">
       <DependentUpon>202504051400506_update.cs</DependentUpon>
@@ -518,6 +522,7 @@
     <Content Include="Areas\Admin\Views\DiemDanhHocVien\_BuoiHocEmpty.cshtml" />
     <Content Include="Areas\Admin\Views\BuoiHoc\DanhSachHocVien.cshtml" />
     <Content Include="Areas\Admin\Views\BuoiHoc\_BuoiHocPartial.cshtml" />
+    <Content Include="Areas\Admin\Views\PhanQuyen\Index.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -551,6 +556,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Areas\Admin\Data\" />
+    <Folder Include="Areas\Admin\Views\TaiKhoan\" />
     <Folder Include="Upload\BuoiHoc\" />
     <Folder Include="Upload\KhoaHoc\" />
     <Folder Include="Upload\LopHoc\" />

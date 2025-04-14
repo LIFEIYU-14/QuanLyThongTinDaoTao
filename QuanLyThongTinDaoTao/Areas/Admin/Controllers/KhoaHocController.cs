@@ -42,21 +42,49 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         }
 
         // GET: Tạo mới Khóa học
+        [HttpGet]
         public ActionResult Create()
         {
-            return View();
+            // Tạo mã khóa học tự động
+            var lastKhoaHoc = db.KhoaHocs
+                                .OrderByDescending(k => k.MaKhoaHoc)
+                                .FirstOrDefault();
+
+            int newNumber = 1;
+            if (lastKhoaHoc != null && lastKhoaHoc.MaKhoaHoc.StartsWith("KH"))
+            {
+                if (int.TryParse(lastKhoaHoc.MaKhoaHoc.Substring(2), out int lastNumber))
+                {
+                    newNumber = lastNumber + 1;
+                }
+            }
+
+            var model = new KhoaHoc
+            {
+                MaKhoaHoc = $"KH{newNumber.ToString("D3")}" // Định dạng 3 chữ số
+            };
+
+            return View(model);
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Create(KhoaHoc model, HttpPostedFileBase hinhDaiDien, HttpPostedFileBase[] attachments)
         {
             if (ModelState.IsValid)
             {
+                // Kiểm tra trùng mã khóa học (phòng trường hợp có nhiều người cùng thêm)
+                if (db.KhoaHocs.Any(k => k.MaKhoaHoc == model.MaKhoaHoc))
+                {
+                    ModelState.AddModelError("MaKhoaHoc", "Mã khóa học đã tồn tại");
+                    return View(model);
+                }
+
                 model.KhoaHocId = Guid.NewGuid();
-                model.MaKhoaHoc = model.MaKhoaHoc.ToUpper();
                 model.NgayTao = DateTime.Now;
                 model.NgayCapNhat = DateTime.Now;
 
+                // Xử lý upload hình đại diện
                 if (hinhDaiDien != null && hinhDaiDien.ContentLength > 0)
                 {
                     string extension = Path.GetExtension(hinhDaiDien.FileName).ToLower();
@@ -84,6 +112,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 UploadAttachments(model.KhoaHocId, attachments);
                 return RedirectToAction("Index");
             }
+
             return View(model);
         }
 
@@ -363,6 +392,40 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             db.SaveChanges();
             return RedirectToAction("Edit", new { id = khoaHocId });
         }
-       
+
+        [HttpPost]
+        public ActionResult UploadImage(HttpPostedFileBase upload)
+        {
+            try
+            {
+                if (upload == null || upload.ContentLength <= 0)
+                {
+                    return Json(new { uploaded = 0, error = new { message = "Không có file được tải lên" } });
+                }
+
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+                var fileExtension = Path.GetExtension(upload.FileName).ToLower();
+                if (!allowedExtensions.Contains(fileExtension))
+                {
+                    return Json(new { uploaded = 0, error = new { message = "Định dạng file không hợp lệ" } });
+                }
+
+                var fileName = Guid.NewGuid() + fileExtension;
+                var uploadPath = Server.MapPath("~/Upload/KhoaHoc/CKEditorImages");
+
+                if (!Directory.Exists(uploadPath))
+                    Directory.CreateDirectory(uploadPath);
+
+                var filePath = Path.Combine(uploadPath, fileName);
+                upload.SaveAs(filePath);
+
+                var fileUrl = Url.Content("~/Upload/KhoaHoc/CKEditorImages/" + fileName);
+                return Json(new { uploaded = 1, fileName = fileName, url = fileUrl });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { uploaded = 0, error = new { message = "Lỗi: " + ex.Message } });
+            }
+        }
     }
 }

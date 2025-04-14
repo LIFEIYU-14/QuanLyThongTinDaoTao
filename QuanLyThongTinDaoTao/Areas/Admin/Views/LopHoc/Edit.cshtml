@@ -162,32 +162,31 @@
         }
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        // Khởi tạo CKEditor
-        ClassicEditor
-            .create(document.querySelector('#MoTa'))
-            .then(editor => {
-                const editorElement = editor.ui.view.editable.element;
-                editorElement.style.overflowY = 'auto';
-
-                function adjustHeight() {
-                    editorElement.style.height = 'auto';
-                    editorElement.style.height = Math.min(editorElement.scrollHeight, 500) + 'px';
+        document.addEventListener('DOMContentLoaded', function () {
+    ClassicEditor
+        .create(document.querySelector('#MoTa'), {
+            ckfinder: {
+                uploadUrl: '@Url.Action("UploadImage", "LopHoc", new { area = "Admin" })',
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
                 }
-
-                editor.model.document.on('change:data', adjustHeight);
-                adjustHeight();
-            })
-            .catch(error => {
-                console.error('Lỗi CKEditor:', error);
-            });
-
-        // Xử lý form submission
-        $('#editForm').on('submit', function () {
-            const submitBtn = $(this).find('button[type=submit]');
-            submitBtn.prop('disabled', true);
-            submitBtn.html('<i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý...');
+            },
+            toolbar: {
+                items: [
+                    'heading', '|',
+                    'bold', 'italic', 'link', '|',
+                    'bulletedList', 'numberedList', '|',
+                    'imageUpload', 'blockQuote', 'undo', 'redo'
+                ]
+            },
+            language: 'vi'
+        })
+        .then(editor => {
+            window.editor = editor;
+        })
+        .catch(error => {
+            console.error('CKEditor lỗi:', error);
         });
-    });
+});
 </script>
 

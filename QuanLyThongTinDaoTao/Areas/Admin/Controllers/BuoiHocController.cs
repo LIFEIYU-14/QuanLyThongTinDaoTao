@@ -543,7 +543,40 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
             return Json(danhSach);
         }
+        [HttpPost]
+        public ActionResult UploadImage(HttpPostedFileBase upload)
+        {
+            try
+            {
+                if (upload == null || upload.ContentLength <= 0)
+                {
+                    return Json(new { uploaded = 0, error = new { message = "Không có file được tải lên" } });
+                }
 
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+                var fileExtension = Path.GetExtension(upload.FileName).ToLower();
+                if (!allowedExtensions.Contains(fileExtension))
+                {
+                    return Json(new { uploaded = 0, error = new { message = "Định dạng file không hợp lệ" } });
+                }
+
+                var fileName = Guid.NewGuid() + fileExtension;
+                var uploadPath = Server.MapPath("~/Upload/BuoiHoc/CKEditorImages");
+
+                if (!Directory.Exists(uploadPath))
+                    Directory.CreateDirectory(uploadPath);
+
+                var filePath = Path.Combine(uploadPath, fileName);
+                upload.SaveAs(filePath);
+
+                var fileUrl = Url.Content("~/Upload/BuoiHoc/CKEditorImages/" + fileName);
+                return Json(new { uploaded = 1, fileName = fileName, url = fileUrl });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { uploaded = 0, error = new { message = "Lỗi: " + ex.Message } });
+            }
+        }
 
 
     }

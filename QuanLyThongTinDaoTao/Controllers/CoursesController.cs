@@ -160,6 +160,8 @@ namespace QuanLyThongTinDaoTao.Controllers
                 {
                     NguoiDungId = Guid.NewGuid(),
                     MaHocVien = DateTime.Now.Year + hocVienData.NgaySinh.Year.ToString() + new Random().Next(1000, 9999),
+                    TaiKhoan = hocVien.MaHocVien,
+                    MatKhau = PasswordHelper.HashPassword(hocVien.MaHocVien + "123456"),
                     HoVaTen = hocVienData.HoVaTen,
                     Email = hocVienData.Email,
                     NgaySinh = hocVienData.NgaySinh,

@@ -4,6 +4,8 @@ using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Web.Mvc;
+using QuanLyThongTinDaoTao.Services;
+using System.Threading.Tasks;
 
 namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 {
@@ -27,7 +29,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         // POST: Admin/GiangVien/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(GiangVien gv)
+        public async Task<ActionResult> Create(GiangVien gv)
         {
             if (!ModelState.IsValid)
             {
@@ -60,7 +62,21 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 gv.NgayCapNhat = DateTime.Now;
 
                 db.GiangViens.Add(gv);
+                gv.PhanQuyens.Add(new PhanQuyen { TenQuyen = "GiangVien" });
+
                 db.SaveChanges();
+                // Gửi email chứa tài khoản và mật khẩu
+                try
+                {
+                    var emailService = new EmailService();
+                    string matKhauGoc = gv.MaGiangVien + "123456";
+                    await emailService.SendAccountInfoEmail(gv.Email, gv.TaiKhoan, matKhauGoc);
+                }
+                catch (Exception emailEx)
+                {
+                    TempData["Warning"] = "Thêm giảng viên thành công nhưng gửi email thất bại: " + emailEx.Message;
+                }
+
                 TempData["Success"] = "Thêm giảng viên thành công!";
                 return RedirectToAction("Index");
             }

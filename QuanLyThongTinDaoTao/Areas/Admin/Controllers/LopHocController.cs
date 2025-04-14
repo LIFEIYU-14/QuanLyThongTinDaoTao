@@ -66,10 +66,32 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             return View(lopHoc.BuoiHocs.ToList());
         }
 
+        [HttpGet]
         public ActionResult Create()
         {
+            // Tạo mã lớp học tự động
+            var lastLopHoc = db.LopHocs
+                              .OrderByDescending(l => l.MaLopHoc)
+                              .FirstOrDefault();
+
+            int newNumber = 1;
+            if (lastLopHoc != null && lastLopHoc.MaLopHoc.StartsWith("MH"))
+            {
+                if (int.TryParse(lastLopHoc.MaLopHoc.Substring(2), out int lastNumber))
+                {
+                    newNumber = lastNumber + 1;
+                }
+            }
+
+            var model = new LopHoc
+            {
+                MaLopHoc = $"MH{newNumber.ToString("D3")}", // Định dạng 3 chữ số
+                NgayBatDau = DateTime.Today,
+                NgayKetThuc = DateTime.Today.AddMonths(3) // Mặc định 3 tháng
+            };
+
             ViewBag.KhoaHocList = db.KhoaHocs.ToList();
-            return View();
+            return View(model);
         }
 
         [HttpPost]
@@ -79,6 +101,14 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         {
             if (!ModelState.IsValid)
             {
+                ViewBag.KhoaHocList = db.KhoaHocs.ToList();
+                return View(model);
+            }
+
+            // Kiểm tra trùng mã lớp học
+            if (db.LopHocs.Any(l => l.MaLopHoc == model.MaLopHoc))
+            {
+                ModelState.AddModelError("MaLopHoc", "Mã lớp học đã tồn tại");
                 ViewBag.KhoaHocList = db.KhoaHocs.ToList();
                 return View(model);
             }
@@ -384,7 +414,40 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                     return "bg-dark";
             }
         }
+        [HttpPost]
+        public ActionResult UploadImage(HttpPostedFileBase upload)
+        {
+            try
+            {
+                if (upload == null || upload.ContentLength <= 0)
+                {
+                    return Json(new { uploaded = 0, error = new { message = "Không có file được tải lên" } });
+                }
 
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+                var fileExtension = Path.GetExtension(upload.FileName).ToLower();
+                if (!allowedExtensions.Contains(fileExtension))
+                {
+                    return Json(new { uploaded = 0, error = new { message = "Định dạng file không hợp lệ" } });
+                }
+
+                var fileName = Guid.NewGuid() + fileExtension;
+                var uploadPath = Server.MapPath("~/Upload/LopHoc/CKEditorImages");
+
+                if (!Directory.Exists(uploadPath))
+                    Directory.CreateDirectory(uploadPath);
+
+                var filePath = Path.Combine(uploadPath, fileName);
+                upload.SaveAs(filePath);
+
+                var fileUrl = Url.Content("~/Upload/LopHoc/CKEditorImages/" + fileName);
+                return Json(new { uploaded = 1, fileName = fileName, url = fileUrl });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { uploaded = 0, error = new { message = "Lỗi: " + ex.Message } });
+            }
+        }
 
     }
 }
