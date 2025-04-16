@@ -48,7 +48,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            ModelState.AddModelError("", "Tài khoản hoặc mật khẩu không đúng.");
+            TempData["Error"] = "Tài khoản hoặc mật khẩu không đúng.";
             return View(model);
         }
 

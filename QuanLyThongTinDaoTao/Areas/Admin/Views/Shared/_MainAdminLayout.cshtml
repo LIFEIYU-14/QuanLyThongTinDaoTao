@@ -31,27 +31,27 @@
 
         <!-- Phần chứa Form tìm kiếm + User Menu -->
         <div class="collapse navbar-collapse" id="navbarSearch">
-            <!-- Form tìm kiếm (Hiển thị trên cả desktop & mobile) -->
-            <form class="d-flex my-2 my-lg-0 mx-lg-auto" style="max-width: 500px; width: 100%;">
-                <div class="input-group">
-                    <input type="search" class="form-control border-0" placeholder="🔍 Tìm kiếm..."
-                           aria-label="Search" value="@ViewBag.Search">
-                    <button class="btn btn-primary" type="submit">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-            </form>
+            <!-- Wrapper để gom cả tìm kiếm và thông tin tài khoản gần nhau -->
+            <div class="d-flex align-items-center mx-lg-auto" style="max-width: 700px; width: 100%;">
+                <!-- Form tìm kiếm -->
+                <form class="d-flex flex-grow-1 me-3">
+                    <div class="input-group">
+                        <input type="search" class="form-control border-0" placeholder="🔍 Tìm kiếm..."
+                               aria-label="Search" value="@ViewBag.Search">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
 
-            <!-- User Dropdown (Luôn ở góc phải) -->
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item dropdown">
+                <!-- User Dropdown (cạnh thanh tìm kiếm) -->
+                <div class="dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="userDropdown"
                        data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-user me-1"></i> @Session["TaiKhoan"]
                     </a>
+                    <div class="dropdown-menu dropdown-menu">
 
-                    <div class="dropdown-menu dropdown-menu-end">
-                        <!-- Nội dung dropdown -->
                         <a class="dropdown-item" href="#">
                             <i class="fas fa-user-circle me-2"></i> Tài khoản
                         </a>
@@ -59,9 +59,10 @@
                             <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
                         </a>
                     </div>
-                </li>
-            </ul>
+                </div>
+            </div>
         </div>
+     
     </nav>
     <div id="layoutSidenav">
         <div id="layoutSidenav_nav">
