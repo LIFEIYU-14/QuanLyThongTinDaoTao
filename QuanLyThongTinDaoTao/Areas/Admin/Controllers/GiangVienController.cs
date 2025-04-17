@@ -61,21 +61,26 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 gv.NguoiDungId = Guid.NewGuid();
                 gv.NgayTao = DateTime.Now;
                 gv.NgayCapNhat = DateTime.Now;
+                gv.QR_Code_GV = Guid.NewGuid().ToString(); // Tạm thời gán giá trị, sẽ được cập nhật sau
 
                 db.GiangViens.Add(gv);
                 gv.PhanQuyens.Add(new PhanQuyen { TenQuyen = "GiangVien" });
 
                 db.SaveChanges();
-                // Gửi email chứa tài khoản và mật khẩu
+
+                // Tạo và gửi QR code
+                var giangVienService = new GiangVienService(db);
+                string qrCode = giangVienService.GenerateQRCodeForTeacher(gv.NguoiDungId);
+                // Gửi email kết hợp thông tin tài khoản và QR code
                 try
                 {
                     var emailService = new EmailService();
                     string matKhauGoc = gv.MaGiangVien + "123456";
-                    await emailService.SendAccountInfoEmail(gv.Email, gv.TaiKhoan, matKhauGoc);
+                    await emailService.SendTeacherAccountWithQrEmail(gv.Email, gv.TaiKhoan, matKhauGoc, qrCode);
                 }
                 catch (Exception emailEx)
                 {
-                    TempData["Warning"] = "Thêm giảng viên thành công nhưng gửi email thất bại: " + emailEx.Message;
+                    TempData["Error"] = "Thêm giảng viên thành công nhưng gửi email thất bại: " + emailEx.Message;
                 }
 
                 TempData["Success"] = "Thêm giảng viên thành công!";
@@ -92,7 +97,8 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         // GET: Admin/GiangVien/Edit/{id}
         public ActionResult Edit(Guid id)
         {
-            if (id == Guid.Empty) return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            if (id == Guid.Empty)
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             GiangVien gv = db.GiangViens.Find(id);
             if (gv == null) return HttpNotFound();
             return View(gv);

@@ -55,7 +55,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 hv.NguoiDungId = Guid.NewGuid();
                 hv.NgayTao = DateTime.Now;
                 hv.NgayCapNhat = DateTime.Now;
-
+                hv.QR_Code_HV = Guid.NewGuid().ToString();
                 db.HocViens.Add(hv);
                 hv.PhanQuyens.Add(new PhanQuyen { TenQuyen = "HocVien" });
 
