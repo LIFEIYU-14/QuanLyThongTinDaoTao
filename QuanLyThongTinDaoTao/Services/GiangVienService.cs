@@ -22,8 +22,7 @@ public class GiangVienService
 
         var qrInfo = new
         {
-            GiangVienId = giangVienId,
-            giangVien.MaGiangVien
+            GiangVienId = giangVienId
         };
 
         string qrData = JsonConvert.SerializeObject(qrInfo);

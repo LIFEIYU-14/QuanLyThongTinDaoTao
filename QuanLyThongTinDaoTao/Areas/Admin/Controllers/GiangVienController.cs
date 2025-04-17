@@ -68,22 +68,23 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
                 db.SaveChanges();
 
-                // Tạo và gửi QR code
+                // Tạo và lưu mã QR
                 var giangVienService = new GiangVienService(db);
-                string qrCode = giangVienService.GenerateQRCodeForTeacher(gv.NguoiDungId);
-                // Gửi email kết hợp thông tin tài khoản và QR code
+                string qrCodeBase64 = giangVienService.GenerateQRCodeForTeacher(gv.NguoiDungId);
+
+                // Gửi email chứa tài khoản + mật khẩu + QR
                 try
                 {
                     var emailService = new EmailService();
                     string matKhauGoc = gv.MaGiangVien + "123456";
-                    await emailService.SendTeacherAccountWithQrEmail(gv.Email, gv.TaiKhoan, matKhauGoc, qrCode);
+                    await emailService.SendTeacherAccountWithQrEmail(gv.Email, gv.TaiKhoan, matKhauGoc, qrCodeBase64);
                 }
                 catch (Exception emailEx)
                 {
-                    TempData["Error"] = "Thêm giảng viên thành công nhưng gửi email thất bại: " + emailEx.Message;
+                    TempData["Error"] = "Thêm giảng viên thành công nhưng gửi Email thất bại: " + emailEx.Message;
                 }
 
-                TempData["Success"] = "Thêm giảng viên thành công!";
+                TempData["Success"] = "Thêm giảng viên thành công và đã gửi Email!";
                 return RedirectToAction("Index");
             }
             catch (Exception ex)

@@ -3,6 +3,7 @@ using System.Configuration;
 using System.IO;
 using System.Net;
 using System.Net.Mail;
+using System.Net.Mime;
 using System.Threading.Tasks;
 
 namespace QuanLyThongTinDaoTao.Services
@@ -85,6 +86,7 @@ namespace QuanLyThongTinDaoTao.Services
                 throw;
             }
         }
+
         public async Task SendTeacherAccountWithQrEmail(string toEmail, string taiKhoan, string matKhau, string qrCode)
         {
             try
@@ -93,68 +95,27 @@ namespace QuanLyThongTinDaoTao.Services
                 {
                     mail.From = new MailAddress(smtpUser);
                     mail.To.Add(toEmail);
-                    mail.Subject = "Thông tin tài khoản và QR Code giảng viên";
+                    mail.Subject = "Thông tin tài khoản và mã QR điểm danh";
 
-                    // Tạo nội dung email HTML với thông tin tài khoản và QR code
                     mail.Body = $@"
-                <html>
-                <head>
-                    <style>
-                        body {{ font-family: Arial, sans-serif; line-height: 1.6; }}
-                        .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-                        .header {{ background-color: #f8f9fa; padding: 15px; text-align: center; }}
-                        .content {{ padding: 20px; }}
-                        .info-card {{ background-color: #f1f8ff; border-left: 4px solid #007bff; padding: 15px; margin-bottom: 20px; }}
-                        .qr-section {{ text-align: center; margin: 20px 0; }}
-                        .footer {{ margin-top: 20px; font-size: 0.9em; color: #6c757d; }}
-                    </style>
-                </head>
-                <body>
-                    <div class='container'>
-                        <div class='header'>
-                            <h2>Thông Tin Tài Khoản Giảng Viên</h2>
-                        </div>
-                        
-                        <div class='content'>
-                            <p>Chào bạn,</p>
-                            <p>Hệ thống đã tạo tài khoản giảng viên cho bạn với thông tin sau:</p>
-                            
-                            <div class='info-card'>
-                                <p><strong>Tài khoản:</strong> {taiKhoan}</p>
-                                <p><strong>Mật khẩu:</strong> {matKhau}</p>
-                            </div>
-                            
-                            <p>Vui lòng đăng nhập và đổi mật khẩu sau lần đăng nhập đầu tiên.</p>
-                            
-                            <div class='qr-section'>
-                                <h3>Mã QR Code Điểm Danh</h3>
-                                <p>Sử dụng mã QR này để điểm danh khi giảng dạy:</p>
-                                <img src='cid:qrCodeImage' alt='QR Code' style='max-width: 200px;' />
-                                <p><small>Quét mã này bằng ứng dụng điểm danh của hệ thống</small></p>
-                            </div>
-                        </div>
-                        
-                        <div class='footer'>
-                            <p>Đây là email tự động, vui lòng không trả lời.</p>
-                        </div>
-                    </div>
-                </body>
-                </html>";
-
+                <p>Chào bạn,</p>
+                <p>Tài khoản giảng viên của bạn đã được tạo:</p>
+                <ul>
+                    <li><strong>Tài khoản:</strong> {taiKhoan}</li>
+                    <li><strong>Mật khẩu:</strong> {matKhau}</li>
+                </ul>
+                <p>Đây là mã QR dùng để điểm danh:</p>
+                <p><img src='cid:qrCodeImage' alt='QR Code' /></p>";
                     mail.IsBodyHtml = true;
 
-                    // Đính kèm QR code như một embedded image
-                    if (!string.IsNullOrEmpty(qrCode))
-                    {
-                        byte[] qrCodeBytes = Convert.FromBase64String(qrCode);
-                        using (var ms = new MemoryStream(qrCodeBytes))
-                        {
-                            var qrImage = new Attachment(ms, "QRCode_GV.png", "image/png");
-                            qrImage.ContentId = "qrCodeImage"; // ID để tham chiếu trong HTML
-                            qrImage.ContentDisposition.Inline = true;
-                            mail.Attachments.Add(qrImage);
-                        }
-                    }
+                    // Đính kèm hình ảnh QR code
+                    byte[] qrBytes = Convert.FromBase64String(qrCode);
+                    var stream = new MemoryStream(qrBytes);
+                    var attachment = new Attachment(stream, "QRCode.png", "image/png");
+                    attachment.ContentId = "qrCodeImage";
+                    attachment.ContentDisposition.Inline = true;
+                    attachment.ContentDisposition.DispositionType = DispositionTypeNames.Inline;
+                    mail.Attachments.Add(attachment);
 
                     using (var smtp = new SmtpClient(smtpHost, smtpPort))
                     {
@@ -166,10 +127,11 @@ namespace QuanLyThongTinDaoTao.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Lỗi gửi email thông tin tài khoản và QR code: {ex.Message}");
+                Console.WriteLine($"Lỗi khi gửi email tài khoản GV: {ex.Message}");
                 throw;
             }
         }
+
 
     }
 }

@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 using QuanLyThongTinDaoTao.Models;
+using QuanLyThongTinDaoTao.Services;
 
 namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 {
@@ -32,7 +34,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(HocVien hv)
+        public async Task<ActionResult> Create(HocVien hv)
         {
             if (!ModelState.IsValid)
             {
@@ -42,25 +44,40 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             try
             {
                 // Kiểm tra email trùng
-                if (db.HocViens.Any(g => g.Email == hv.Email))
+                if (db.HocViens.Any(h => h.Email == hv.Email))
                 {
                     ModelState.AddModelError("Email", "Email đã tồn tại trong hệ thống.");
                     return View(hv);
                 }
 
+                // Tạo mã học viên
                 hv.MaHocVien = DateTime.Now.Year + hv.NgaySinh.Year.ToString() + new Random().Next(1000, 9999);
-                // Thiết lập thông tin hocj viên
+                // Thiết lập thông tin học viên
                 hv.TaiKhoan = hv.MaHocVien;
                 hv.MatKhau = PasswordHelper.HashPassword(hv.MaHocVien + "123456");
                 hv.NguoiDungId = Guid.NewGuid();
                 hv.NgayTao = DateTime.Now;
                 hv.NgayCapNhat = DateTime.Now;
-                hv.QR_Code_HV = Guid.NewGuid().ToString();
+                hv.QR_Code_HV = ""; // Chưa có mã QR tại thời điểm tạo, sẽ tạo sau
+
                 db.HocViens.Add(hv);
                 hv.PhanQuyens.Add(new PhanQuyen { TenQuyen = "HocVien" });
 
                 db.SaveChanges();
-                TempData["Success"] = "Thêm học viên thành công!";
+
+                // Tạo QR code cho học viên
+                var hocVienService = new HocVienService(db);
+                string qrBase64 = hocVienService.GenerateQRCodeForStudent(hv.NguoiDungId);
+
+                // Gửi email chứa QR code
+                var emailService = new EmailService();
+                await emailService.SendQrCodeEmail(hv.Email, qrBase64);
+
+                // Cập nhật lại mã QR vào database
+                hv.QR_Code_HV = qrBase64;
+                db.SaveChanges();
+
+                TempData["Success"] = "Thêm học viên thành công và đã gửi email!";
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
@@ -70,6 +87,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
             return View(hv);
         }
+
 
         // Xử lý cập nhật học viên
         public ActionResult Edit(Guid id)
