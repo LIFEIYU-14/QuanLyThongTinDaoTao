@@ -46,26 +46,27 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         {
             var lopHoc = db.LopHocs
                 .Include(k => k.LopHocAttachments.Select(a => a.Attachment))
+                .Include(k => k.BuoiHocs.Select(b => b.GiangVien_BuoiHocs))
                 .FirstOrDefault(k => k.LopHocId == id);
 
             if (lopHoc == null)
             {
                 return HttpNotFound();
             }
+
+            ViewBag.TenLopHoc = lopHoc.TenLopHoc;
+            ViewBag.LopHocId = lopHoc.LopHocId;
+
+            // Sắp xếp buổi học theo ngày và giờ
+            ViewBag.BuoiHocs = lopHoc.BuoiHocs
+                .OrderBy(b => b.NgayHoc)
+                .ThenBy(b => b.GioBatDau)
+                .ToList();
+
             return View(lopHoc);
         }
 
-        public ActionResult DanhSachBuoiHoc(Guid id)
-        {
-            var lopHoc = db.LopHocs.Include(l => l.BuoiHocs).FirstOrDefault(k => k.LopHocId == id);
-            if (lopHoc == null)
-            {
-                return HttpNotFound();
-            }
 
-            ViewBag.TenLopHoc = lopHoc.TenLopHoc;
-            return View(lopHoc.BuoiHocs.ToList());
-        }
 
         [HttpGet]
         public ActionResult Create()

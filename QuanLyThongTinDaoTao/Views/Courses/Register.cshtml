@@ -1,7 +1,6 @@
-﻿@model QuanLyThongTinDaoTao.Models.LopHoc
-
+﻿
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Register";
     Layout = "~/Views/Shared/_MainLayout.cshtml";
 }
 
@@ -108,18 +107,27 @@
                 };
 
                 $.ajax({
-                    type: "POST",
-                    url: "/api/dangky/verify",
-                    contentType: "application/json",
-                    data: JSON.stringify(verifyData),
+                    url: '/api/dangky/verify',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        Email: $('#Email').val(),
+                        Otp: $('#Otp').val()
+                    }),
                     success: function (response) {
                         alert(response.message);
                         window.location.href = response.redirectUrl;
                     },
                     error: function (xhr) {
-                        alert("Xác thực thất bại: " + xhr.responseText);
+                        const error = xhr.responseJSON?.error;
+                        if (error) {
+                            alert(error); // đây là thông báo lỗi thay cho TempData["Error"]
+                        } else {
+                            alert("Đã xảy ra lỗi.");
+                        }
                     }
                 });
+
             });
         });
 </script>

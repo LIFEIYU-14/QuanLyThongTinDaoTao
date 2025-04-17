@@ -15,15 +15,16 @@
         </div>
         <div class="card-body fs-5">
             <div class="row">
-                <!-- Hình Đại Diện -->
-                <div class="col-md-5 mb-4">
-                    <div class="border rounded-3 p-2 bg-light shadow-sm">
-                        <img src="@imagePath" class="img-fluid rounded-3" alt="@Model.TenKhoaHoc" style="max-height: 350px; width: 100%; object-fit: cover;" />
+                <!-- Cột trái: Thông tin khóa học -->
+                <div class="col-md-5">
+                    <!-- Hình đại diện -->
+                    <div class="mb-4">
+                        <div class="border rounded-3 p-2 bg-light shadow-sm">
+                            <img src="@imagePath" class="img-fluid rounded-3" alt="@Model.TenKhoaHoc" style="max-height: 300px; width: 100%; object-fit: cover;" />
+                        </div>
                     </div>
-                </div>
 
-                <!-- Thông Tin Khóa Học -->
-                <div class="col-md-7">
+                    <!-- Thông tin chi tiết -->
                     <div class="mb-4">
                         <p><strong><i class="fa-solid fa-book-open"></i> Tên Khóa Học:</strong> @Model.TenKhoaHoc</p>
                         <p><strong><i class="fa-solid fa-clock"></i> Thời Lượng:</strong> @Model.ThoiLuong tiết</p>
@@ -31,99 +32,162 @@
                         <p><strong><i class="fa-solid fa-calendar-check"></i> Ngày Cập Nhật:</strong> @Model.NgayCapNhat.ToString("dd/MM/yyyy")</p>
                     </div>
 
-                    <div class="mb-3">
+                    <!-- Mô tả -->
+                    <div class="mb-4">
                         <p><strong><i class="fa-solid fa-file-lines"></i> Mô Tả:</strong></p>
                         <div class="border rounded p-3 bg-light">@Html.Raw(Model.MoTa)</div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Tệp Đính Kèm -->
-            <div class="mt-4">
-                <h4 class="text-primary"><i class="fa-solid fa-paperclip"></i> Tệp Đính Kèm</h4>
-
-                @if (Model.KhoaHocAttachments != null && Model.KhoaHocAttachments.Any())
-                {
-                    <div class="row mt-3">
-                        @foreach (var attachment in Model.KhoaHocAttachments)
+                    <!-- Tệp đính kèm -->
+                    <div class="mb-4">
+                        <h5 class="text-primary"><i class="fa-solid fa-paperclip"></i> Tệp Đính Kèm</h5>
+                        @if (Model.KhoaHocAttachments != null && Model.KhoaHocAttachments.Any())
                         {
-                            string fileType = attachment?.Attachment?.FileType?.ToLower();
-                            string iconClass = "fa-file";
-                            string badgeColor = "bg-secondary";
+                            <div class="row">
+                                @foreach (var attachment in Model.KhoaHocAttachments)
+                                {
+                                    string fileType = attachment?.Attachment?.FileType?.ToLower();
+                                    string iconClass = "fa-file";
+                                    string badgeColor = "bg-secondary";
 
-                            switch (fileType)
-                            {
-                                case "pdf":
-                                    iconClass = "fa-file-pdf";
-                                    badgeColor = "bg-danger";
-                                    break;
-                                case "docx":
-                                case "doc":
-                                    iconClass = "fa-file-word";
-                                    badgeColor = "bg-primary";
-                                    break;
-                                case "txt":
-                                    iconClass = "fa-file-alt";
-                                    badgeColor = "bg-dark";
-                                    break;
-                                case "xlsx":
-                                case "xls":
-                                    iconClass = "fa-file-excel";
-                                    badgeColor = "bg-success";
-                                    break;
-                                case "jpg":
-                                case "jpeg":
-                                case "png":
-                                    <div class="col-md-3 mb-3">
-                                        <div class="card h-100">
-                                            <img src="@Url.Content(attachment.Attachment.FilePath)" class="card-img-top" style="height: 150px; object-fit: cover;" alt="@attachment.Attachment.FileName">
-                                            <div class="card-body text-center">
-                                                <a href="@Url.Content(attachment.Attachment.FilePath)" target="_blank" class="btn btn-sm btn-outline-primary">Xem Ảnh</a>
+                                    switch (fileType)
+                                    {
+                                        case "pdf":
+                                            iconClass = "fa-file-pdf";
+                                            badgeColor = "bg-danger";
+                                            break;
+                                        case "docx":
+                                        case "doc":
+                                            iconClass = "fa-file-word";
+                                            badgeColor = "bg-primary";
+                                            break;
+                                        case "txt":
+                                            iconClass = "fa-file-alt";
+                                            badgeColor = "bg-dark";
+                                            break;
+                                        case "xlsx":
+                                        case "xls":
+                                            iconClass = "fa-file-excel";
+                                            badgeColor = "bg-success";
+                                            break;
+                                        case "jpg":
+                                        case "jpeg":
+                                        case "png":
+                                            <div class="col-6 mb-2">
+                                                <img src="@Url.Content(attachment.Attachment.FilePath)" class="img-thumbnail" alt="@attachment.Attachment.FileName">
+                                                <div class="text-center mt-1">
+                                                    <a href="@Url.Content(attachment.Attachment.FilePath)" target="_blank" class="btn btn-sm btn-outline-primary">Xem Ảnh</a>
+                                                </div>
                                             </div>
+                                            continue;
+                                    }
+
+                                    <div class="col-12 mb-2">
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <i class="fas @iconClass me-2"></i>
+                                                <a href="@Url.Content(attachment.Attachment.FilePath)" target="_blank">@attachment.Attachment.FileName</a>
+                                            </div>
+                                            <span class="badge @badgeColor rounded-pill">@attachment.Attachment.FileType</span>
                                         </div>
                                     </div>
-                                    continue;
-                                default:
-                                    iconClass = "fa-file";
-                                    badgeColor = "bg-secondary";
-                                    break;
-                            }
-
-                            <div class="col-md-6 mb-2">
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <i class="fas @iconClass me-2"></i>
-                                        <a href="@Url.Content(attachment.Attachment.FilePath)" target="_blank" class="text-decoration-none">@attachment.Attachment.FileName</a>
-                                    </div>
-                                    <span class="badge @badgeColor rounded-pill">@attachment.Attachment.FileType</span>
-                                </div>
+                                }
                             </div>
                         }
+                        else
+                        {
+                            <div class="alert alert-info">Không có tệp đính kèm</div>
+                        }
                     </div>
-                }
-                else
-                {
-                    <div class="alert alert-info mt-3">Không có tệp đính kèm</div>
-                }
-            </div>
 
-            <!-- Nút Hành Động -->
-            <div class="text-center mt-5">
-                <a href="@Url.Action("Index")" class="btn btn-secondary btn-lg me-2">
-                    <i class="fa-solid fa-arrow-left me-2"></i>Quay Lại
-                </a>
-                <a href="@Url.Action("Edit", new { id = Model.KhoaHocId })" class="btn btn-warning btn-lg me-2">
-                    <i class="fa-solid fa-pen-to-square me-2"></i>Chỉnh Sửa
-                </a>
-                <a href="@Url.Action("DanhSachLopHoc", "KhoaHoc", new { id = Model.KhoaHocId })" class="btn btn-success btn-lg me-2">
-                    <i class="fa-solid fa-list me-2"></i>Lớp Học
-                </a>
-                <a href="@Url.Action("Delete", new { id = Model.KhoaHocId })" class="btn btn-danger btn-lg"
-                   onclick="return confirm('Bạn có chắc chắn muốn xóa khóa học này?');">
-                    <i class="fa-solid fa-trash-can me-2"></i>Xóa
-                </a>
+                    <!-- Nút hành động -->
+                    <div class="text-center">
+                        <a href="@Url.Action("Index")" class="btn btn-secondary me-2"><i class="fa-solid fa-arrow-left"></i> Quay Lại</a>
+                        <a href="@Url.Action("Edit", new { id = Model.KhoaHocId })" class="btn btn-warning me-2"><i class="fa-solid fa-pen-to-square"></i> Chỉnh Sửa</a>
+                        <a href="@Url.Action("Delete", new { id = Model.KhoaHocId })" class="btn btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa khóa học này?');"><i class="fa-solid fa-trash-can"></i> Xóa</a>
+                    </div>
+                </div>
+
+                <!-- Cột phải: Danh sách lớp học -->
+                <div class="col-md-7">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="text-primary"><i class="fa-solid fa-list"></i> Danh Sách Lớp Học</h4>
+                        <a href="@Url.Action("Create", "LopHoc", new { KhoaHocId = ViewBag.KhoaHocId })" class="btn btn-primary">
+                            <i class="fa-solid fa-plus"></i> Thêm Lớp Học
+                        </a>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped align-middle">
+                            <thead class="table-primary text-center">
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Mã</th>
+                                    <th>Tên</th>
+                                    <th>Tín chỉ</th>
+                                    <th>Bắt đầu</th>
+                                    <th>Kết thúc</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    int stt = 1;
+                                }
+                                @foreach (var lophoc in Model.LopHocs)
+                                {
+                                    <tr class="text-center">
+                                        <td>@stt</td>
+                                        <td>@lophoc.MaLopHoc</td>
+                                        <td>@lophoc.TenLopHoc</td>
+                                        <td>@lophoc.SoTinChi</td>
+                                        <td>@lophoc.NgayBatDau.ToString("dd/MM/yyyy")</td>
+                                        <td>@lophoc.NgayKetThuc.ToString("dd/MM/yyyy")</td>
+                                        <td>
+                                            @{
+                                                string trangThaiText = "";
+                                                string badgeClass = "";
+
+                                                if (lophoc.TrangThai == QuanLyThongTinDaoTao.Models.LopHoc.TrangThaiLopHoc.SapMo)
+                                                {
+                                                    trangThaiText = "Sắp mở";
+                                                    badgeClass = "bg-primary";
+                                                }
+                                                else if (lophoc.TrangThai == QuanLyThongTinDaoTao.Models.LopHoc.TrangThaiLopHoc.DaBatDau)
+                                                {
+                                                    trangThaiText = "Đang học";
+                                                    badgeClass = "bg-success";
+                                                }
+                                                else if (lophoc.TrangThai == QuanLyThongTinDaoTao.Models.LopHoc.TrangThaiLopHoc.DaKetThuc)
+                                                {
+                                                    trangThaiText = "Kết thúc";
+                                                    badgeClass = "bg-secondary";
+                                                }
+                                                else
+                                                {
+                                                    trangThaiText = "Không xác định";
+                                                    badgeClass = "bg-dark";
+                                                }
+                                            }
+                                            <span class="badge @badgeClass">@trangThaiText</span>
+
+                                        </td>
+                                        <td>
+                                            <a href="@Url.Action("Details","LopHoc" ,new { id = lophoc.LopHocId })" class="btn btn-info btn-sm m-1"><i class="fas fa-eye"></i></a>
+                                            <a href="@Url.Action("Edit","LopHoc" ,new { id = lophoc.LopHocId })" class="btn btn-warning btn-sm m-1"><i class="fas fa-edit"></i></a>
+                                            <a href="@Url.Action("Delete","LopHoc", new { id = lophoc.LopHocId })" class="btn btn-danger btn-sm m-1" onclick="return confirm('Bạn có chắc chắn muốn xóa lớp học này?');"><i class="fas fa-trash-alt"></i></a>
+                                        </td>
+                                    </tr>
+                                    stt++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
+
     </div>
 </div>
 

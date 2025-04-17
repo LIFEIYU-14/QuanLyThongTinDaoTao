@@ -40,11 +40,11 @@ namespace QuanLyThongTinDaoTao.APIControllers
         {
             string storedOtp = OtpCache.Get("OTP_" + model.Email)?.ToString();
             if (storedOtp == null || storedOtp != model.Otp)
-                return BadRequest("Mã OTP không hợp lệ hoặc đã hết hạn.");
+                return Content(System.Net.HttpStatusCode.BadRequest, new { error = "Mã OTP không hợp lệ hoặc đã hết hạn." });
 
             var hocVienData = OtpCache.Get("HocVienData_" + model.Email) as DangKyHocRequest;
             if (hocVienData == null)
-                return BadRequest("Dữ liệu học viên không còn hiệu lực.");
+                return Content(System.Net.HttpStatusCode.BadRequest, new { error = "Dữ liệu học viên không còn hiệu lực." });
 
             OtpCache.Remove("OTP_" + model.Email);
             OtpCache.Remove("HocVienData_" + model.Email);
@@ -70,11 +70,11 @@ namespace QuanLyThongTinDaoTao.APIControllers
 
             var lopHoc = db.LopHocs.FirstOrDefault(l => l.LopHocId == hocVienData.LopHocId);
             if (lopHoc == null)
-                return BadRequest("Lớp học không tồn tại.");
+                return Content(System.Net.HttpStatusCode.BadRequest, new { error = "Lớp học không tồn tại." });
 
             bool daDangKy = db.DangKyHocs.Any(d => d.NguoiDungId == hocVien.NguoiDungId && d.LopHocId == hocVienData.LopHocId);
             if (daDangKy)
-                return BadRequest("Bạn đã đăng ký lớp học này trước đó.");
+                 return Content(System.Net.HttpStatusCode.BadRequest, new { error = "Bạn đã đăng ký lớp học này trước đó." });
 
             db.DangKyHocs.Add(new DangKyHoc
             {

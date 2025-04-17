@@ -33,14 +33,23 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         }
         public ActionResult Details(Guid id)
         {
-            var khoaHoc = db.KhoaHocs.Include(k => k.KhoaHocAttachments.Select(a => a.Attachment))
-                                       .FirstOrDefault(k => k.KhoaHocId == id);
+            var khoaHoc = db.KhoaHocs
+                .Include(k => k.KhoaHocAttachments.Select(a => a.Attachment))
+                .Include(k => k.LopHocs.Select(l => l.BuoiHocs))
+                .FirstOrDefault(k => k.KhoaHocId == id);
+
             if (khoaHoc == null)
             {
                 return HttpNotFound();
             }
+
+            ViewBag.TenKhoaHoc = khoaHoc.TenKhoaHoc;
+            ViewBag.KhoaHocId = khoaHoc.KhoaHocId;
+
             return View(khoaHoc);
         }
+
+
 
         // GET: Tạo mới Khóa học
         [HttpGet]
@@ -261,20 +270,6 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
             return RedirectToAction("Index");
         }
-
-
-        public ActionResult DanhSachLopHoc(Guid id)
-        {
-            var khoaHoc = db.KhoaHocs.Include(k => k.LopHocs).FirstOrDefault(k => k.KhoaHocId == id);
-            if (khoaHoc == null)
-            {
-                return HttpNotFound();
-            }
-
-            ViewBag.TenKhoaHoc = khoaHoc.TenKhoaHoc;
-            return View(khoaHoc.LopHocs.ToList());
-        }
-
         // Upload tệp đính kèm
         private void UploadAttachments(Guid khoaHocId, HttpPostedFileBase[] attachments)
         {
