@@ -28,7 +28,7 @@
                             <span class="fa fa-user-o"></span>
                         </div>
 
-                        @using (Html.BeginForm("DangNhap", "TaiKhoan", FormMethod.Post, new { @class = "login-form" }))
+                        @using (Html.BeginForm("DangNhap", "Login", FormMethod.Post, new { @class = "login-form" }))
                         {
                             @Html.AntiForgeryToken()
 

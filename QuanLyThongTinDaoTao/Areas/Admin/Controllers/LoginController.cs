@@ -8,7 +8,7 @@ using System.Web.Mvc;
 
 namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 {
-    public class TaiKhoanController : Controller
+    public class LoginController : Controller
     {
         private DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
 

@@ -5,60 +5,108 @@
     Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
 }
 
-<div class="container py-4">
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white d-flex justify-content-between">
-            <h4 class="mb-0">📚Thông Tin Lớp Học</h4>
-           
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white text-center">
+            <h3><i class="fa-solid fa-circle-info"></i> Chi Tiết Lớp Học</h3>
         </div>
         <div class="card-body fs-5">
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <p><strong>Tên Lớp Học:</strong> @Model.TenLopHoc</p>
-                    <p><strong>Số Tín Chỉ:</strong> @Model.SoTinChi</p>
-                    <p><strong>Tên Khóa Học:</strong> @(Model.KhoaHoc != null ? Model.KhoaHoc.TenKhoaHoc : "Chưa có")</p>
+                    <p><strong><i class="fa-solid fa-id-card"></i> Mã Lớp Học:</strong> @Model.MaLopHoc</p>
+                    <p><strong><i class="fa-solid fa-book"></i> Tên Lớp Học:</strong> @Model.TenLopHoc</p>
+                    <p><strong><i class="fa-solid fa-credit-card"></i> Số Tín Chỉ:</strong> @Model.SoTinChi</p>
                 </div>
                 <div class="col-md-6 mb-3">
-                    <p><strong>Ngày Bắt Đầu:</strong> @Model.NgayBatDau.ToString("dd/MM/yyyy")</p>
-                    <p><strong>Ngày Kết Thúc:</strong> @Model.NgayKetThuc.ToString("dd/MM/yyyy")</p>
+                    <p><strong><i class="fa-solid fa-calendar-day"></i> Ngày Bắt Đầu:</strong> @Model.NgayBatDau.ToString("dd/MM/yyyy")</p>
+                    <p><strong><i class="fa-solid fa-calendar-check"></i> Ngày Kết Thúc:</strong> @Model.NgayKetThuc.ToString("dd/MM/yyyy")</p>
+                    <p><strong><i class="fa-solid fa-users"></i> Số Lượng Tối Đa:</strong> @Model.SoLuongToiDa</p>
                 </div>
             </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <p><strong><i class="fa-solid fa-graduation-cap"></i> Khóa Học:</strong> 
+                        @(Model.KhoaHoc != null ? Model.KhoaHoc.TenKhoaHoc : "Chưa có")
+                    </p>
+                </div>
+            </div>
+            
             <div class="mb-3">
-                <p><strong>Mô Tả:</strong></p>
+                <p><strong><i class="fa-solid fa-file-lines"></i> Mô Tả:</strong></p>
                 <div class="border rounded p-3 bg-light">@Html.Raw(Model.MoTa)</div>
+            </div>
+            
+            <div class="mb-3">
+                <h4 class="text-primary"><i class="fa-solid fa-paperclip"></i> Tệp Đính Kèm</h4>
+                @if (Model.LopHocAttachments.Any())
+                {
+                    <ul class="list-group mt-3">
+                        @foreach (var attachment in Model.LopHocAttachments)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <a href="@Url.Content(attachment.Attachment.FilePath)" target="_blank" class="text-decoration-none">
+                                    <i class="fa-solid fa-file me-2"></i>@attachment.Attachment.FileName
+                                </a>
+                                <span class="badge bg-primary rounded-pill">@attachment.Attachment.FileType</span>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <div class="alert alert-info mt-3">Không có tệp đính kèm</div>
+                }
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="@Url.Action("Index")" class="btn btn-secondary btn-lg me-2">
+                    <i class="fa-solid fa-arrow-left me-2"></i>Quay Lại
+                </a>
+                <a href="@Url.Action("Edit", new { id = Model.LopHocId })" class="btn btn-warning btn-lg me-2">
+                    <i class="fa-solid fa-pen-to-square me-2"></i>Chỉnh Sửa
+                </a>
+                <a href="@Url.Action("DanhSachBuoiHoc", new { id = Model.LopHocId })" class="btn btn-success btn-lg me-2">
+                    <i class="fa-solid fa-list me-2"></i>Buổi Học
+                </a>
+                <a href="@Url.Action("Delete", new { id = Model.LopHocId })" class="btn btn-danger btn-lg" 
+                   onclick="return confirm('Bạn có chắc chắn muốn xóa lớp học này?');">
+                    <i class="fa-solid fa-trash-can me-2"></i>Xóa
+                </a>
             </div>
         </div>
     </div>
-
-    <h3 class="mt-4">📎Tệp Đính Kèm</h3>
-    <div class="card shadow-sm">
-        <div class="card-body fs-5">
-            @if (Model.LopHocAttachments.Any())
-            {
-                <ul class="list-group">
-                    @foreach (var attachment in Model.LopHocAttachments)
-                    {
-                        <li class="list-group-item">
-                            <a href="@attachment.Attachment.FilePath" target="_blank" class="text-primary">@attachment.Attachment.FileName</a>
-                        </li>
-                    }
-                </ul>
-            }
-            else
-            {
-                <p>Không có tệp đính kèm.</p>
-            }
-        </div>
-    </div>
-    <div class="text-center">
-        <a href="@Url.Action("Index")" class="btn btn-secondary btn-lg"><i class="fas fa-arrow-left"></i> Quay Lại</a>
-        <a href="@Url.Action("Edit", new { id = Model.LopHocId })" class="btn btn-warning btn-lg"><i class="fas fa-edit"></i>Chỉnh Sửa</a>
-
-        <a href="@Url.Action("DanhSachBuoiHoc", new { id = Model.LopHocId })" class="btn btn-success btn-lg">
-            <i class="fas fa-list me-1"></i> Danh Sách Buổi Học
-        </a>
-        <a href="@Url.Action("Delete", new { id = Model.LopHocId })" class="btn btn-danger btn-lg" onclick="return confirm('Bạn có chắc chắn muốn xóa lớp học này?');">
-            <i class="fas fa-trash-alt"></i> Xóa
-        </a>
-    </div>
 </div>
+
+<style>
+    .card-header {
+        font-size: 1.5rem;
+        padding: 1.25rem;
+    }
+    
+    .card-body p {
+        margin-bottom: 1rem;
+    }
+    
+    .btn-lg {
+        padding: 0.5rem 1.5rem;
+        font-size: 1.125rem;
+    }
+    
+    .list-group-item {
+        padding: 1rem;
+        transition: all 0.3s;
+    }
+    
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+    
+    strong {
+        color: #0d6efd;
+    }
+</style>

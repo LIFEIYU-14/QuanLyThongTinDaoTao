@@ -26,67 +26,81 @@
 }
 
 
-<div class="d-flex justify-content-between align-items-center mb-2">
-    <div>
-        <strong>Tuần từ:</strong> @weekStart.ToString("dd/MM/yyyy") đến @weekStart.AddDays(6).ToString("dd/MM/yyyy")
-    </div>
-    <div class="btn-group">
-        <button class="btn btn-sm btn-outline-primary" onclick="changeWeek(-7)">← Trở về</button>
-        <button class="btn btn-sm btn-outline-success" onclick="changeWeek(0)">Hôm nay</button>
-        <button class="btn btn-sm btn-outline-primary" onclick="changeWeek(7)">Tiếp →</button>
-    </div>
-</div>
+<div class="container-fluid pt-4 px-4">
+    <div class="bg-light rounded p-4 shadow-sm">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h4 class="mb-0 text-primary fw-bold">
+                <i class="fas fa-calendar-alt"></i> Lịch Dạy Học
+            </h4>
 
-<div class="table-responsive">
-    <table class="table table-bordered align-middle text-center">
-        <thead class="table-info">
-            <tr>
-                <th>Ca học</th>
-                @foreach (var ngay in ngayHocTuan)
-                {
-                    <th>
-                        @ngay.ToString("dddd")<br />
-                        @ngay.ToString("dd/MM/yyyy")
-                    </th>
-                }
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var ca in new[] { "Sáng", "Chiều" })
-            {
-                <tr>
-                    <td class="fw-bold">@ca</td>
-                    @foreach (var ngay in ngayHocTuan)
+            <div class="d-flex align-items-center">
+                <span class="me-3 fw-bold">Tuần từ: @weekStart.ToString("dd/MM/yyyy") đến @weekStart.AddDays(6).ToString("dd/MM/yyyy")</span>
+                <div class="btn-group">
+                    <button class="btn btn-outline-primary" onclick="changeWeek(-7)">
+                        <i class="fas fa-arrow-left"></i> Tuần trước
+                    </button>
+                    <button class="btn btn-outline-success" onclick="changeWeek(0)">
+                        <i class="fas fa-calendar-day"></i> Hôm nay
+                    </button>
+                    <button class="btn btn-outline-primary" onclick="changeWeek(7)">
+                        Tuần sau <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle text-center">
+                <thead class="table-info">
+                    <tr>
+                        <th>Ca học</th>
+                        @foreach (var ngay in ngayHocTuan)
+                        {
+                            <th>
+                                @ngay.ToString("dddd")<br />
+                                @ngay.ToString("dd/MM/yyyy")
+                            </th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ca in new[] { "Sáng", "Chiều" })
                     {
-                        var buoiHocList = getBuoiHoc(ngay, ca);
-                        <td>
-                            @if (buoiHocList.Any())
+                        <tr>
+                            <td class="fw-bold">@ca</td>
+                            @foreach (var ngay in ngayHocTuan)
                             {
-                                foreach (var buoiHoc in buoiHocList)
-                                {
-                                    <a href="@Url.Action("ThongTinDiemDanh", "DiemDanhHocVien", new { buoiHocId = buoiHoc.BuoiHocId })" class="text-decoration-none">
-                                        <div class="bg-light border p-2 rounded mb-2 text-start shadow-sm">
-                                            <div class="fw-bold">@buoiHoc.LopHoc.TenLopHoc</div>
-                                            <div>Giờ: @(new DateTime(buoiHoc.GioBatDau.Ticks).ToString("HH:mm")) - @(new DateTime(buoiHoc.GioKetThuc.Ticks).ToString("HH:mm"))</div>
-                                            <div>Phòng: Zoom</div>
-                                            <div class="text-muted small">Trạng thái: @buoiHoc.TrangThai</div>
-                                        </div>
-                                    </a>
-                                }
+                                var buoiHocList = getBuoiHoc(ngay, ca);
+                                <td>
+                                    @if (buoiHocList.Any())
+                                    {
+                                        foreach (var buoiHoc in buoiHocList)
+                                        {
+                                            <a href="@Url.Action("ThongTinDiemDanh", "DiemDanhHocVien", new { buoiHocId = buoiHoc.BuoiHocId })" class="text-decoration-none">
+                                                <div class="bg-light border p-2 rounded mb-2 text-start shadow-sm">
+                                                    <div class="fw-bold">@buoiHoc.LopHoc.TenLopHoc</div>
+                                                    <div>Giờ: @(new DateTime(buoiHoc.GioBatDau.Ticks).ToString("HH:mm")) - @(new DateTime(buoiHoc.GioKetThuc.Ticks).ToString("HH:mm"))</div>
+                                                    <div>Phòng: Zoom</div>
+                                                    <div class="text-muted small">Trạng thái: @buoiHoc.TrangThai</div>
+                                                </div>
+                                            </a>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">—</span>
+                                    }
+                                </td>
                             }
-                            else
-                            {
-                                <span class="text-muted">—</span>
-                            }
-                        </td>
+                        </tr>
                     }
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
+                </tbody>
+            </table>
+        </div>
 
-<script>
+    </div>
+ </div>
+      
+        <script>
     function changeWeek(offset) {
         var startDate = '@weekStart.ToString("yyyy-MM-dd")';
         var currentWeekStart = new Date(startDate);
@@ -97,5 +111,5 @@
         // Redirect to the current page with updated week start date
         window.location.href = '?startDate=' + formattedDate;
     }
-</script>
+        </script>
 

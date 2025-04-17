@@ -21,6 +21,6 @@ public class RoleAuthorizeAttribute : AuthorizeAttribute
 
     protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)
     {
-        filterContext.Result = new RedirectResult("~/Admin/TaiKhoan/DangNhap");
+        filterContext.Result = new RedirectResult("~/Admin/Login/DangNhap");
     }
 }

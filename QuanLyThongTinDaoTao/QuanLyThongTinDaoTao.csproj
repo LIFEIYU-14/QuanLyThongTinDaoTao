@@ -216,7 +216,7 @@
     <Compile Include="Areas\Admin\Controllers\LopHocController.cs" />
     <Compile Include="Areas\Admin\Controllers\HocVienController.cs" />
     <Compile Include="Areas\Admin\Controllers\PhanQuyenController.cs" />
-    <Compile Include="Areas\Admin\Controllers\TaiKhoanController.cs" />
+    <Compile Include="Areas\Admin\Controllers\LoginController.cs" />
     <Compile Include="Controllers\CoursesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\TraCuuController.cs" />
@@ -536,7 +536,7 @@
     <Content Include="Areas\Admin\Views\BuoiHoc\_BuoiHocPartial.cshtml" />
     <Content Include="Areas\Admin\Views\PhanQuyen\Index.cshtml" />
     <Content Include="Areas\Admin\Views\PhanQuyen\Edit.cshtml" />
-    <Content Include="Areas\Admin\Views\TaiKhoan\DangNhap.cshtml" />
+    <Content Include="Areas\Admin\Views\Login\DangNhap.cshtml" />
     <Content Include="Areas\Admin\Views\DiemDanhHocVien\DanhSachBuoiDayGV.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
