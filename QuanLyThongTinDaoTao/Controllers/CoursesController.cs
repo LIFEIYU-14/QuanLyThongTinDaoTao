@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using QuanLyThongTinDaoTao.Models;
 using QuanLyThongTinDaoTao.Services;
 using PagedList;
+using System.Collections.Generic;
 
 namespace QuanLyThongTinDaoTao.Controllers
 {
@@ -66,165 +67,34 @@ namespace QuanLyThongTinDaoTao.Controllers
         }
 
 
-        public ActionResult Register(Guid? lopHocId)
+        [HttpPost]
+        public ActionResult Register(List<Guid> selectedLopHocIds)
         {
-            if (!lopHocId.HasValue)
+            if (selectedLopHocIds == null || !selectedLopHocIds.Any())
             {
-                TempData["Error"] = "Lớp học không hợp lệ.";
+                TempData["Error"] = "Vui lòng chọn ít nhất một lớp học để đăng ký.";
                 return RedirectToAction("Index");
             }
 
-            var lopHoc = db.LopHocs.Include(l => l.KhoaHoc).FirstOrDefault(l => l.LopHocId == lopHocId.Value);
-            if (lopHoc == null)
+            // Lấy danh sách lớp học đã chọn và kèm thông tin khóa học
+            var lopHocList = db.LopHocs
+                .Include(l => l.KhoaHoc)
+                .Where(l => selectedLopHocIds.Contains(l.LopHocId))
+                .ToList();
+
+            if (lopHocList.Count != selectedLopHocIds.Count)
             {
-                TempData["Error"] = "Lớp học không tồn tại.";
+                TempData["Error"] = "Một số lớp học không tồn tại.";
                 return RedirectToAction("Index");
             }
-
-            return View(lopHoc);
+      
+            return View("Register", lopHocList); // View mới
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Register(FormCollection form)
-        {
-            try
-            {
-                string hoVaTen = form["HoVaTen"];
-                string email = form["Email"];
-                string soDienThoai = form["SoDienThoai"];
-                string coQuanLamViec = form["CoQuanLamViec"] ?? "Không có";
 
-                if (!DateTime.TryParse(form["NgaySinh"], out DateTime ngaySinh))
-                {
-                    ModelState.AddModelError("", "Ngày sinh không hợp lệ.");
-                    return View();
-                }
 
-                if (!Guid.TryParse(form["LopHocId"], out Guid lopHocId))
-                {
-                    ModelState.AddModelError("", "Lớp học không hợp lệ.");
-                    return View();
-                }
 
-                var lopHoc = db.LopHocs.Include(l => l.KhoaHoc).FirstOrDefault(l => l.LopHocId == lopHocId);
-                if (lopHoc == null) return HttpNotFound();
 
-                // Tạo mã OTP
-                string otp = new Random().Next(100000, 999999).ToString();
-                Session["OTP_" + email] = otp;
-                Session["HocVienData_" + email] = new HocVienTempData
-                {
-                    HoVaTen = hoVaTen,
-                    Email = email,
-                    NgaySinh = ngaySinh,
-                    SoDienThoai = soDienThoai,
-                    CoQuanLamViec = coQuanLamViec,
-                    LopHocId = lopHocId
-                };
-
-                await emailService.SendOtpEmail(email, otp);
-                ViewBag.Email = email;
-                return View(lopHoc);
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", "Lỗi đăng ký: " + ex.Message);
-                return View();
-            }
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> VerifyOTP(string email, string otp)
-        {
-            string storedOtp = Session["OTP_" + email]?.ToString();
-            if (storedOtp == null || storedOtp != otp)
-            {
-                TempData["Error"] = "Mã OTP không chính xác hoặc đã hết hạn.";
-                return RedirectToAction("Register", new { email });
-            }
-
-            var hocVienData = Session["HocVienData_" + email] as HocVienTempData;
-            if (hocVienData == null) return RedirectToAction("Index", "Home");
-
-            Session.Remove("OTP_" + email);
-            Session.Remove("HocVienData_" + email);
-            // **Tìm học viên theo email**
-            var hocVien = db.HocViens.FirstOrDefault(hv => hv.Email == email);
-
-            if (hocVien == null)
-            {
-                // **Nếu chưa có học viên, tạo mới**
-                hocVien = new HocVien
-                {
-                    NguoiDungId = Guid.NewGuid(),
-                    MaHocVien = DateTime.Now.Year + hocVienData.NgaySinh.Year.ToString() + new Random().Next(1000, 9999),
-                    TaiKhoan = hocVien.MaHocVien,
-                    MatKhau = PasswordHelper.HashPassword(hocVien.MaHocVien + "123456"),
-                    HoVaTen = hocVienData.HoVaTen,
-                    Email = hocVienData.Email,
-                    NgaySinh = hocVienData.NgaySinh,
-                    SoDienThoai = hocVienData.SoDienThoai,
-                    CoQuanLamViec = hocVienData.CoQuanLamViec,
-                    QR_Code_HV = Guid.NewGuid().ToString(),
-                    IsConfirmed = true,
-                };
-
-                db.HocViens.Add(hocVien);
-                db.SaveChanges();
-            }
-
-            var lopHoc = db.LopHocs.Include(l => l.KhoaHoc).FirstOrDefault(l => l.LopHocId == hocVienData.LopHocId);
-            if (lopHoc == null)
-            {
-                TempData["Error"] = "Lớp học không tồn tại.";
-                return RedirectToAction("Index", "Home");
-            }
-            // **Kiểm tra xem học viên đã đăng ký lớp học chưa**
-            var existingDangKy = db.DangKyHocs.FirstOrDefault(dk => dk.NguoiDungId == hocVien.NguoiDungId && dk.LopHocId == hocVienData.LopHocId);
-            if (existingDangKy != null)
-            {
-                TempData["Error"] = "Bạn đã đăng ký lớp học này trước đó.";
-                return RedirectToAction("Index", "Home");
-            }
-
-            // **Tạo đăng ký lớp học mới**
-            var dangKyHoc = new DangKyHoc
-            {
-                DangKyId = Guid.NewGuid(),
-                NguoiDungId = hocVien.NguoiDungId,
-                LopHocId = hocVienData.LopHocId,
-                IsConfirmed = true,
-                NgayDangKy = DateTime.Now
-            };
-
-            db.DangKyHocs.Add(dangKyHoc);
-
-            try
-            {
-                db.SaveChanges();
-                // Tạo mã QR cho học viên sau khi đăng ký thành công
-                string qrCode = hocVienService.GenerateQRCodeForStudent(hocVien.NguoiDungId);
-
-                // Gửi QR Code qua email
-                await emailService.SendQrCodeEmail(hocVien.Email, qrCode);
-
-                TempData["Success"] = "Xác nhận thành công";
-                return RedirectToAction("Index", "Courses");
-            }
-            catch (System.Data.Entity.Validation.DbEntityValidationException ex)
-            {
-                foreach (var validationErrors in ex.EntityValidationErrors)
-                {
-                    foreach (var validationError in validationErrors.ValidationErrors)
-                    {
-                        ModelState.AddModelError("", $"{validationError.PropertyName}: {validationError.ErrorMessage}");
-                    }
-                }
-                return View("Register");
-            }
-        }
         protected override void Dispose(bool disposing)
         {
             if (disposing)

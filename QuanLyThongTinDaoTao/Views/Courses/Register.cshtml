@@ -1,4 +1,4 @@
-﻿
+﻿@model List<QuanLyThongTinDaoTao.Models.LopHoc>
 @{
     ViewBag.Title = "Register";
     Layout = "~/Views/Shared/_MainLayout.cshtml";
@@ -8,55 +8,82 @@
     <div class="container">
         <div class="row">
             <!-- Thông tin khóa học -->
-            <div class="col-lg-4 mb-4 mb-lg-0">
-                <div class="card shadow-lg">
-                    <img src="@(string.IsNullOrEmpty(Model.KhoaHoc.HinhDaiDienKhoaHoc) ? "/images/default-course.jpg" : Model.KhoaHoc.HinhDaiDienKhoaHoc)"
-                         class="card-img-top"
-                         alt="@Model.KhoaHoc.TenKhoaHoc">
-                    <div class="card-body">
-                        <h5 class="card-title text-center">@Model.KhoaHoc.TenKhoaHoc</h5>
-                        <p class="card-text text-muted">@Html.Raw(Model.KhoaHoc.MoTa)</p>
+
+            @{
+                var khoaHoc = Model.FirstOrDefault()?.KhoaHoc;
+            }
+            @if (khoaHoc != null)
+            {
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <div class="card shadow-lg">
+                        <img src="@(string.IsNullOrEmpty(khoaHoc.HinhDaiDienKhoaHoc) ? "/images/default-course.jpg" : khoaHoc.HinhDaiDienKhoaHoc)" class="card-img-top" alt="@khoaHoc.TenKhoaHoc">
+                        <div class="card-body">
+                            <h5 class="card-title text-center">@khoaHoc.TenKhoaHoc</h5>
+                            <p class="card-text text-muted">@Html.Raw(khoaHoc.MoTa)</p>
+                        </div>
                     </div>
                 </div>
-            </div>
+            }
 
-            <!-- Form đăng ký -->
+
+
+            <!-- Form đăng ký lớp học -->
             <div class="col-lg-8">
                 <div class="bg-light rounded p-4 shadow-lg">
-                    <h6 class="mb-4 fs-4 text-secondary text-center">Đăng Ký Lớp Học - @Model.TenLopHoc</h6>
+                    <h5 class="mt-4">Lớp học đã chọn</h5>
+                    <ul class="list-group mb-4">
+                        @foreach (var lh in Model)
+                        {
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>@lh.TenLopHoc (Từ @lh.NgayBatDau.ToString("dd/MM") - @lh.NgayKetThuc.ToString("dd/MM"))</span>
+                                <span class="badge bg-primary">@lh.KhoaHoc.TenKhoaHoc</span>
+                            </li>
+                        }
+                    </ul>
 
-                    <!-- Form Đăng ký -->
-                    <div id="registerForm">
+
+                    <!-- Form đăng ký -->
+                    <div id="registerForm" style="@(ViewBag.Email != null ? "display:none;" : "")">
                         <div class="mb-3">
-                            <label class="form-label" for="HoVaTen">Họ và Tên</label>
-                            <input type="text" id="HoVaTen" class="form-control" required />
+                            <label class="form-label" for="HoVaTen">Họ và Tên:</label>
+                            <input type="text" id="HoVaTen" name="HoVaTen" class="form-control" placeholder="Nhập họ và tên" required />
                         </div>
+
                         <div class="mb-3">
-                            <label class="form-label" for="Email">Email</label>
-                            <input type="email" id="Email" class="form-control" required />
+                            <label class="form-label" for="Email">Email:</label>
+                            <input type="email" id="Email" name="Email" class="form-control" placeholder="Nhập email" required />
                         </div>
+
                         <div class="mb-3">
-                            <label class="form-label" for="NgaySinh">Ngày Sinh</label>
-                            <input type="date" id="NgaySinh" class="form-control" required />
+                            <label class="form-label" for="NgaySinh">Ngày Sinh:</label>
+                            <input type="date" id="NgaySinh" name="NgaySinh" class="form-control" required />
                         </div>
+
                         <div class="mb-3">
-                            <label class="form-label" for="SoDienThoai">Số Điện Thoại</label>
-                            <input type="tel" id="SoDienThoai" class="form-control" required />
+                            <label class="form-label" for="SoDienThoai">Số Điện Thoại:</label>
+                            <input type="tel" id="SoDienThoai" name="SoDienThoai" class="form-control" required pattern="[0-9]{10,15}" placeholder="Nhập số điện thoại" />
                         </div>
+
                         <div class="mb-3">
-                            <label class="form-label" for="CoQuanLamViec">Cơ Quan Làm Việc</label>
-                            <input type="text" id="CoQuanLamViec" class="form-control" required />
+                            <label class="form-label" for="CoQuanLamViec">Cơ Quan Làm Việc:</label>
+                            <input type="text" id="CoQuanLamViec" name="CoQuanLamViec" class="form-control" placeholder="Nhập cơ quan làm việc" required />
                         </div>
-                        <input type="hidden" id="LopHocId" value="@Model.LopHocId" />
-                        <button id="sendOtpBtn" class="btn btn-success w-100 mt-3">Gửi Mã OTP</button>
+
+                        <input type="hidden" id="SelectedLopHocIds" value="@string.Join(",", Model.Select(l => l.LopHocId))" />
+
+                        <button id="sendOtpBtn" type="button" class="btn btn-success w-100 mt-3 py-2" style="border-radius: 50px;">
+                            <i class="fas fa-envelope"></i> Gửi Mã OTP
+                        </button>
                     </div>
 
                     <!-- Form OTP -->
-                    <div id="otpForm" style="display:none;">
+                    <div id="otpForm" style="@(ViewBag.Email == null ? "display:none;" : "")">
                         <h5 class="mb-3 text-success">Nhập Mã OTP</h5>
                         <input type="hidden" id="otpEmail" />
                         <input type="text" id="Otp" class="form-control mb-3" placeholder="Nhập mã OTP" required />
-                        <button id="verifyOtpBtn" class="btn btn-primary w-100">Xác Nhận OTP</button>
+                        <button id="verifyOtpBtn" class="btn btn-primary w-100 py-2">
+                            <i class="fas fa-check"></i> Xác nhận OTP
+                        </button>
                     </div>
                 </div>
             </div>
@@ -66,68 +93,62 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-        $(document).ready(function () {
-            // Gửi OTP
-            $('#sendOtpBtn').click(function (e) {
-                e.preventDefault();
+    $(function () {
+        // Gửi OTP
+        $('#sendOtpBtn').click(function () {
+            const data = {
+                HoVaTen: $('#HoVaTen').val(),
+                Email: $('#Email').val(),
+                NgaySinh: $('#NgaySinh').val(),
+                SoDienThoai: $('#SoDienThoai').val(),
+                CoQuanLamViec: $('#CoQuanLamViec').val(),
+                LopHocId: $('#LopHocId').val()
+            };
 
-                const data = {
-                    HoVaTen: $('#HoVaTen').val(),
-                    Email: $('#Email').val(),
-                    NgaySinh: $('#NgaySinh').val(),
-                    SoDienThoai: $('#SoDienThoai').val(),
-                    CoQuanLamViec: $('#CoQuanLamViec').val(),
-                    LopHocId: $('#LopHocId').val()
-                };
-
-                $.ajax({
-                    type: "POST",
-                    url: "/api/dangky/start",
-                    contentType: "application/json",
-                    data: JSON.stringify(data),
-                    success: function (response) {
-                        alert(response.message);
-                        $('#registerForm').hide();
-                        $('#otpForm').show();
-                        $('#otpEmail').val(data.Email);
-                    },
-                    error: function (xhr) {
-                        alert("Lỗi: " + xhr.responseText);
-                    }
-                });
-            });
-
-            // Xác thực OTP
-            $('#verifyOtpBtn').click(function (e) {
-                e.preventDefault();
-
-                const verifyData = {
-                    Email: $('#otpEmail').val(),
-                    Otp: $('#Otp').val()
-                };
-
-                $.ajax({
-                    url: '/api/dangky/verify',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({
-                        Email: $('#Email').val(),
-                        Otp: $('#Otp').val()
-                    }),
-                    success: function (response) {
-                        alert(response.message);
-                        window.location.href = response.redirectUrl;
-                    },
-                    error: function (xhr) {
-                        const error = xhr.responseJSON?.error;
-                        if (error) {
-                            alert(error); // đây là thông báo lỗi thay cho TempData["Error"]
-                        } else {
-                            alert("Đã xảy ra lỗi.");
-                        }
-                    }
-                });
-
+            $.ajax({
+                url: '/api/dangky/start',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function (res) {
+                    alert(res.message);
+                    $('#registerForm').hide();
+                    $('#otpForm').show();
+                    $('#otpEmail').val(data.Email);
+                },
+                error: function (xhr) {
+                    alert("Lỗi: " + (xhr.responseJSON?.error || xhr.responseText));
+                }
             });
         });
+
+        // Xác nhận OTP
+        $('#verifyOtpBtn').click(function () {
+            const data = {
+                Email: $('#otpEmail').val(),
+                Otp: $('#Otp').val()
+            };
+
+            $.ajax({
+                url: '/api/dangky/verify',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function (res) {
+                    let message = res.message;
+                    if (res.successfulRegistrations && res.successfulRegistrations.length > 0) {
+                        message += "\n\nĐã đăng ký thành công các lớp:\n- " + res.successfulRegistrations.join("\n- ");
+                    }
+                    if (res.errors && res.errors.length > 0) {
+                        message += "\n\nCó lỗi với các lớp sau:\n- " + res.errors.join("\n- ");
+                    }
+                    alert(message);
+                    window.location.href = res.redirectUrl;
+                },
+                error: function (xhr) {
+                    alert("Lỗi xác thực OTP: " + (xhr.responseJSON?.error || xhr.responseText));
+                }
+            });
+        });
+    });
 </script>

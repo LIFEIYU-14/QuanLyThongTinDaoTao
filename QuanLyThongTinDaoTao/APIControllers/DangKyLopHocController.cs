@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 using QuanLyThongTinDaoTao.Models;
 using QuanLyThongTinDaoTao.ModelsHelper;
 using QuanLyThongTinDaoTao.Services;
-using QuanLyThongTinDaoTao.Helpers;   
+using QuanLyThongTinDaoTao.Helpers;
 
 namespace QuanLyThongTinDaoTao.APIControllers
 {
@@ -21,7 +22,7 @@ namespace QuanLyThongTinDaoTao.APIControllers
         [Route("start")]
         public async Task<IHttpActionResult> StartOtp([FromBody] DangKyHocRequest model)
         {
-            if (!ModelState.IsValid || model.LopHocId == Guid.Empty)
+            if (!ModelState.IsValid || model.LopHocIds == null || !model.LopHocIds.Any())
                 return BadRequest("Thông tin đăng ký không hợp lệ.");
 
             string otp = new Random().Next(100000, 999999).ToString();
@@ -68,31 +69,52 @@ namespace QuanLyThongTinDaoTao.APIControllers
                 db.SaveChanges();
             }
 
-            var lopHoc = db.LopHocs.FirstOrDefault(l => l.LopHocId == hocVienData.LopHocId);
-            if (lopHoc == null)
-                return Content(System.Net.HttpStatusCode.BadRequest, new { error = "Lớp học không tồn tại." });
+            // Đăng ký cho từng lớp học
+            var errors = new List<string>();
+            var successfulRegistrations = new List<string>();
 
-            bool daDangKy = db.DangKyHocs.Any(d => d.NguoiDungId == hocVien.NguoiDungId && d.LopHocId == hocVienData.LopHocId);
-            if (daDangKy)
-                 return Content(System.Net.HttpStatusCode.BadRequest, new { error = "Bạn đã đăng ký lớp học này trước đó." });
-
-            db.DangKyHocs.Add(new DangKyHoc
+            foreach (var lopHocId in hocVienData.LopHocIds)
             {
-                DangKyId = Guid.NewGuid(),
-                LopHocId = hocVienData.LopHocId,
-                NguoiDungId = hocVien.NguoiDungId,
-                IsConfirmed = true,
-                NgayDangKy = DateTime.Now
-            });
+                var lopHoc = db.LopHocs.FirstOrDefault(l => l.LopHocId == lopHocId);
+                if (lopHoc == null)
+                {
+                    errors.Add($"Lớp học {lopHocId} không tồn tại.");
+                    continue;
+                }
+
+                bool daDangKy = db.DangKyHocs.Any(d => d.NguoiDungId == hocVien.NguoiDungId && d.LopHocId == lopHocId);
+                if (daDangKy)
+                {
+                    errors.Add($"Bạn đã đăng ký lớp {lopHoc.TenLopHoc} trước đó.");
+                    continue;
+                }
+
+                db.DangKyHocs.Add(new DangKyHoc
+                {
+                    DangKyId = Guid.NewGuid(),
+                    LopHocId = lopHocId,
+                    NguoiDungId = hocVien.NguoiDungId,
+                    IsConfirmed = true,
+                    NgayDangKy = DateTime.Now
+                });
+                successfulRegistrations.Add(lopHoc.TenLopHoc);
+            }
+
             db.SaveChanges();
 
+            // Gửi QR code
             string qrCode = hocVienService.GenerateQRCodeForStudent(hocVien.NguoiDungId);
             await emailService.SendQrCodeEmail(hocVien.Email, qrCode);
 
-            return Ok(new { message = "Đăng ký thành công. Mã QR đã được gửi đến email.",
-                redirectUrl = Url.Content("~/Courses/Index")
-            });
+            var result = new
+            {
+                message = "Đăng ký thành công.",
+                redirectUrl = Url.Content("~/Courses/Index"),
+                successfulRegistrations = successfulRegistrations,
+                errors = errors
+            };
 
+            return Ok(result);
         }
     }
 }

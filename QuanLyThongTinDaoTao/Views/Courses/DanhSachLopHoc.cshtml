@@ -1,10 +1,9 @@
 ﻿@model List<QuanLyThongTinDaoTao.Models.LopHoc>
-    @using QuanLyThongTinDaoTao.Models;
+@using QuanLyThongTinDaoTao.Models;
 @{
     ViewBag.Title = "Danh Sách Lớp Học";
     Layout = "~/Views/Shared/_MainLayout.cshtml";
 }
-
 @{
     var khoaHoc = ViewBag.KhoaHoc as QuanLyThongTinDaoTao.Models.KhoaHoc;
 }
@@ -23,6 +22,65 @@
                     <div class="w-100 text-center text-lg-start mt-3 mt-lg-0">
                         <h3 class="fw-bold">Khóa Học : @khoaHoc.TenKhoaHoc</h3>
                         <p>NỘI DUNG: @Html.Raw(khoaHoc.MoTa)</p>
+                        <p>TÀI LIỆU KHÓA HỌC</p>
+                        @if (khoaHoc.KhoaHocAttachments != null && khoaHoc.KhoaHocAttachments.Any())
+
+                        {
+                            <div class="row">
+                                @foreach (var attachment in khoaHoc.KhoaHocAttachments)
+                                {
+                                    string fileType = attachment?.Attachment?.FileType?.ToLower();
+                                    string iconClass = "fa-file";
+                                    string badgeColor = "bg-secondary";
+
+                                    switch (fileType)
+                                    {
+                                        case "pdf":
+                                            iconClass = "fa-file-pdf";
+                                            badgeColor = "bg-danger";
+                                            break;
+                                        case "docx":
+                                        case "doc":
+                                            iconClass = "fa-file-word";
+                                            badgeColor = "bg-primary";
+                                            break;
+                                        case "txt":
+                                            iconClass = "fa-file-alt";
+                                            badgeColor = "bg-dark";
+                                            break;
+                                        case "xlsx":
+                                        case "xls":
+                                            iconClass = "fa-file-excel";
+                                            badgeColor = "bg-success";
+                                            break;
+                                        case "jpg":
+                                        case "jpeg":
+                                        case "png":
+                                            <div class="col-6 mb-2">
+                                                <img src="@Url.Content(attachment.Attachment.FilePath)" class="img-thumbnail" alt="@attachment.Attachment.FileName">
+                                                <div class="text-center mt-1">
+                                                    <a href="@Url.Content(attachment.Attachment.FilePath)" target="_blank" class="btn btn-sm btn-outline-primary">Xem Ảnh</a>
+                                                </div>
+                                            </div>
+                                            continue;
+                                    }
+
+                                    <div class="col-12 mb-2">
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <i class="fas @iconClass me-2"></i>
+                                                <a href="@Url.Content(attachment.Attachment.FilePath)" target="_blank">@attachment.Attachment.FileName</a>
+                                            </div>
+                                            <span class="badge @badgeColor rounded-pill">@attachment.Attachment.FileType</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-info">Không có tệp đính kèm</div>
+                        }
                     </div>
                 </div>
             </div>
@@ -35,74 +93,78 @@
 
                         @if (Model != null && Model.Any())
                         {
-                            <div class="table-responsive">
-                                <table class="table table-striped align-middle table-bordered">
-                                    <thead class="table-primary">
-                                        <tr>
-                                            <th>STT</th>
-                                            <th>Mã Lớp Học</th>
-                                            <th>Tên Lớp Học</th>
-                                            <th>Số Tín Chỉ</th>
-                                            <th>Ngày Bắt Đầu</th>
-                                            <th>Ngày Kết Thúc</th>
-                                            <th>Trạng Thái</th>
-                                            <th>Hành Động</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @{ int stt = 1; }
-                                        @foreach (var lophoc in Model)
-                                        {
+                            <form method="post" action="@Url.Action("Register", "Courses")" id="registerForm">
+                                <div class="table-responsive">
+                                    <table class="table table-striped align-middle table-bordered">
+                                        <thead class="table-primary">
                                             <tr>
-                                                <td>@stt</td>
-                                                <td>@lophoc.MaLopHoc</td>
-                                                <td>@lophoc.TenLopHoc</td>
-                                                <td>@lophoc.SoTinChi</td>
-                                                <td>@lophoc.NgayBatDau.ToString("dd/MM/yyyy")</td>
-                                                <td>@lophoc.NgayKetThuc.ToString("dd/MM/yyyy")</td>
-                                                <td>
-                                                    @{
-                                                        string trangThaiText = "";
-                                                        if (lophoc.TrangThai == LopHoc.TrangThaiLopHoc.SapMo)
-                                                        {
-                                                            trangThaiText = "Sắp mở";
-                                                        }
-                                                        else if (lophoc.TrangThai == LopHoc.TrangThaiLopHoc.DaBatDau)
-                                                        {
-                                                            trangThaiText = "Đã Bắt Đầu";
-                                                        }
-                                                        else if (lophoc.TrangThai == LopHoc.TrangThaiLopHoc.DaKetThuc)
-                                                        {
-                                                            trangThaiText = "Kết thúc";
-                                                        }
-                                                        else
-                                                        {
-                                                            trangThaiText = "Không xác định";
-                                                        }
-
-                                                        var badgeClass = lophoc.TrangThai == LopHoc.TrangThaiLopHoc.SapMo ? "bg-primary"
-                                                            : lophoc.TrangThai == LopHoc.TrangThaiLopHoc.DaBatDau ? "bg-success"
-                                                            : "bg-secondary";
-                                                    }
-
-                                                    <span class="badge @badgeClass">@trangThaiText</span>
-                                                </td>
-
-                                                <td>
-                                                    @if (lophoc.TrangThai == LopHoc.TrangThaiLopHoc.SapMo)
-                                                    {
-                                                        <a href="@Url.Action("Register", "Courses", new { lopHocId = lophoc.LopHocId })" class="btn btn-sm btn-success">
-                                                            <i class="fas fa-user-plus"></i> Đăng Ký
-                                                        </a>
-                                                    }
-                                                </td>
-
+                                                <th></th> <!-- Checkbox -->
+                                                <th>STT</th>
+                                                <th>Mã Lớp Học</th>
+                                                <th>Tên Lớp Học</th>
+                                                <th>Số Tín Chỉ</th>
+                                                <th>Ngày Bắt Đầu</th>
+                                                <th>Ngày Kết Thúc</th>
+                                                <th>Trạng Thái</th>
+                                                <th>Hành Động</th>
                                             </tr>
-                                            stt++;
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
+                                        </thead>
+                                        <tbody>
+                                            @{ int stt = 1; }
+                                            @foreach (var lophoc in Model)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @if (lophoc.TrangThai == LopHoc.TrangThaiLopHoc.SapMo)
+                                                        {
+                                                            <input type="checkbox" name="selectedLopHocIds" value="@lophoc.LopHocId" />
+                                                        }
+                                                    </td>
+                                                    <td>@stt</td>
+                                                    <td>@lophoc.MaLopHoc</td>
+                                                    <td>@lophoc.TenLopHoc</td>
+                                                    <td>@lophoc.SoTinChi</td>
+                                                    <td>@lophoc.NgayBatDau.ToString("dd/MM/yyyy")</td>
+                                                    <td>@lophoc.NgayKetThuc.ToString("dd/MM/yyyy")</td>
+                                                    <td>
+                                                        @{
+                                                            string trangThaiText = "";
+                                                            var badgeClass = "bg-secondary";
+                                                            switch (lophoc.TrangThai)
+                                                            {
+                                                                case LopHoc.TrangThaiLopHoc.SapMo:
+                                                                    trangThaiText = "Sắp mở";
+                                                                    badgeClass = "bg-primary";
+                                                                    break;
+                                                                case LopHoc.TrangThaiLopHoc.DaBatDau:
+                                                                    trangThaiText = "Đã Bắt Đầu";
+                                                                    badgeClass = "bg-success";
+                                                                    break;
+                                                                case LopHoc.TrangThaiLopHoc.DaKetThuc:
+                                                                    trangThaiText = "Kết thúc";
+                                                                    break;
+                                                                default:
+                                                                    trangThaiText = "Không xác định";
+                                                                    break;
+                                                            }
+                                                        }
+                                                        <span class="badge @badgeClass">@trangThaiText</span>
+                                                    </td>
+                                              
+                                                </tr>
+                                                stt++;
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="text-end mt-3">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-check-circle"></i> Đăng ký lớp học đã chọn
+                                    </button>
+                                </div>
+                            </form>
+
                         }
                         else
                         {
@@ -125,3 +187,37 @@ else
     </div>
 }
 
+    <script>
+    $(document).ready(function() {
+        // Xử lý khi click nút đăng ký lớp học đã chọn
+        $('#registerForm').submit(function(e) {
+            e.preventDefault();
+
+            // Kiểm tra xem có lớp nào được chọn không
+            var selectedClasses = $('.class-checkbox:checked');
+            if (selectedClasses.length === 0) {
+                alert('Vui lòng chọn ít nhất một lớp học để đăng ký.');
+                return false;
+            }
+
+            // Lấy danh sách ID lớp học đã chọn
+            var selectedIds = selectedClasses.map(function() {
+                return $(this).val();
+            }).get();
+
+            // Submit form với danh sách ID
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'POST',
+                data: { selectedLopHocIds: selectedIds },
+                success: function(response) {
+                    // Chuyển hướng đến trang đăng ký
+                    window.location.href = '@Url.Action("Register", "Courses")?selectedLopHocIds=' + selectedIds.join(',');
+                },
+                error: function(xhr) {
+                    alert('Có lỗi xảy ra: ' + xhr.responseText);
+                }
+            });
+        });
+    });
+    </script>

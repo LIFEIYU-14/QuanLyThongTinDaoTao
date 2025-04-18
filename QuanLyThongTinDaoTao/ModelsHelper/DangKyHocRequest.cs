@@ -16,6 +16,7 @@ namespace QuanLyThongTinDaoTao.ModelsHelper
         [JsonConverter(typeof(IsoDateTimeConverter))]
         public DateTime NgaySinh { get; set; }
 
-        public Guid LopHocId { get; set; }
+        public List<Guid> LopHocIds { get; set; }
+
     }
 }
