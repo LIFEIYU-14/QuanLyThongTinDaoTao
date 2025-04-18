@@ -271,25 +271,23 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
         // Upload tệp đính kèm
+
         private void UploadAttachments(Guid khoaHocId, HttpPostedFileBase[] attachments)
         {
+
             if (attachments == null || !attachments.Any())
-            {
                 return;
-            }
 
             string uploadPath = Server.MapPath("~/Upload/KhoaHoc/");
             if (!Directory.Exists(uploadPath))
-            {
                 Directory.CreateDirectory(uploadPath);
-            }
 
             var khoaHoc = db.KhoaHocs.Find(khoaHocId);
-
             if (khoaHoc == null)
-            {
                 return;
-            }
+
+            var newAttachments = new List<Attachment>();
+            var newKhoaHocAttachments = new List<KhoaHocAttachment>();
 
             foreach (var file in attachments)
             {
@@ -299,17 +297,18 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                     if (!allowedExtensions.Contains(extension))
                     {
                         ModelState.AddModelError("", $"Định dạng tệp '{extension}' không được hỗ trợ!");
-                        return;
+                        continue;
                     }
 
                     if (file.ContentLength > 1073741824) // 1GB
                     {
                         ModelState.AddModelError("", "Kích thước tệp không được vượt quá 1GB!");
-                        return;
+                        continue;
                     }
 
                     string sanitizedTenKhoaHoc = string.Join("_", khoaHoc.TenKhoaHoc.Split(Path.GetInvalidFileNameChars()));
-                    string fileName = $"KH_{sanitizedTenKhoaHoc}_{DateTime.Now:yyyyMMddHHmmss}{extension}";
+                    string uniqueSuffix = Guid.NewGuid().ToString("N").Substring(0, 8); // Đảm bảo tên duy nhất
+                    string fileName = $"KH_{sanitizedTenKhoaHoc}_{DateTime.Now:yyyyMMddHHmmss}_{uniqueSuffix}{extension}";
                     string filePath = Path.Combine(uploadPath, fileName);
                     file.SaveAs(filePath);
 
@@ -321,19 +320,25 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                         FilePath = $"/Upload/KhoaHoc/{fileName}",
                         UploadDate = DateTime.Now
                     };
-                    db.Attachments.Add(attachment);
-                    db.SaveChanges();
 
-                    var khoaHocAttachment = new KhoaHocAttachment
+                    newAttachments.Add(attachment);
+
+                    newKhoaHocAttachments.Add(new KhoaHocAttachment
                     {
                         KhoaHocId = khoaHocId,
                         AttachmentId = attachment.AttachmentId
-                    };
-                    db.KhoaHocAttachments.Add(khoaHocAttachment);
+                    });
                 }
             }
-            db.SaveChanges();
+
+            if (newAttachments.Any())
+            {
+                db.Attachments.AddRange(newAttachments);
+                db.KhoaHocAttachments.AddRange(newKhoaHocAttachments);
+                db.SaveChanges(); // Gọi save chỉ một lần
+            }
         }
+
         public ActionResult DeleteAttachment(Guid attachmentId, Guid khoaHocId)
         {
             var attachment = db.Attachments.Find(attachmentId);

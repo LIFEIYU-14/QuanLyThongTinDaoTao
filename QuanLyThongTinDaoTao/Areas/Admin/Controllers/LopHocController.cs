@@ -14,6 +14,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
     public class LopHocController : Controller
     {
         private readonly DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
+        private readonly string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".pdf", ".docx", ".ppt", ".pptx", ".txt" };
 
         public ActionResult Index(Guid? KhoaHocId)
         {
@@ -305,6 +306,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             return RedirectToAction("Edit", new { id = lopHocId });
         }
 
+
         private void UploadAttachments(Guid lopHocId, HttpPostedFileBase[] attachments)
         {
             if (attachments == null || attachments.Length == 0)
@@ -314,7 +316,8 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             if (!Directory.Exists(uploadPath))
                 Directory.CreateDirectory(uploadPath);
 
-            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".pdf", ".docx", ".ppt", ".pptx", ".txt" };
+            var newAttachments = new List<Attachment>();
+            var newLopHocAttachments = new List<LopHocAttachment>();
 
             foreach (var file in attachments)
             {
@@ -324,7 +327,8 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                     if (!allowedExtensions.Contains(extension))
                         continue;
 
-                    string fileName = $"{Path.GetFileNameWithoutExtension(file.FileName)}_{DateTime.Now:yyyyMMddHHmmss}{extension}";
+                    string uniqueSuffix = Guid.NewGuid().ToString("N").Substring(0, 8);
+                    string fileName = $"{Path.GetFileNameWithoutExtension(file.FileName)}_{DateTime.Now:yyyyMMddHHmmss}_{uniqueSuffix}{extension}";
                     string filePath = Path.Combine(uploadPath, fileName);
                     file.SaveAs(filePath);
 
@@ -336,19 +340,25 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                         FilePath = "/Upload/LopHoc/" + fileName,
                         UploadDate = DateTime.Now
                     };
-                    db.Attachments.Add(attachment);
-                    db.SaveChanges();
 
-                    var lopHocAttachment = new LopHocAttachment
+                    newAttachments.Add(attachment);
+
+                    newLopHocAttachments.Add(new LopHocAttachment
                     {
                         LopHocId = lopHocId,
                         AttachmentId = attachment.AttachmentId
-                    };
-                    db.LopHocAttachments.Add(lopHocAttachment);
-                    db.SaveChanges();
+                    });
                 }
             }
+
+            if (newAttachments.Any())
+            {
+                db.Attachments.AddRange(newAttachments);
+                db.LopHocAttachments.AddRange(newLopHocAttachments);
+                db.SaveChanges();
+            }
         }
+
         private void CapNhatTrangThaiLopHoc(LopHoc lopHoc)
         {
             var now = DateTime.Now;

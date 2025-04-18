@@ -14,8 +14,9 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
     public class BuoiHocController : Controller
     {
         private DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
+        private readonly string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".pdf", ".docx", ".ppt", ".pptx", ".txt" };
 
-    
+
         // Hiển thị toàn bộ danh sách buổi học
         public ActionResult Index()
         {
@@ -428,7 +429,8 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             if (!Directory.Exists(uploadPath))
                 Directory.CreateDirectory(uploadPath);
 
-            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".pdf", ".docx", ".ppt", ".pptx", ".txt" };
+            var newAttachments = new List<Attachment>();
+            var newBuoiHocAttachments = new List<BuoiHocAttachment>();
 
             foreach (var file in attachments)
             {
@@ -438,7 +440,8 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                     if (!allowedExtensions.Contains(extension))
                         continue;
 
-                    string fileName = Path.GetFileNameWithoutExtension(file.FileName) + "_" + DateTime.Now.ToString("yyyyMMddHHmmss") + extension;
+                    string uniqueSuffix = Guid.NewGuid().ToString("N").Substring(0, 8);
+                    string fileName = $"{Path.GetFileNameWithoutExtension(file.FileName)}_{DateTime.Now:yyyyMMddHHmmss}_{uniqueSuffix}{extension}";
                     string filePath = Path.Combine(uploadPath, fileName);
                     file.SaveAs(filePath);
 
@@ -450,19 +453,25 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                         FilePath = "/Upload/BuoiHoc/" + fileName,
                         UploadDate = DateTime.Now
                     };
-                    db.Attachments.Add(attachment);
-                    db.SaveChanges();
 
-                    var buoiHocAttachment = new BuoiHocAttachment
+                    newAttachments.Add(attachment);
+
+                    newBuoiHocAttachments.Add(new BuoiHocAttachment
                     {
                         BuoiHocId = buoiHocId,
                         AttachmentId = attachment.AttachmentId
-                    };
-                    db.BuoiHocAttachments.Add(buoiHocAttachment);
-                    db.SaveChanges();
+                    });
                 }
             }
+
+            if (newAttachments.Any())
+            {
+                db.Attachments.AddRange(newAttachments);
+                db.BuoiHocAttachments.AddRange(newBuoiHocAttachments);
+                db.SaveChanges();
+            }
         }
+
         public ActionResult DeleteAttachment(Guid attachmentId, Guid buoiHocId)
         {
             var attachment = db.Attachments.Find(attachmentId);
