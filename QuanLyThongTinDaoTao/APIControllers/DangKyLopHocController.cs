@@ -7,6 +7,10 @@ using QuanLyThongTinDaoTao.Models;
 using QuanLyThongTinDaoTao.ModelsHelper;
 using QuanLyThongTinDaoTao.Services;
 using QuanLyThongTinDaoTao.Helpers;
+using System.Net;
+using QuanLyThongTinDaoTao.Identity;
+using System.Web;
+using Microsoft.AspNet.Identity.Owin;
 
 namespace QuanLyThongTinDaoTao.APIControllers
 {
@@ -16,7 +20,12 @@ namespace QuanLyThongTinDaoTao.APIControllers
         private readonly DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
         private readonly EmailService emailService = new EmailService();
         private readonly HocVienService hocVienService = new HocVienService(new DbContextThongTinDaoTao());
-
+        private AppUserManager _userManager;
+        public AppUserManager UserManager
+        {
+            get => _userManager ?? HttpContext.Current.GetOwinContext().GetUserManager<AppUserManager>();
+            private set => _userManager = value;
+        }
         // POST: api/dangky/start
         [HttpPost]
         [Route("start")]
@@ -37,39 +46,53 @@ namespace QuanLyThongTinDaoTao.APIControllers
         // POST: api/dangky/verify
         [HttpPost]
         [Route("verify")]
+    
         public async Task<IHttpActionResult> VerifyOtp([FromBody] VerifyOtpRequest model)
         {
-            string storedOtp = OtpCache.Get("OTP_" + model.Email)?.ToString();
-            if (storedOtp == null || storedOtp != model.Otp)
-                return Content(System.Net.HttpStatusCode.BadRequest, new { error = "Mã OTP không hợp lệ hoặc đã hết hạn." });
+            var email = model.Email?.Trim();
+            var otp = model.Otp?.Trim();
 
-            var hocVienData = OtpCache.Get("HocVienData_" + model.Email) as DangKyHocRequest;
+            string storedOtp = OtpCache.Get("OTP_" + email)?.ToString();
+            if (storedOtp == null || storedOtp != otp)
+                return Content(HttpStatusCode.BadRequest, new { error = "Mã OTP không hợp lệ hoặc đã hết hạn." });
+
+            var hocVienData = OtpCache.Get("HocVienData_" + email) as DangKyHocRequest;
             if (hocVienData == null)
-                return Content(System.Net.HttpStatusCode.BadRequest, new { error = "Dữ liệu học viên không còn hiệu lực." });
+                return Content(HttpStatusCode.BadRequest, new { error = "Dữ liệu học viên không còn hiệu lực." });
 
-            OtpCache.Remove("OTP_" + model.Email);
-            OtpCache.Remove("HocVienData_" + model.Email);
+            OtpCache.Remove("OTP_" + email);
+            OtpCache.Remove("HocVienData_" + email);
 
-            var hocVien = db.HocViens.FirstOrDefault(h => h.Email == model.Email);
+            var hocVien = UserManager.Users
+                            .OfType<HocVien>()
+                            .FirstOrDefault(h => h.Email == email);
+
             if (hocVien == null)
             {
-                hocVien = new HocVien
+                var newHocVien = new HocVien
                 {
-                    NguoiDungId = Guid.NewGuid(),
+                    UserName = email,
                     MaHocVien = DateTime.Now.Year + hocVienData.NgaySinh.Year.ToString() + new Random().Next(1000, 9999),
+                    Email = email,
+                    EmailConfirmed = true,
                     HoVaTen = hocVienData.HoVaTen,
-                    Email = hocVienData.Email,
                     NgaySinh = hocVienData.NgaySinh,
                     SoDienThoai = hocVienData.SoDienThoai,
                     CoQuanLamViec = hocVienData.CoQuanLamViec,
                     QR_Code_HV = Guid.NewGuid().ToString(),
                     IsConfirmed = true
                 };
-                db.HocViens.Add(hocVien);
-                db.SaveChanges();
+
+                var password = "123456"; // consider generating random or allow reset
+                var createResult = await UserManager.CreateAsync(newHocVien, password);
+                if (!createResult.Succeeded)
+                    return Content(HttpStatusCode.InternalServerError, new { error = string.Join("; ", createResult.Errors) });
+
+                await UserManager.AddToRoleAsync(newHocVien.Id, "HocVien");
+
+                hocVien = newHocVien;
             }
 
-            // Đăng ký cho từng lớp học
             var errors = new List<string>();
             var successfulRegistrations = new List<string>();
 
@@ -82,7 +105,7 @@ namespace QuanLyThongTinDaoTao.APIControllers
                     continue;
                 }
 
-                bool daDangKy = db.DangKyHocs.Any(d => d.NguoiDungId == hocVien.NguoiDungId && d.LopHocId == lopHocId);
+                bool daDangKy = db.DangKyHocs.Any(d => d.AppUserId == hocVien.Id && d.LopHocId == lopHocId);
                 if (daDangKy)
                 {
                     errors.Add($"Bạn đã đăng ký lớp {lopHoc.TenLopHoc} trước đó.");
@@ -93,7 +116,7 @@ namespace QuanLyThongTinDaoTao.APIControllers
                 {
                     DangKyId = Guid.NewGuid(),
                     LopHocId = lopHocId,
-                    NguoiDungId = hocVien.NguoiDungId,
+                    AppUserId = hocVien.Id,
                     IsConfirmed = true,
                     NgayDangKy = DateTime.Now
                 });
@@ -102,8 +125,7 @@ namespace QuanLyThongTinDaoTao.APIControllers
 
             db.SaveChanges();
 
-            // Gửi QR code
-            string qrCode = hocVienService.GenerateQRCodeForStudent(hocVien.NguoiDungId);
+            string qrCode = hocVienService.GenerateQRCodeForStudent(hocVien.Id);
             await emailService.SendQrCodeEmail(hocVien.Email, qrCode);
 
             var result = new
@@ -116,5 +138,6 @@ namespace QuanLyThongTinDaoTao.APIControllers
 
             return Ok(result);
         }
+
     }
 }

@@ -13,24 +13,30 @@ namespace QuanLyThongTinDaoTao.Models
     {
         [Key]
         public Guid DiemDanhId { get; set; } = Guid.NewGuid();
+
         [Required]
         public Guid BuoiHocId { get; set; }
+
         [ForeignKey("BuoiHocId")]
         public virtual BuoiHoc BuoiHoc { get; set; }
+
         [Required]
-        public Guid NguoiDungId { get; set; }
-        [ForeignKey("NguoiDungId")]
-        public virtual HocVien HocVien { get; set; }    
+        public string AppUserId { get; set; }
+
+        [ForeignKey("AppUserId")]
+        public virtual HocVien HocVien { get; set; }
+
         public DateTime NgayDiemDanh { get; set; }
 
         public enum TrangThaiDiemDanhHV
         {
-            CoMat, // Có mặt
-            VangKhongPhep, // Vắng không phép
-            VangCoPhep // Vắng có phép
+            CoMat,
+            VangKhongPhep,
+            VangCoPhep
         }
 
         [Required]
         public TrangThaiDiemDanhHV TrangThai { get; set; }
     }
+
 }

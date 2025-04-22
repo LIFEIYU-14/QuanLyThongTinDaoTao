@@ -7,7 +7,6 @@ using QuanLyThongTinDaoTao.Models;
 
 namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 {
-    [RoleAuthorize("Admin")]
     public class DiemDanhGiangVienController : Controller
     {
         private DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
@@ -68,7 +67,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 foreach (var diemDanh in danhSachDiemDanh)
                 {
                     var existingRecord = db.DiemDanhs_GVs
-                        .FirstOrDefault(d => d.NguoiDungId == diemDanh.NguoiDungId && d.BuoiHocId == diemDanh.BuoiHocId);
+                        .FirstOrDefault(d => d.AppUserId == diemDanh.AppUserId && d.BuoiHocId == diemDanh.BuoiHocId);
 
                     if (existingRecord == null)
                     {
@@ -84,7 +83,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
                     updatedAttendance.Add(new
                     {
-                        diemDanh.NguoiDungId,
+                        diemDanh.AppUserId,
                         diemDanh.BuoiHocId,
                         diemDanh.TrangThai
                     });

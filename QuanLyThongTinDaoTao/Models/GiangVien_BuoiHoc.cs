@@ -9,16 +9,21 @@ namespace QuanLyThongTinDaoTao.Models
 {
     [Table("GiangVien_BuoiHoc")]
     public class GiangVien_BuoiHoc
-	{
-		[Key]
+    {
+        [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
+
         [Required]
         public Guid BuoiHocId { get; set; }
+
         [ForeignKey("BuoiHocId")]
         public virtual BuoiHoc BuoiHoc { get; set; }
+
         [Required]
-        public Guid NguoiDungId { get; set; }
-        [ForeignKey("NguoiDungId")]
+        public string AppUserId { get; set; }
+
+        [ForeignKey("AppUserId")]
         public virtual GiangVien GiangVien { get; set; }
     }
+
 }

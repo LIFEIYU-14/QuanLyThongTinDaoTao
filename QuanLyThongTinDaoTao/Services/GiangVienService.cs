@@ -15,9 +15,11 @@ public class GiangVienService
         _context = context;
     }
 
-    public string GenerateQRCodeForTeacher(Guid giangVienId)
+    // Đổi kiểu giangVienId thành string
+    public string GenerateQRCodeForTeacher(string giangVienId)
     {
-        var giangVien = _context.GiangViens.FirstOrDefault(gv => gv.NguoiDungId == giangVienId);
+        // Tìm giảng viên theo Id dạng string
+        var giangVien = _context.GiangViens.FirstOrDefault(gv => gv.Id == giangVienId);
         if (giangVien == null) return null;
 
         var qrInfo = new
@@ -41,7 +43,7 @@ public class GiangVienService
                         byte[] qrCodeBytes = ms.ToArray();
                         string qrBase64 = Convert.ToBase64String(qrCodeBytes);
 
-                        // Lưu mã QR vào DB cho giảng viên
+                        // Cập nhật QR code và lưu DB
                         giangVien.QR_Code_GV = qrBase64;
                         _context.SaveChanges();
 

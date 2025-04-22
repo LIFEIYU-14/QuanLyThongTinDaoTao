@@ -10,7 +10,6 @@ using QuanLyThongTinDaoTao.Models;
 
 namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 {
-    [RoleAuthorize("Admin", "GiangVien")]
     public class BuoiHocController : Controller
     {
         private DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
@@ -54,7 +53,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             }
 
             // Lấy danh sách học viên đã đăng ký và xác nhận
- 
+
             var danhSachHocVien = db.DangKyHocs
                     .Include(dk => dk.HocVien)
                     .Where(dk => dk.LopHocId == buoiHoc.LopHoc.LopHocId)
@@ -73,7 +72,8 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         // Tạo buổi học (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(BuoiHoc model, Guid LopHocId, HttpPostedFileBase[] attachments, Guid[] selectedGiangViens)
+        public ActionResult Create(BuoiHoc model, Guid LopHocId, HttpPostedFileBase[] attachments, string[] selectedGiangViens)
+
         {
             if (!ModelState.IsValid)
             {
@@ -124,7 +124,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 {
                     bool isGiangVienBusy = db.GiangVien_BuoiHoc
                         .Include(gv => gv.BuoiHoc)
-                        .Any(gv => gv.NguoiDungId == giangVienId &&
+                        .Any(gv => gv.AppUserId == giangVienId &&
                               gv.BuoiHoc.NgayHoc == model.NgayHoc &&
                               ((model.GioBatDau >= gv.BuoiHoc.GioBatDau && model.GioBatDau < gv.BuoiHoc.GioKetThuc) ||
                                (model.GioKetThuc > gv.BuoiHoc.GioBatDau && model.GioKetThuc <= gv.BuoiHoc.GioKetThuc) ||
@@ -159,7 +159,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                         {
                             Id = Guid.NewGuid(),
                             BuoiHocId = model.BuoiHocId,
-                            NguoiDungId = giangVienId
+                            AppUserId = giangVienId
                         });
                     }
                 }
@@ -186,17 +186,17 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             {
                 return HttpNotFound();
             }
-   
+
             ViewBag.LopHocList = db.LopHocs.ToList();
             ViewBag.GiangVienList = db.GiangViens.ToList();
-            ViewBag.GiangVienDaChon = buoiHoc.GiangVien_BuoiHocs?.Select(g => g.NguoiDungId).ToList();
+            ViewBag.GiangVienDaChon = buoiHoc.GiangVien_BuoiHocs?.Select(g => g.AppUserId).ToList();
             return View(buoiHoc);
         }
 
         // Chỉnh sửa buổi học (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(BuoiHoc model, Guid LopHocId, HttpPostedFileBase[] attachments, Guid[] selectedGiangViens)
+        public ActionResult Edit(BuoiHoc model, Guid LopHocId, HttpPostedFileBase[] attachments, string[] selectedGiangViens)
         {
             if (!ModelState.IsValid)
             {
@@ -255,7 +255,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 {
                     bool isGiangVienBusy = db.GiangVien_BuoiHoc
                         .Include(gv => gv.BuoiHoc)
-                        .Any(gv => gv.NguoiDungId == giangVienId &&
+                        .Any(gv => gv.AppUserId == giangVienId &&
                               gv.BuoiHoc.NgayHoc == model.NgayHoc &&
                               gv.BuoiHoc.BuoiHocId != model.BuoiHocId && // Loại trừ buổi học hiện tại
                               ((model.GioBatDau >= gv.BuoiHoc.GioBatDau && model.GioBatDau < gv.BuoiHoc.GioKetThuc) ||
@@ -280,33 +280,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             buoiHoc.GhiChu = model.GhiChu;
             buoiHoc.LopHoc = lopHoc;
 
-            //// --- XỬ LÝ GIẢNG VIÊN ---
-            //// Xóa hết danh sách giảng viên đã có cho buổi học hiện tại
-            //var existingGiangVienBuoiHoc = db.GiangVien_BuoiHoc.Where(gv => gv.BuoiHocId == model.BuoiHocId).ToList();
-            //foreach (var gv in existingGiangVienBuoiHoc)
-            //{
-            //    db.GiangVien_BuoiHoc.Remove(gv);
-            //}
-            //db.SaveChanges();
-
-            //// Thêm lại giảng viên theo danh sách được chọn
-            //if (selectedGiangViens != null && selectedGiangViens.Any())
-            //{
-            //    foreach (var giangVienId in selectedGiangViens)
-            //    {
-            //        var giangVien = db.GiangViens.Find(giangVienId);
-            //        if (giangVien != null)
-            //        {
-            //            db.GiangVien_BuoiHoc.Add(new GiangVien_BuoiHoc
-            //            {
-            //                Id = Guid.NewGuid(),
-            //                BuoiHocId = model.BuoiHocId,
-            //                NguoiDungId = giangVienId
-            //            });
-            //        }
-            //    }
-            //    db.SaveChanges();
-            //}
+          
             // --- XỬ LÝ GIẢNG VIÊN ---
             // Lấy danh sách giảng viên hiện tại của buổi học
             var existingGiangVienBuoiHoc = db.GiangVien_BuoiHoc
@@ -315,16 +289,17 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
             // Lấy danh sách ID giảng viên sẽ bị xóa (có trong DB nhưng không có trong danh sách chọn)
             var giangVienIdsToRemove = existingGiangVienBuoiHoc
-                .Where(gv => selectedGiangViens == null || !selectedGiangViens.Contains(gv.NguoiDungId))
-                .Select(gv => gv.NguoiDungId)
-                .ToList();
+                    .Where(gv => selectedGiangViens == null || !selectedGiangViens.Contains(gv.AppUserId))
+                    .Select(gv => gv.AppUserId)
+                    .ToList();
+
 
             // Xóa điểm danh của các giảng viên bị xóa khỏi buổi học
             if (giangVienIdsToRemove.Any())
             {
                 var diemDanhToRemove = db.DiemDanhs_GVs
                     .Where(d => d.BuoiHocId == model.BuoiHocId &&
-                           giangVienIdsToRemove.Contains(d.NguoiDungId))
+                           giangVienIdsToRemove.Contains(d.AppUserId))
                     .ToList();
 
                 db.DiemDanhs_GVs.RemoveRange(diemDanhToRemove);
@@ -346,7 +321,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                         {
                             Id = Guid.NewGuid(),
                             BuoiHocId = model.BuoiHocId,
-                            NguoiDungId = giangVienId
+                            AppUserId = giangVienId
                         });
                     }
                 }
@@ -531,15 +506,15 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             var selectedGVIds = buoiHocId != null
                 ? db.GiangVien_BuoiHoc
                     .Where(x => x.BuoiHocId == buoiHocId)
-                    .Select(x => x.NguoiDungId)
+                    .Select(x => x.AppUserId)
                     .ToList()
-                : new List<Guid>();
+                : new List<string>();
 
             var danhSach = allGVs.Select(gv => new
             {
-                gv.NguoiDungId,
+                gv.Id, // AppUserId vì GiangVien kế thừa từ AppUser
                 gv.HoVaTen,
-                IsSelected = selectedGVIds.Contains(gv.NguoiDungId),
+                IsSelected = selectedGVIds.Contains(gv.Id),
                 IsBusy = db.BuoiHocs.Any(b =>
                     b.BuoiHocId != buoiHocId && // bỏ qua chính nó
                     b.NgayHoc == ngayHoc &&
@@ -548,12 +523,13 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                         (gioKetThuc > b.GioBatDau && gioKetThuc <= b.GioKetThuc) ||
                         (gioBatDau <= b.GioBatDau && gioKetThuc >= b.GioKetThuc)
                     ) &&
-                    b.GiangVien_BuoiHocs.Any(g => g.NguoiDungId == gv.NguoiDungId)
+                    b.GiangVien_BuoiHocs.Any(g => g.AppUserId == gv.Id)
                 )
             });
 
             return Json(danhSach);
         }
+
         [HttpPost]
         public ActionResult UploadImage(HttpPostedFileBase upload)
         {

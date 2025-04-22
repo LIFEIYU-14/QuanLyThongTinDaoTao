@@ -1,8 +1,8 @@
-﻿using QuanLyThongTinDaoTao.LoginModelView;
-using QuanLyThongTinDaoTao.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
+using QuanLyThongTinDaoTao.Identity;
+using QuanLyThongTinDaoTao.LoginModelView;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -10,7 +10,28 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 {
     public class LoginController : Controller
     {
-        private DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
+        private AppUserManager _userManager;
+        private AppSignInManager _signInManager;
+
+        public LoginController() { }
+
+        public LoginController(AppUserManager userManager, AppSignInManager signInManager)
+        {
+            UserManager = userManager;
+            SignInManager = signInManager;
+        }
+
+        public AppUserManager UserManager
+        {
+            get => _userManager ?? HttpContext.GetOwinContext().GetUserManager<AppUserManager>();
+            private set => _userManager = value;
+        }
+
+        public AppSignInManager SignInManager
+        {
+            get => _signInManager ?? HttpContext.GetOwinContext().Get<AppSignInManager>();
+            private set => _signInManager = value;
+        }
 
         [HttpGet]
         public ActionResult DangNhap()
@@ -20,43 +41,52 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult DangNhap(LoginViewModel model)
+        public async Task<ActionResult> DangNhap(LoginViewModel model)
         {
             if (!ModelState.IsValid) return View(model);
 
-            // Tìm theo tài khoản hoặc email
-            var nguoiDungList = db.NguoiDungs
-         .Include("PhanQuyens")
-         .ToList();
+            var user = await UserManager.FindByNameAsync(model.TaiKhoanOrEmail)
+                       ?? await UserManager.FindByEmailAsync(model.TaiKhoanOrEmail);
 
-            var nguoiDung = nguoiDungList
-                .FirstOrDefault(n => n.TaiKhoan == model.TaiKhoanOrEmail ||
-                                     (n is GiangVien gv && gv.Email == model.TaiKhoanOrEmail));
-
-
-            if (nguoiDung != null && PasswordHelper.VerifyPassword(model.MatKhau, nguoiDung.MatKhau))
+            if (user == null)
             {
-                var quyen = nguoiDung.PhanQuyens.FirstOrDefault()?.TenQuyen;
-                Session["TaiKhoan"] = nguoiDung.TaiKhoan;
-                Session["TenQuyen"] = quyen;
-                Session["NguoiDungId"] = nguoiDung.NguoiDungId;
-                // Chuyển hướng tùy theo quyền
-                if (quyen == "Admin" || quyen == "GiangVien")
-                    return RedirectToAction("Index", "HomeAdmin", new { area = "Admin" });
-
-
-                return RedirectToAction("Index", "Home");
+                ModelState.AddModelError("", "Tài khoản không tồn tại.");
+                return View(model);
             }
 
-            TempData["Error"] = "Tài khoản hoặc mật khẩu không đúng.";
+            var result = await SignInManager.PasswordSignInAsync(
+                user.UserName, model.MatKhau, isPersistent: false, shouldLockout: false);
+
+            switch (result)
+            {
+                case SignInStatus.Success:
+                    var roles = await UserManager.GetRolesAsync(user.Id);
+                    if (roles.Contains("Admin"))
+                        return RedirectToAction("Index", "HomeAdmin", new { area = "Admin" });
+                    if (roles.Contains("GiangVien"))
+                        return RedirectToAction("Index", "HomeGiangVien", new { area = "GiangVien" });
+
+                    return RedirectToAction("Index", "Home");
+
+                case SignInStatus.LockedOut:
+                    ModelState.AddModelError("", "Tài khoản đã bị khóa.");
+                    break;
+
+                case SignInStatus.Failure:
+                default:
+                    ModelState.AddModelError("", "Tài khoản hoặc mật khẩu không đúng.");
+                    break;
+            }
+
             return View(model);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult DangXuat()
         {
-            Session.Clear();
+            SignInManager.AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
             return RedirectToAction("DangNhap");
         }
     }
-
 }

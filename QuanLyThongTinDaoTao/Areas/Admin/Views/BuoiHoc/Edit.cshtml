@@ -57,8 +57,9 @@
                     <label class="form-label">Chọn Giảng Viên</label>
 
                     <div id="giangVienContainer" class="border rounded p-2" style="max-height: 300px; overflow-y: auto;">
-                        <!-- Sẽ được cập nhật bằng JS -->
+                    
                     </div>
+
                 </div>
 
                 <!-- Tệp Đính Kèm -->
@@ -116,6 +117,7 @@
         resize: vertical;
         overflow-y: auto;
     }
+
     .form-label {
         font-weight: bold;
     }
@@ -209,25 +211,26 @@
                     if (gv.IsBusy && gv.IsSelected) {
                         html = `
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="selectedGiangViens" value="${gv.NguoiDungId}" id="gv_${gv.NguoiDungId}" ${isChecked} />
-                                <label class="form-check-label text-warning" for="gv_${gv.NguoiDungId}">${gv.HoVaTen} (bận - đã chọn)</label>
+                                <input class="form-check-input" type="checkbox" name="selectedGiangViens" value="${gv.Id}" id="gv_${gv.Id}" ${isChecked} />
+                                <label class="form-check-label text-warning" for="gv_${gv.Id}">${gv.HoVaTen} (bận - đã chọn)</label>
                             </div>`;
-                    } else if (gv.IsBusy) {
-                        html = `
+                                    } else if (gv.IsBusy) {
+                                        html = `
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" disabled />
                                 <label class="form-check-label text-muted">${gv.HoVaTen} (bận)</label>
                             </div>`;
-                    } else {
-                        html = `
+                                    } else {
+                                        html = `
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="selectedGiangViens" value="${gv.NguoiDungId}" id="gv_${gv.NguoiDungId}" ${isChecked} />
-                                <label class="form-check-label" for="gv_${gv.NguoiDungId}">${gv.HoVaTen}</label>
+                                <input class="form-check-input" type="checkbox" name="selectedGiangViens" value="${gv.Id}" id="gv_${gv.Id}" ${isChecked} />
+                                <label class="form-check-label" for="gv_${gv.Id}">${gv.HoVaTen}</label>
                             </div>`;
                     }
 
                     container.append(html);
                 });
+
             },
             error: function (err) {
                 console.error("Lỗi khi tải danh sách giảng viên:", err);

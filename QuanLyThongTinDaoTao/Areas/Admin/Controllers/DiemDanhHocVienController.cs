@@ -7,7 +7,6 @@ using System.Web.Mvc;
 
 namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 {
-    [RoleAuthorize("Admin", "GiangVien")]
     public class DiemDanhHocVienController : Controller
     {
         private readonly DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
@@ -21,7 +20,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             {
                 // Only retrieve the classes (buổi học) taught by the current teacher
                 var buoiHoc = db.GiangVien_BuoiHoc
-                                .Where(gb => gb.GiangVien.TaiKhoan == currentUser)
+                                .Where(gb => gb.GiangVien.UserName == currentUser)
                                 .Select(gb => gb.BuoiHoc)
                                 .ToList();
                 return View("DanhSachBuoiDayGV", buoiHoc);
@@ -43,7 +42,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         }
 
         // Lấy danh sách buổi học theo lớp học
-        public ActionResult FilterByLopHoc(Guid? lopHocId , string startDate)
+        public ActionResult FilterByLopHoc(Guid? lopHocId, string startDate)
         {
             if (!lopHocId.HasValue)
                 return PartialView("_BuoiHocEmpty");
@@ -104,7 +103,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 {
                     // Check if attendance for this student and session already exists
                     var existingRecord = db.DiemDanhs_HVs
-                        .FirstOrDefault(d => d.NguoiDungId == diemDanh.NguoiDungId && d.BuoiHocId == diemDanh.BuoiHocId);
+                        .FirstOrDefault(d => d.AppUserId == diemDanh.AppUserId && d.BuoiHocId == diemDanh.BuoiHocId);
 
                     if (existingRecord == null)
                     {
@@ -121,7 +120,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
                     updatedAttendance.Add(new
                     {
-                        diemDanh.NguoiDungId,
+                        diemDanh.AppUserId,
                         diemDanh.BuoiHocId,
                         diemDanh.TrangThai
                     });

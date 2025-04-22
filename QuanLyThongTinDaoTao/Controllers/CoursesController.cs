@@ -87,13 +87,9 @@ namespace QuanLyThongTinDaoTao.Controllers
                 TempData["Error"] = "Một số lớp học không tồn tại.";
                 return RedirectToAction("Index");
             }
-      
+
             return View("Register", lopHocList); // View mới
         }
-
-
-
-
 
         protected override void Dispose(bool disposing)
         {

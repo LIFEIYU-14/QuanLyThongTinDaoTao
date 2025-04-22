@@ -14,29 +14,10 @@
 
         protected override void Seed(QuanLyThongTinDaoTao.Models.DbContextThongTinDaoTao context)
         {
-            // Kiểm tra nếu chưa có admin nào
-            if (!context.NguoiDungs.Any(n => n.TaiKhoan == "admin"))
-            {
-                var admin = new QuanLyThongTinDaoTao.Models.NguoiDung
-                {
-                    NguoiDungId = Guid.NewGuid(),
-                    TaiKhoan = "admin",
-                    MatKhau = QuanLyThongTinDaoTao.Models.PasswordHelper.HashPassword("123456"),
-                    NgayTao = DateTime.Now,
-                    NgayCapNhat = DateTime.Now,
-                };
+            //  This method will be called after migrating to the latest version.
 
-                // Thêm quyền Admin
-                admin.PhanQuyens.Add(new QuanLyThongTinDaoTao.Models.PhanQuyen
-                {
-                    TenQuyen = "Admin",
-                    NguoiDungId = admin.NguoiDungId
-                });
-
-                context.NguoiDungs.Add(admin);
-                context.SaveChanges();
-            }
+            //  You can use the DbSet<T>.AddOrUpdate() helper extension method
+            //  to avoid creating duplicate seed data.
         }
-
     }
 }

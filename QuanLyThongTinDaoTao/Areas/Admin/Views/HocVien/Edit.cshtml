@@ -13,7 +13,7 @@
             @using (Html.BeginForm("Edit", "HocVien", FormMethod.Post))
             {
                 @Html.AntiForgeryToken()
-                @Html.HiddenFor(model => model.NguoiDungId)
+                @Html.HiddenFor(model => model.Id)
 
             <div class="row">
                     <div class="col-md-6 mb-3">

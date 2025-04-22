@@ -36,14 +36,14 @@
             <tbody>
                 @foreach (var hv in Model)
                 {
-                    var diemDanh = diemDanhs?.FirstOrDefault(dd => dd.NguoiDungId == hv.NguoiDungId && dd.BuoiHocId == buoiHoc.BuoiHocId);
+                    var diemDanh = diemDanhs?.FirstOrDefault(dd => dd.AppUserId == hv.AppUserId && dd.BuoiHocId == buoiHoc.BuoiHocId);
                     <tr class="text-center">
                         <td>@stt</td>
                         <td>@hv.HocVien.MaHocVien</td>
                         <td>@hv.HocVien.HoVaTen</td>
                         <td>
                             <select class="form-control form-control-sm trang-thai-diem-danh"
-                                    data-hocvien-id="@hv.NguoiDungId"
+                                    data-hocvien-id="@hv.AppUserId"
                                     data-buoihoc-id="@buoiHoc.BuoiHocId">
                                 <option value="-1" class="text-center" @(diemDanh == null ? "selected" : "")>Chưa điểm danh</option>
                                 <option value="0" class="text-center" @(diemDanh?.TrangThai == DiemDanh_HV.TrangThaiDiemDanhHV.CoMat ? "selected" : "")>Có mặt</option>
@@ -76,7 +76,7 @@
         if (trangThai == -1) return;
 
         danhSachDiemDanh.push({
-            NguoiDungId: hocVienId,
+            AppUserId: hocVienId,
             BuoiHocId: buoiHocId,
             TrangThai: trangThai
         });
