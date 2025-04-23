@@ -12,6 +12,7 @@ using QuanLyThongTinDaoTao.Services;
 
 namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class HocVienController : Controller
     {
         private DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();

@@ -1,4 +1,5 @@
-﻿using QuanLyThongTinDaoTao.Models;
+﻿using Microsoft.AspNet.Identity;
+using QuanLyThongTinDaoTao.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -12,17 +13,18 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         private readonly DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
 
         // GET: Admin/DiemDanhHocVien
+        [Authorize]
         public ActionResult DanhSachBuoiDay()
         {
-            var currentUser = Session["TaiKhoan"]?.ToString();
-            var role = Session["TenQuyen"]?.ToString();
-            if (role == "GiangVien")
+            var userId = User.Identity.GetUserId();
+
+            if (User.IsInRole("GiangVien"))
             {
-                // Only retrieve the classes (buổi học) taught by the current teacher
                 var buoiHoc = db.GiangVien_BuoiHoc
-                                .Where(gb => gb.GiangVien.UserName == currentUser)
+                                .Where(gb => gb.GiangVien.Id == userId)
                                 .Select(gb => gb.BuoiHoc)
                                 .ToList();
+
                 return View("DanhSachBuoiDayGV", buoiHoc);
             }
 

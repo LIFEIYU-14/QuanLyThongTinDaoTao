@@ -64,7 +64,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                     if (roles.Contains("Admin"))
                         return RedirectToAction("Index", "HomeAdmin", new { area = "Admin" });
                     if (roles.Contains("GiangVien"))
-                        return RedirectToAction("Index", "HomeGiangVien", new { area = "GiangVien" });
+                        return RedirectToAction("Index", "HomeAdmin", new { area = "Admin" });
 
                     return RedirectToAction("Index", "Home");
 

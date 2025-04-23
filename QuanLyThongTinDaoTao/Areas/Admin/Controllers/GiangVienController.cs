@@ -13,6 +13,7 @@ using System.Web.Mvc;
 
 namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class GiangVienController : Controller
     {
         private DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
