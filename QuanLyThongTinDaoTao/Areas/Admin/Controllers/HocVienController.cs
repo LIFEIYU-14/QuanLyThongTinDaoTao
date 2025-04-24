@@ -95,7 +95,8 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
                     // Cập nhật mã QR code trong database
                     // Truy vấn lại HocVien từ DbContext để update (không dùng createdUser.HocVien)
-                    var hocVienEntity = db.HocViens.FirstOrDefault(hv => hv.Id == model.Id);
+                    var hocVienEntity = db.HocViens.FirstOrDefault(hv => hv.Email == model.Email);
+
                     if (hocVienEntity != null)
                     {
                         hocVienEntity.QR_Code_HV = qrBase64;
@@ -159,7 +160,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 existingHV.NgaySinh = model.NgaySinh;
                 existingHV.SoDienThoai = model.SoDienThoai;
                 existingHV.Email = model.Email;
-                existingHV.UserName = model.Email; // hoặc giữ nguyên UserName? tùy bạn
+                existingHV.UserName = model.Email; 
                 existingHV.CoQuanLamViec = model.CoQuanLamViec;
                 existingHV.NgayCapNhat = DateTime.Now;
 

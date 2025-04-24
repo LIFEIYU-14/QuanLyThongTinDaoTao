@@ -69,13 +69,13 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
 
         [HttpGet]
-        public ActionResult Create()
+        public ActionResult Create(Guid? khoaHocId)
         {
             // Tạo mã lớp học tự động
             var lastLopHoc = db.LopHocs
                               .OrderByDescending(l => l.MaLopHoc)
                               .FirstOrDefault();
-
+          
             int newNumber = 1;
             if (lastLopHoc != null && lastLopHoc.MaLopHoc.StartsWith("MH"))
             {
@@ -84,15 +84,24 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                     newNumber = lastNumber + 1;
                 }
             }
-
             var model = new LopHoc
             {
                 MaLopHoc = $"MH{newNumber.ToString("D3")}", // Định dạng 3 chữ số
                 NgayBatDau = DateTime.Today,
                 NgayKetThuc = DateTime.Today.AddMonths(3) // Mặc định 3 tháng
             };
+            if (khoaHocId.HasValue)
+            {
+                var khoaHoc = db.KhoaHocs.FirstOrDefault(k => k.KhoaHocId == khoaHocId.Value);
+                ViewBag.TenKhoaHoc = khoaHoc?.TenKhoaHoc;
+                model.KhoaHocId = khoaHocId.Value;
+            }
 
-            ViewBag.KhoaHocList = db.KhoaHocs.ToList();
+            // Nếu không có KhoaHocId thì hiển thị dropdown
+            if (!khoaHocId.HasValue)
+            {
+                ViewBag.KhoaHocList = db.KhoaHocs.ToList();
+            }
             return View(model);
         }
 

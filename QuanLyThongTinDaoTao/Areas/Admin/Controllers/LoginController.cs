@@ -43,10 +43,11 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DangNhap(LoginViewModel model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+                return View(model);
 
             var user = await UserManager.FindByNameAsync(model.TaiKhoanOrEmail)
-                       ?? await UserManager.FindByEmailAsync(model.TaiKhoanOrEmail);
+                    ?? await UserManager.FindByEmailAsync(model.TaiKhoanOrEmail);
 
             if (user == null)
             {
@@ -54,29 +55,20 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 return View(model);
             }
 
-            var result = await SignInManager.PasswordSignInAsync(
-                user.UserName, model.MatKhau, isPersistent: false, shouldLockout: false);
+            var result = await SignInManager.PasswordSignInAsync(user.UserName, model.MatKhau, false, false);
 
-            switch (result)
+            if (result == SignInStatus.Success)
             {
-                case SignInStatus.Success:
-                    var roles = await UserManager.GetRolesAsync(user.Id);
-                    if (roles.Contains("Admin"))
-                        return RedirectToAction("Index", "HomeAdmin", new { area = "Admin" });
-                    if (roles.Contains("GiangVien"))
-                        return RedirectToAction("Index", "HomeAdmin", new { area = "Admin" });
+                var roles = await UserManager.GetRolesAsync(user.Id);
+                if (roles.Contains("Admin") || roles.Contains("GiangVien"))
+                    return RedirectToAction("Index", "HomeAdmin", new { area = "Admin" });
 
-                    return RedirectToAction("Index", "Home");
-
-                case SignInStatus.LockedOut:
-                    ModelState.AddModelError("", "Tài khoản đã bị khóa.");
-                    break;
-
-                case SignInStatus.Failure:
-                default:
-                    ModelState.AddModelError("", "Tài khoản hoặc mật khẩu không đúng.");
-                    break;
+                return RedirectToAction("Index", "Home");
             }
+
+            ModelState.AddModelError("", result == SignInStatus.LockedOut
+                ? "Tài khoản đã bị khóa."
+                : "Tài khoản hoặc mật khẩu không đúng.");
 
             return View(model);
         }

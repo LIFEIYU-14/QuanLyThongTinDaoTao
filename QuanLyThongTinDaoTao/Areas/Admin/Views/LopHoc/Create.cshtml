@@ -17,10 +17,33 @@
 
                 <!-- Mã Lớp Học (readonly) -->
                 <div class="col-md-6 mb-3">
-                    @Html.LabelFor(model => model.MaLopHoc, new { @class = "form-label" })
+                    @Html.LabelFor(model => model.MaLopHoc, "Mã Lớp Học", new { @class = "form-label" })
                     @Html.TextBoxFor(model => model.MaLopHoc, new { @class = "form-control", @readonly = "readonly" })
                     @Html.ValidationMessageFor(model => model.MaLopHoc, "", new { @class = "text-danger" })
                 </div>
+                if (Model.KhoaHocId != Guid.Empty)
+                {
+                    @Html.HiddenFor(model => model.KhoaHocId)
+
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label">Khóa Học</label>
+                        <input type="text" class="form-control" value="@ViewBag.TenKhoaHoc" readonly />
+                    </div>
+                }
+                else
+                {
+                    <!-- Chọn thủ công từ dropdown -->
+                    <div class="col-md-12 mb-3">
+                        @Html.Label("KhoaHocId", "Khóa Học", new { @class = "form-label" })
+                        <select class="form-control" name="KhoaHocId" required>
+                            <option value="">-- Chọn Khóa Học --</option>
+                            @foreach (var khoaHoc in ViewBag.KhoaHocList)
+                            {
+                                <option value="@khoaHoc.KhoaHocId">@khoaHoc.TenKhoaHoc</option>
+                            }
+                        </select>
+                    </div>
+                }
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
@@ -71,20 +94,6 @@
                     @Html.ValidationMessageFor(model => model.MoTa, "", new { @class = "text-danger" })
                 </div>
 
-
-                <div class="col-md-6 mb-3">
-                    @Html.Label("KhoaHocId", "Khóa Học", new { @class = "form-label" })
-                    <select class="form-control" name="KhoaHocId" required>
-                        <option value="">-- Chọn Khóa Học --</option>
-                        @foreach (var khoaHoc in ViewBag.KhoaHocList)
-                        {
-                            <option value="@khoaHoc.KhoaHocId" )>
-                                @khoaHoc.TenKhoaHoc
-                            </option>
-                        }
-
-                    </select>
-                </div>
 
                 <div class="mb-3">
                     <label for="attachments" class="form-label">Tệp Đính Kèm (JPG, PNG, PDF, DOCX)</label>

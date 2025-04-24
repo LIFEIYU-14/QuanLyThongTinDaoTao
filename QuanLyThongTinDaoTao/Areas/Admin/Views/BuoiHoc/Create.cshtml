@@ -13,24 +13,37 @@
             @using (Html.BeginForm("Create", "BuoiHoc", FormMethod.Post, new { enctype = "multipart/form-data" }))
             {
                 @Html.AntiForgeryToken()
+                if (Model.LopHocId != Guid.Empty)
+                {
+                    @Html.HiddenFor(model => model.LopHocId)
 
-                <div class="mb-3">
-                    @Html.Label("LopHocId", "Lớp Học", new { @class = "form-label" })
-                    <span class="text-danger">*</span>
-                    <select class="form-control" name="LopHocId" required>
-                        <option value="" class="text-center">-- Chọn Lớp Học --</option>
-                        @foreach (var lopHoc in ViewBag.LopHocList)
-                        {
-                            var ngayBatDau = lopHoc.NgayBatDau != null ? ((DateTime)lopHoc.NgayBatDau).ToString("dd/MM/yyyy") : "??";
-                            var ngayKetThuc = lopHoc.NgayKetThuc != null ? ((DateTime)lopHoc.NgayKetThuc).ToString("dd/MM/yyyy") : "??";
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label">Lớp Học</label>
+                        <input type="text" class="form-control" value="@ViewBag.TenLopHoc" readonly />
+                    </div>
+                }
+                else
+                {
+                    <!-- Chọn thủ công từ dropdown -->
+                    <div class="mb-3">
+                        @Html.Label("LopHocId", "Lớp Học", new { @class = "form-label" })
+                        <span class="text-danger">*</span>
+                        <select class="form-control" name="LopHocId" required>
+                            <option value="" class="text-center">-- Chọn Lớp Học --</option>
+                            @foreach (var lopHoc in ViewBag.LopHocList)
+                            {
+                                var ngayBatDau = lopHoc.NgayBatDau != null ? ((DateTime)lopHoc.NgayBatDau).ToString("dd/MM/yyyy") : "??";
+                                var ngayKetThuc = lopHoc.NgayKetThuc != null ? ((DateTime)lopHoc.NgayKetThuc).ToString("dd/MM/yyyy") : "??";
 
-                            <option value="@lopHoc.LopHocId">
-                                @lopHoc.TenLopHoc - (@ngayBatDau - @ngayKetThuc)
-                            </option>
-                         
-                        }
-                    </select>
-                </div>
+                                <option value="@lopHoc.LopHocId">
+                                    @lopHoc.TenLopHoc - (@ngayBatDau - @ngayKetThuc)
+                                </option>
+
+                            }
+                        </select>
+                    </div>
+                }
+
 
 
                 <div class="mb-3">
@@ -61,7 +74,7 @@
                 </div>
                 <div class="col-md-12 mb-3">
                     <label class="form-label">Chọn Giảng Viên</label>
-                  
+
                     <div id="giangVienContainer" class="border rounded p-2" style="max-height: 300px; overflow-y: auto;">
                         <!-- Sẽ được cập nhật bằng JS -->
                     </div>

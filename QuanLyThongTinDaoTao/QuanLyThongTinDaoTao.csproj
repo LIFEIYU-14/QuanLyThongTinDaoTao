@@ -265,6 +265,10 @@
     <Compile Include="Migrations\202504221718084_2304.Designer.cs">
       <DependentUpon>202504221718084_2304.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202504230709478_fixQR.cs" />
+    <Compile Include="Migrations\202504230709478_fixQR.Designer.cs">
+      <DependentUpon>202504230709478_fixQR.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ModelsHelper\DangKyHocRequest.cs" />
     <Compile Include="ModelsHelper\VerifyOtpRequest.cs" />
@@ -548,6 +552,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202504221718084_2304.resx">
       <DependentUpon>202504221718084_2304.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202504230709478_fixQR.resx">
+      <DependentUpon>202504230709478_fixQR.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

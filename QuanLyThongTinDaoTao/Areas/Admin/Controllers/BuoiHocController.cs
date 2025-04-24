@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography;
 using System.Web;
 using System.Web.Mvc;
 using QuanLyThongTinDaoTao.Models;
@@ -63,11 +64,24 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             return View(danhSachHocVien); // Trả đúng List<HocVien>
         }
         // Tạo buổi học (GET)
-        public ActionResult Create()
+        public ActionResult Create(Guid? lopHocId)
         {
-            ViewBag.LopHocList = db.LopHocs.ToList();
+            var model = new BuoiHoc();
+    
+            if (lopHocId.HasValue)
+            {
+                var lopHoc = db.LopHocs.FirstOrDefault(k => k.LopHocId == lopHocId.Value);
+                ViewBag.TenLopHoc = lopHoc?.TenLopHoc;
+                model.LopHocId = lopHocId.Value;
+            }
+
+            // Nếu không có LopHocId thì hiển thị dropdown
+            if (!lopHocId.HasValue)
+            {
+                ViewBag.LopHocList = db.LopHocs.ToList();
+            }
             ViewBag.GiangVienList = db.GiangViens.ToList();
-            return View();
+            return View(model);
         }
         // Tạo buổi học (POST)
         [HttpPost]

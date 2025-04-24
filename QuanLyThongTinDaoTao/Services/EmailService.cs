@@ -87,7 +87,8 @@ namespace QuanLyThongTinDaoTao.Services
             }
         }
 
-        public async Task SendTeacherAccountWithQrEmail(string toEmail, string taiKhoan, string matKhau, string qrCode)
+
+        public async Task SendTeacherAccountWithQrEmail(string toEmail, string taiKhoan, string matKhau, string qrCodeBase64)
         {
             try
             {
@@ -97,7 +98,8 @@ namespace QuanLyThongTinDaoTao.Services
                     mail.To.Add(toEmail);
                     mail.Subject = "Thông tin tài khoản và mã QR điểm danh";
 
-                    mail.Body = $@"
+                    // Tạo AlternateView để hỗ trợ hình ảnh inline
+                    var htmlBody = $@"
                 <p>Chào bạn,</p>
                 <p>Tài khoản giảng viên của bạn đã được tạo:</p>
                 <ul>
@@ -106,16 +108,26 @@ namespace QuanLyThongTinDaoTao.Services
                 </ul>
                 <p>Đây là mã QR dùng để điểm danh:</p>
                 <p><img src='cid:qrCodeImage' alt='QR Code' /></p>";
-                    mail.IsBodyHtml = true;
 
-                    // Đính kèm hình ảnh QR code
-                    byte[] qrBytes = Convert.FromBase64String(qrCode);
+                    var alternateView = AlternateView.CreateAlternateViewFromString(htmlBody, null, "text/html");
+
+                    // Chuyển base64 thành stream ảnh
+                    byte[] qrBytes = Convert.FromBase64String(qrCodeBase64);
                     var stream = new MemoryStream(qrBytes);
-                    var attachment = new Attachment(stream, "QRCode.png", "image/png");
-                    attachment.ContentId = "qrCodeImage";
-                    attachment.ContentDisposition.Inline = true;
-                    attachment.ContentDisposition.DispositionType = DispositionTypeNames.Inline;
-                    mail.Attachments.Add(attachment);
+
+                    var linkedResource = new LinkedResource(stream, "image/png")
+                    {
+                        ContentId = "qrCodeImage",
+                        TransferEncoding = System.Net.Mime.TransferEncoding.Base64,
+                        ContentType = new ContentType("image/png"),
+                        ContentLink = new Uri("cid:qrCodeImage")
+                    };
+
+                    alternateView.LinkedResources.Add(linkedResource);
+
+                    mail.AlternateViews.Add(alternateView);
+
+                    mail.IsBodyHtml = true;
 
                     using (var smtp = new SmtpClient(smtpHost, smtpPort))
                     {
@@ -131,7 +143,6 @@ namespace QuanLyThongTinDaoTao.Services
                 throw;
             }
         }
-
 
     }
 }
