@@ -4,20 +4,22 @@
     Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
 }
 
-<div class="container-fluid pt-4 px-4">
-    <div class="bg-light rounded p-4 shadow-sm">
-        <h4 class="mb-4 text-primary fw-bold">
-            <i class="fas fa-school"></i> Điểm Danh Học Viên
-        </h4>
-
+<div class="container-xxl py-5">
+    <div class="text-center wow fadeInUp mb-5" data-wow-delay="0.1s">
+        <h3 class="mb-5">   <i class="fas fa-user-tag me-2"></i>ĐIỂM DANH HỌC VIÊN</h3>
+    </div>
+    <div class="card-header text-white text-center d-flex flex-wrap align-items-center justify-content-center gap-2 mb-3 mt-4">
         <!-- Dropdown chọn lớp học -->
-        <select class="form-control mb-3 select2" id="LopHocId">
+        <select class="form-select w-100 mb-0" id="LopHocId">
             <option value="">-- Chọn Lớp Học Điểm Danh --</option>
             @foreach (var lopHoc in ViewBag.LopHocList)
             {
                 <option value="@lopHoc.LopHocId">Lớp: @lopHoc.TenLopHoc</option>
             }
         </select>
+    </div>
+    <div class="bg-light rounded p-4 shadow-sm">
+
 
         <!-- Danh sách buổi học của lớp được chọn -->
         <div id="buoiHocContainer" class="mb-3"></div>

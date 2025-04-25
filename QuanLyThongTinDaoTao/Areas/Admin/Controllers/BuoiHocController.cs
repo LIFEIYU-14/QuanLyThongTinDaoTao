@@ -72,6 +72,8 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             {
                 var lopHoc = db.LopHocs.FirstOrDefault(k => k.LopHocId == lopHocId.Value);
                 ViewBag.TenLopHoc = lopHoc?.TenLopHoc;
+                ViewBag.NgayBatDau = lopHoc?.NgayBatDau;
+                ViewBag.NgayKetThuc = lopHoc?.NgayKetThuc;
                 model.LopHocId = lopHocId.Value;
             }
 

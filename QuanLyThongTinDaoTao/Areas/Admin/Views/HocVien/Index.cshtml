@@ -3,112 +3,113 @@
     ViewBag.Title = "Danh Sách Học Viên";
     Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
 }
-
-<div class="container-fluid pt-4 px-4">
-    <div class="bg-light rounded p-4 shadow-sm">
-        <div class="d-flex align-items-center justify-content-between mb-4">
-            <h4 class="mb-0 text-primary fw-bold">
-                <i class="fas fa-users"></i> Danh Sách Học Viên
-            </h4>
-            <a href="@Url.Action("Create")" class="btn btn-success fs-5">
-                <i class="fas fa-plus-circle"></i> Thêm Học Viên Mới
+<div class="container-xxl py-5">
+    <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+        <h3 class="mb-5"><i class="fas fa-user-tag me-2"></i>DANH SÁCH HỌC VIÊN</h3>
+    </div>
+    <div class="bg-light rounded shadow-sm">
+        <!-- Action Bar -->
+        <div class="card-header text-white text-center d-flex flex-wrap align-items-center justify-content-center gap-2 mb-3 mt-4">
+            <a href="@Url.Action("Create")" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Thêm học viên
             </a>
+            <input type="text" class="form-control w-50" id="searchInput" placeholder="Tìm kiếm theo mã, tên, email..." />
+            <button class="btn btn-primary" type="submit">
+                <i class="fas fa-search"></i>
+            </button>
+
+            <button class="btn btn-danger d-none" id="btnXoaNhieu" onclick="xoaNhieu()">
+                <i class="bi bi-trash3"></i> Xóa Tất Cả
+            </button>
         </div>
 
+        <!-- Table -->
         <div class="table-responsive">
-            <table class="table align-middle table-bordered">
-                <thead class="table-primary">
-                    <tr class="text-center">
-                        <th>STT</th>
+            <table class="table table-bordered align-middle text-center" id="hocVienTable">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 50px;"><input type="checkbox" id="checkAll" /></th>
                         <th>Mã Học Viên</th>
                         <th>Họ và Tên</th>
                         <th>Ngày Sinh</th>
                         <th>Email</th>
                         <th>Điện Thoại</th>
-                        <th>Cơ Quan Làm Việc</th>
-                        <th>Hành Động</th>
+                        <th>Cơ Quan</th>
+                        <th>Thao Tác</th>
                     </tr>
                 </thead>
                 <tbody>
                     @{
                         int stt = 1;
-                        foreach (var item in Model)
+                        foreach (var hv in Model)
                         {
-                            <tr class="text-center">
-                                <td>@stt</td>
-                                <td>@item.MaHocVien</td>
-                                <td>@item.HoVaTen</td>
-                                <td>@item.NgaySinh.ToShortDateString()</td>
-                                <td>@item.Email</td>
-                                <td>@item.SoDienThoai</td>
-                                <td>@item.CoQuanLamViec</td>
+                            <tr>
+                                <td><input type="checkbox" class="check-item" value="@hv.Id" /></td>
+                                <td>@hv.MaHocVien</td>
+                                <td>@hv.HoVaTen</td>
+                                <td>@hv.NgaySinh.ToShortDateString()</td>
+                                <td>@hv.Email</td>
+                                <td>@hv.SoDienThoai</td>
+                                <td>@hv.CoQuanLamViec</td>
+
                                 <td>
-                                    @*<a href="@Url.Action("Details", new { id = item.NguoiDungId })" class="btn btn-info btn-sm m-2 ">
-                                        <i class="fas fa-eye"></i> Xem
-                                    </a>*@
-                                    <a href="@Url.Action("Edit", new { id = item.Id })" class="btn btn-warning btn-sm m-2">
-                                        <i class="fas fa-edit"></i> Chỉnh Sửa
+                                    <a href="@Url.Action("Edit", new { id = hv.Id })" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
                                     </a>
-                                    <a href="@Url.Action("Delete", new { id = item.Id })" class="btn btn-danger btn-sm m-2" onclick="return confirm('Bạn có chắc chắn muốn xóa học viên này?');">
-                                        <i class="fas fa-trash-alt"></i> Xóa
+                                    <a href="@Url.Action("Delete", new { id = hv.Id })" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa học viên này?');">
+                                        <i class="fas fa-trash-alt"></i>
                                     </a>
                                 </td>
                             </tr>
-
                             stt++;
                         }
                     }
                 </tbody>
             </table>
         </div>
+
+        <!-- Pagination -->
+        <nav>
+            <ul class="pagination justify-content-center">
+                <li class="page-item"><a class="page-link" href="#">Trang đầu</a></li>
+                <li class="page-item"><a class="page-link" href="#">Trước</a></li>
+                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item"><a class="page-link" href="#">Sau</a></li>
+                <li class="page-item"><a class="page-link" href="#">Trang cuối</a></li>
+            </ul>
+        </nav>
     </div>
 </div>
+<script>
+    // Check all
+    $("#checkAll").click(function () {
+        $(".check-item").prop('checked', $(this).prop('checked'));
+        toggleDeleteButton();
+    });
 
-<style>
-    .table th, .table td {
-        vertical-align: middle !important;
+    // Toggle delete button
+    $(".check-item").on('change', function () {
+        toggleDeleteButton();
+    });
+
+    function toggleDeleteButton() {
+        let anyChecked = $(".check-item:checked").length > 0;
+        $("#btnXoaNhieu").toggleClass("d-none", !anyChecked);
     }
 
-    .table-striped tbody tr:nth-of-type(odd) {
-        background-color: #f9f9f9;
-    }
+    function xoaNhieu() {
+        let ids = $(".check-item:checked").map(function () {
+            return $(this).val();
+        }).get();
 
-    .table-bordered th, .table-bordered td {
-        border: 1px solid #dee2e6;
-    }
+        if (ids.length === 0) return;
 
-    .btn-sm {
-        font-size: 0.875rem;
-        padding: 0.25rem 0.5rem;
-    }
-
-    .btn-info {
-        background-color: #17a2b8;
-        border-color: #17a2b8;
-    }
-
-        .btn-info:hover {
-            background-color: #138496;
-            border-color: #117a8b;
+        if (confirm("Bạn có chắc chắn muốn xóa các học viên đã chọn?")) {
+            // Gọi API hoặc form submit xóa nhiều
+            console.log("IDs to delete:", ids);
+            // TODO: AJAX hoặc POST xử lý
         }
-
-    .btn-warning {
-        background-color: #ffc107;
-        border-color: #ffc107;
     }
-
-        .btn-warning:hover {
-            background-color: #e0a800;
-            border-color: #d39e00;
-        }
-
-    .btn-danger {
-        background-color: #dc3545;
-        border-color: #dc3545;
-    }
-
-        .btn-danger:hover {
-            background-color: #c82333;
-            border-color: #bd2130;
-        }
-</style>
+</script>

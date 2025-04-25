@@ -25,7 +25,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>Admin</title>
+    <title>Trung Tâm Đào Tạo</title>
     <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
     <link href="~/Areas/Admin/Asset/css/styles.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
@@ -48,7 +48,7 @@
         <div class="collapse navbar-collapse" id="navbarSearch">
             <!-- Wrapper để gom cả tìm kiếm và thông tin tài khoản gần nhau -->
             <div class="d-flex align-items-center mx-lg-auto" style="max-width: 700px; width: 100%;">
-                <!-- Form tìm kiếm -->
+                 @*Form tìm kiếm 
                 <form class="d-flex flex-grow-1 me-3">
                     <div class="input-group">
                         <input type="search" class="form-control border-0" placeholder="🔍 Tìm kiếm..."
@@ -57,7 +57,7 @@
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
-                </form>
+                </form>*@
 
                 <!-- User Dropdown (cạnh thanh tìm kiếm) -->
                 <div class="dropdown">
@@ -87,28 +87,70 @@
         <div id="layoutSidenav_nav">
             <nav class="sb-sidenav accordion bg-secondary " id="sidenavAccordion">
                 <div class="sb-sidenav-menu text-bg-light">
-                    <div class="nav ">
+                    <div class="nav">
                         <br />
                         @if (role == "Admin")
                         {
                             <a href="@Url.Action("Index", "HomeAdmin")" class="nav-item nav-link">
                                 <i class="fa fa-tachometer-alt me-2"></i>Trang chủ
                             </a>
-                            <a href="@Url.Action("Index", "KhoaHoc")" class="nav-item nav-link">
-                                <i class="fa-solid fa-graduation-cap me-2"></i>Khóa Học
-                            </a>
-                            <a href="@Url.Action("Index", "LopHoc")" class="nav-item nav-link">
-                                <i class="fa fa-th me-2"></i>Lớp Học
-                            </a>
-                            <a href="@Url.Action("Index", "BuoiHoc")" class="nav-item nav-link">
-                                <i class="fas fa-calendar-alt me-2"></i>Buổi Học
-                            </a>
-                            <a href="@Url.Action("Index", "HocVien")" class="nav-item nav-link">
-                                <i class="fa fa-keyboard me-2"></i>Học Viên
-                            </a>
-                            <a href="@Url.Action("Index", "GiangVien")" class="nav-item nav-link">
-                                <i class="fa fa-keyboard me-2"></i>Giảng Viên
-                            </a>
+
+                            <!-- KHÓA HỌC -->
+                            <div class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="dropdownKhoaHoc" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa-solid fa-graduation-cap me-2"></i>Quản Lý Khóa Học
+                                </a>
+                                <ul class="dropdown-menu bg-light border-0" aria-labelledby="dropdownKhoaHoc">
+                                    <li><a class="dropdown-item" href="@Url.Action("Index", "KhoaHoc")"><i class="fa-solid fa-graduation-cap me-2"></i>Danh sách Khóa Học</a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("Create", "KhoaHoc")"><i class="fa-solid fa-graduation-cap me-2"></i>Thêm Khóa Học</a></li>
+                                </ul>
+                            </div>
+
+                            <!-- LỚP HỌC -->
+                            <div class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="dropdownLopHoc" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-school me-2"></i>Quản Lý Lớp Học
+                                </a>
+                                <ul class="dropdown-menu bg-light border-0" aria-labelledby="dropdownLopHoc">
+                                    <li><a class="dropdown-item" href="@Url.Action("Index", "LopHoc")"> <i class="fas fa-school me-2"></i>Danh sách Lớp Học</a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("Create", "LopHoc")"> <i class="fas fa-school me-2"></i>Thêm Lớp Học</a></li>
+                                </ul>
+                            </div>
+
+                            <!-- BUỔI HỌC -->
+                            <div class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="dropdownBuoiHoc" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-calendar-alt me-2"></i>Quản Lý Buổi Học
+                                </a>
+                                <ul class="dropdown-menu bg-light border-0" aria-labelledby="dropdownBuoiHoc">
+                                    <li><a class="dropdown-item" href="@Url.Action("Index", "BuoiHoc")"><i class="fas fa-calendar-alt me-2"></i>Danh sách Buổi Học</a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("Create", "BuoiHoc")"><i class="fas fa-calendar-alt me-2"></i>Thêm Buổi Học</a></li>
+                                </ul>
+                            </div>
+
+                            <!-- HỌC VIÊN -->
+                            <div class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="dropdownHocVien" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-user-tag me-2"></i>Quản Lý Học Viên
+                                </a>
+                                <ul class="dropdown-menu bg-light border-0" aria-labelledby="dropdownHocVien">
+                                    <li><a class="dropdown-item" href="@Url.Action("Index", "HocVien")">Danh sách Học Viên</a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("Create", "HocVien")">Thêm Học Viên</a></li>
+                                </ul>
+                            </div>
+
+                            <!-- GIẢNG VIÊN -->
+                            <div class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="dropdownGiangVien" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa fa-keyboard me-2"></i>Quản Lý Giảng Viên
+                                </a>
+                                <ul class="dropdown-menu bg-light border-0" aria-labelledby="dropdownGiangVien">
+                                    <li><a class="dropdown-item" href="@Url.Action("Index", "GiangVien")">Danh sách Giảng Viên</a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("Create", "GiangVien")">Thêm Giảng Viên</a></li>
+                                </ul>
+                            </div>
+
+                            <!-- Các mục còn lại không đổi -->
                             <a href="@Url.Action("Index", "DiemDanhHocVien")" class="nav-item nav-link">
                                 <i class="fas fa-check-circle me-2"></i>Điểm danh Học Viên
                             </a>
@@ -116,9 +158,11 @@
                                 <i class="fas fa-check-circle me-2"></i>Điểm danh Giảng Viên
                             </a>
                             <a href="@Url.Action("Index", "PhanQuyen")" class="nav-item nav-link">
-                                <i class="fa fa-keyboard me-2"></i>Phân Quyền Người Dùng
+                                <i class="fa fa-user-shield me-2"></i>Phân Quyền Người Dùng
                             </a>
                         }
+
+
                         else if (role == "GiangVien")
                         {
                             <a href="@Url.Action("Index", "HomeAdmin")" class="nav-item nav-link">
@@ -127,12 +171,11 @@
                             <a href="@Url.Action("DanhSachBuoiDay", "DiemDanhHocVien")" class="nav-item nav-link">
                                 <i class="fas fa-calendar-alt me-2"></i>Lịch Dạy Của Tôi
                             </a>
-
                         }
 
                         <div class="sb-sidenav-footer">
                             @*<div class="small">Logged in as:</div>
-                                Start Bootstrap*@
+            Start Bootstrap*@
                         </div>
                     </div>
                 </div>

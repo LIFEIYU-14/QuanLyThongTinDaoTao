@@ -5,39 +5,47 @@
     Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
 }
 
-<div class="container-fluid pt-4 px-4">
+<div class="container-xxl py-5">
     <div class="bg-light rounded p-4 shadow-sm">
-        <div class="d-flex align-items-center justify-content-between mb-4">
-            <h4 class="mb-0 text-primary fw-bold">
-                <i class="fas fa-school"></i> Danh Sách Lớp Học
-            </h4>
-            <a href="@Url.Action("Create")" class="btn btn-success fs-5">
-                <i class="fas fa-plus-circle"></i> Thêm Lớp Học Mới
+        <div class="text-center wow fadeInUp mb-5" data-wow-delay="0.1s">
+            <h3 class="mb-5">      <i class="fas fa-school"></i> DANH SÁCH LỚP HỌC</h3>
+        </div>
+        <div class="card-header text-white text-center d-flex flex-wrap align-items-center justify-content-center gap-2 mb-3 mt-4">
+            <a href="@Url.Action("Create")" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Thêm lớp học
             </a>
+            <input type="text" class="form-control w-50" id="searchInput" placeholder="Tìm kiếm theo mã, tên,.." />
+            <button class="btn btn-primary" type="submit" id="btnTimKiem">
+                <i class="fas fa-search"></i>
+            </button>
+            <button class="btn btn-danger d-none" id="btnXoaNhieu" onclick="xoaNhieu()">
+                <i class="bi bi-trash3"></i> Xóa đã chọn
+            </button>
+        </div>
+        <div class="card-header text-white text-center d-flex flex-wrap align-items-center justify-content-center gap-2 mb-3 mt-4">
+            <!-- Dropdown chọn khóa học -->
+            <select id="KhoaHocId" name="KhoaHocId" class="form-select w-100 mb-0">
+                <option value="" class="text-center">-- Tất cả Khóa Học --</option>
+                @foreach (var khoaHoc in ViewBag.KhoaHocList)
+                {
+                    <option value="@khoaHoc.KhoaHocId" class="text-center">@khoaHoc.TenKhoaHoc</option>
+                }
+            </select>
         </div>
 
-        <!-- Dropdown chọn khóa học -->
-        <select class="form-control mb-3" id="KhoaHocId" name="KhoaHocId">
-            <option value="" class="text-center">-- Tất cả Khóa Học --</option>
-            @foreach (var khoaHoc in ViewBag.KhoaHocList)
-            {
-                <option value="@khoaHoc.KhoaHocId"  class="text-center">@khoaHoc.TenKhoaHoc</option>
-            }
-        </select>
-
         <div class="table-responsive">
-            <table class="table align-middle table-bordered">
-                <thead class="table-primary">
-                    <tr class="text-center">
+            <table class="table table-bordered align-middle">
+                <thead class="table-primary text-center">
+                    <tr>
                         <th>STT</th>
-                        <th scope="col">Mã Lớp Học</th>
-                        <th scope="col">Tên Lớp Học</th>
-                        <th scope="col">Tên Khóa Học</th>
-                        <th scope="col">Số Tín Chỉ</th>
-                        <th scope="col">Ngày Bắt Đầu</th>
-                        <th scope="col">Ngày Kết Thúc</th>
-                        <th scope="col">Trạng Thái</th>
-                        <th scope="col">Hành Động</th>
+                        <th>Mã Lớp Học</th>
+                        <th>Tên Lớp Học</th>
+                        <th>Tên Khóa Học</th>
+                        <th>Số Tín Chỉ</th>
+                        <th>Ngày Bắt Đầu</th>
+                        <th>Ngày Kết Thúc</th>
+                        <th>Trạng Thái</th>
+                        <th>Hành Động</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
@@ -45,50 +53,53 @@
                 </tbody>
             </table>
         </div>
+
     </div>
 </div>
 
-<script>
-    $(document).ready(function () {
-        $("#KhoaHocId").change(function () {
-            var khoaHocId = $(this).val();
+    <script>
+    $(function () {
+        // Xử lý khi chọn khóa học trong dropdown
+        $('#KhoaHocId').change(function () {
+            var khoaHocId = $(this).val() || null;
+
             $.ajax({
                 url: '@Url.Action("FilterByKhoaHoc", "LopHoc")',
                 type: 'GET',
-                data: { khoaHocId: khoaHocId || null },
+                data: { khoaHocId: khoaHocId },
                 success: function (data) {
                     if (data.error) {
-                        $("#tableBody").html('<tr><td colspan="7" class="text-center text-danger"><strong>' + data.error + '</strong></td></tr>');
+                        $('#tableBody').html('<tr><td colspan="9" class="text-center text-danger"><strong>' + data.error + '</strong></td></tr>');
                     } else {
-                        $("#tableBody").html(data);
+                        $('#tableBody').html(data);
                     }
                 },
                 error: function (xhr) {
-                    console.log("Lỗi khi tải dữ liệu: " + xhr.responseText);
+                    console.error("Lỗi khi tải dữ liệu: " + xhr.responseText);
                 }
             });
         });
-    });
-    function capNhatTrangThaiLopHoc() {
-        $.ajax({
-            url: '@Url.Action("GetTrangThaiLopHoc", "LopHoc")',
-            method: 'GET',
-            success: function (data) {
-                data.forEach(function (lop) {
-                    var row = $('#row-' + lop.LopHocId);
-                    var badge = '<span class="badge ' + lop.BadgeClass + '">' + lop.TrangThai + '</span>';
-                    row.find('.trang-thai').html(badge);
-                });
-            },
-            error: function () {
-                console.error("Lỗi khi cập nhật trạng thái lớp học.");
-            }
-        });
-    }
 
-    // Tự động gọi cập nhật trạng thái mỗi 30s
-    setInterval(capNhatTrangThaiLopHoc, 30000);
-    $(document).ready(function () {
+        // Hàm cập nhật trạng thái lớp học (badge)
+        function capNhatTrangThaiLopHoc() {
+            $.ajax({
+                url: '@Url.Action("GetTrangThaiLopHoc", "LopHoc")',
+                method: 'GET',
+                success: function (data) {
+                    data.forEach(function (lop) {
+                        var row = $('#row-' + lop.LopHocId);
+                        var badge = '<span class="badge ' + lop.BadgeClass + '">' + lop.TrangThai + '</span>';
+                        row.find('.trang-thai').html(badge);
+                    });
+                },
+                error: function () {
+                    console.error("Lỗi khi cập nhật trạng thái lớp học.");
+                }
+            });
+        }
+
+        // Gọi cập nhật trạng thái khi trang load và mỗi 30s
         capNhatTrangThaiLopHoc();
+        setInterval(capNhatTrangThaiLopHoc, 30000);
     });
-</script>
+    </script>

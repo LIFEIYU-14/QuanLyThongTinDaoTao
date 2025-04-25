@@ -7,6 +7,14 @@
     var fromDateValue = ViewBag.FromDate ?? Request.QueryString["fromDate"];
     var toDateValue = ViewBag.ToDate ?? Request.QueryString["toDate"];
     var selectedLopHocId = ViewBag.SelectedLopHocId ?? Request.QueryString["lopHocId"];
+    DateTime weekStart;
+    if (!DateTime.TryParse(Request["startDate"], out weekStart))
+    {
+        weekStart = DateTime.Today;
+        int dow = (int)weekStart.DayOfWeek;
+        dow = dow == 0 ? 7 : dow;
+        weekStart = weekStart.AddDays(1 - dow);
+    }
 }
 
 <style>
@@ -16,43 +24,47 @@
 </style>
 
 <div class="container-fluid pt-4 px-4">
+    <div class="text-center wow fadeInUp mb-5" data-wow-delay="0.1s">
+        <h3 class="mb-5"><i class="fa-solid fa-graduation-cap me-2"></i>ĐIỂM DANH GIẢNG VIÊN</h3>
+    </div>
     <div class="card-header">
-        <h3 class="card-title text-center">Điểm Danh Giảng viên</h3>
         <div class="card-tools">
-            @using (Html.BeginForm("Index", "DiemDanhGiangVien", FormMethod.Get, new { @class = "form-inline" }))
+            @using (Html.BeginForm("Index", "DiemDanhGiangVien", FormMethod.Get, new { @class = "d-flex flex-wrap align-items-center justify-content-center gap-3 mb-4" }))
             {
-                <div class="form-row align-items-center">
-                    <div class="row">
-                        <div class="col-md-3 md-3">
-                            <label for="fromDate" class="sr-only">Từ ngày</label>
-                            <input type="date" id="fromDate" name="fromDate" class="form-control mb-2" value="@fromDateValue">
-                        </div>
+                <div class="form-group mb-2">
+                    <label for="fromDate" class="form-label visually-hidden">Từ ngày</label>
+                    <input type="date" id="fromDate" name="fromDate" class="form-control" value="@fromDateValue" placeholder="Từ ngày" />
+                </div>
 
-                        <div class="col-md-3 md-3">
-                            <label for="toDate" class="sr-only">Đến ngày</label>
-                            <input type="date" id="toDate" name="toDate" class="form-control mb-2" value="@toDateValue">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-3">
-                            <label for="lopHocId" class="sr-only">Lớp học</label>
-                            @Html.DropDownList("lopHocId",
-                                new SelectList(ViewBag.LopHocs, "LopHocId", "TenLopHoc", selectedLopHocId),
-                                "Tất cả lớp",
-                                new { @class = "form-control mb-2", @id = "lopHocId" })
-                        </div>
+                <div class="form-group mb-2">
+                    <label for="toDate" class="form-label visually-hidden">Đến ngày</label>
+                    <input type="date" id="toDate" name="toDate" class="form-control" value="@toDateValue" placeholder="Đến ngày" />
+                </div>
 
-                        <div class="col-md-3">
-                            <button type="submit" class="btn btn-primary mb-2">
-                                <i class="fas fa-search"></i> Lọc
-                            </button>
-                        </div>
-                    </div>
-                    
+                <div class="form-group mb-2" style="min-width: 200px;">
+                    @Html.DropDownList("lopHocId",
+                        new SelectList(ViewBag.LopHocs, "LopHocId", "TenLopHoc", selectedLopHocId),
+                        "Chọn lớp học",
+                        new { @class = "form-select", @id = "lopHocId" })
+                </div>
 
-                  
+                <div class="form-group mb-2">
+                    <button type="submit" class="btn btn-primary px-4 d-flex align-items-center gap-2">
+                        <i class="fas fa-search"></i> Tìm kiếm
+                    </button>
                 </div>
             }
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <div>
+            <strong>Tuần từ:</strong> <span id="weekRangeText">@weekStart.ToString("dd/MM/yyyy") đến @weekStart.AddDays(6).ToString("dd/MM/yyyy")</span>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-sm btn-outline-primary" onclick="changeWeek(-7)">← Trở về</button>
+            <button class="btn btn-sm btn-outline-success" onclick="changeWeek(0)">Hôm nay</button>
+            <button class="btn btn-sm btn-outline-primary" onclick="changeWeek(7)">Tiếp →</button>
         </div>
     </div>
 
@@ -69,47 +81,56 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var buoiHoc in Model)
+                @if (Model != null && Model.Any())
                 {
-                    var firstRow = true;
-                    var rowCount = buoiHoc.GiangVien_BuoiHocs.Count;
-                    var thu = buoiHoc.NgayHoc.ToString("dddd", new System.Globalization.CultureInfo("vi-VN"));
-
-                    foreach (var gv in buoiHoc.GiangVien_BuoiHocs)
+                    foreach (var buoiHoc in Model)
                     {
-                        var diemDanh = diemDanhs?.FirstOrDefault(d => d.BuoiHocId == buoiHoc.BuoiHocId && d.AppUserId == gv.AppUserId);
+                        var firstRow = true;
+                        var rowCount = buoiHoc.GiangVien_BuoiHocs.Count;
+                        var thu = buoiHoc.NgayHoc.ToString("dddd", new System.Globalization.CultureInfo("vi-VN"));
 
-                        <tr>
-                            @if (firstRow)
-                            {
-                                <td rowspan="@rowCount">
-                                    <small class="text-primary fw-bold fs-5">@thu</small>
-                                    <br />
-                                    @buoiHoc.NgayHoc.ToString("dd/MM/yyyy")
+                        foreach (var gv in buoiHoc.GiangVien_BuoiHocs)
+                        {
+                            var diemDanh = diemDanhs?.FirstOrDefault(d => d.BuoiHocId == buoiHoc.BuoiHocId && d.AppUserId == gv.AppUserId);
+
+                            <tr>
+                                @if (firstRow)
+                                {
+                                    <td rowspan="@rowCount">
+                                        <small class="text-primary fw-bold fs-5">@thu</small>
+                                        <br />
+                                        @buoiHoc.NgayHoc.ToString("dd/MM/yyyy")
+                                    </td>
+                                    <td rowspan="@rowCount">@buoiHoc.GioBatDau.ToString(@"hh\:mm") - @buoiHoc.GioKetThuc.ToString(@"hh\:mm")</td>
+                                    <td rowspan="@rowCount">@buoiHoc.LopHoc.TenLopHoc</td>
+                                    <td>@gv.GiangVien.HoVaTen</td>
+                                    <td rowspan="@rowCount">@buoiHoc.TrangThai</td>
+                                    firstRow = false;
+                                }
+                                else
+                                {
+                                    <td>@gv.GiangVien.HoVaTen</td>
+                                }
+
+                                <td width="200px">
+                                    <select class="form-control trang-thai-diem-danh"
+                                            data-buoihoc-id="@buoiHoc.BuoiHocId"
+                                            data-giangvien-id="@gv.AppUserId">
+                                        <option value="-1" class="text-center" @(diemDanh == null ? "selected" : "")>Chưa điểm danh</option>
+                                        <option value="0" class="text-center" @(diemDanh?.TrangThai == DiemDanh_GV.TrangThaiDiemDanhGV.CoMat ? "selected" : "")>Có mặt</option>
+                                        <option value="1" class="text-center" @(diemDanh?.TrangThai == DiemDanh_GV.TrangThaiDiemDanhGV.VangCoPhep ? "selected" : "")>Vắng có phép</option>
+                                        <option value="2" class="text-center" @(diemDanh?.TrangThai == DiemDanh_GV.TrangThaiDiemDanhGV.VangKhongPhep ? "selected" : "")>Vắng không phép</option>
+                                    </select>
                                 </td>
-                                <td rowspan="@rowCount">@buoiHoc.GioBatDau.ToString(@"hh\:mm") - @buoiHoc.GioKetThuc.ToString(@"hh\:mm")</td>
-                                <td rowspan="@rowCount">@buoiHoc.LopHoc.TenLopHoc</td>
-                                <td>@gv.GiangVien.HoVaTen</td>
-                                <td rowspan="@rowCount">@buoiHoc.TrangThai</td>
-                                firstRow = false;
-                            }
-                            else
-                            {
-                                <td>@gv.GiangVien.HoVaTen</td>
-                            }
-
-                            <td width="200px">
-                                <select class="form-control trang-thai-diem-danh"
-                                        data-buoihoc-id="@buoiHoc.BuoiHocId"
-                                        data-giangvien-id="@gv.AppUserId">
-                                    <option value="-1" class="text-center" @(diemDanh == null ? "selected" : "")>Chưa điểm danh</option>
-                                    <option value="0" class="text-center" @(diemDanh?.TrangThai == DiemDanh_GV.TrangThaiDiemDanhGV.CoMat ? "selected" : "")>Có mặt</option>
-                                    <option value="1" class="text-center" @(diemDanh?.TrangThai == DiemDanh_GV.TrangThaiDiemDanhGV.VangCoPhep ? "selected" : "")>Vắng có phép</option>
-                                    <option value="2" class="text-center" @(diemDanh?.TrangThai == DiemDanh_GV.TrangThaiDiemDanhGV.VangKhongPhep ? "selected" : "")>Vắng không phép</option>
-                                </select>
-                            </td>
-                        </tr>
+                            </tr>
+                        }
                     }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-danger fw-bold">Không có dữ liệu để hiển thị</td>
+                    </tr>
                 }
             </tbody>
         </table>
@@ -123,70 +144,86 @@
 </div>
 
 <script>
-    $(document).ready(function () {
-        $('#btnLuuDiemDanh').click(function () {
-            var danhSachDiemDanh = [];
+    // Đặt hàm và biến lên đầu để có thể gọi khi onclick button
+    function formatDateForInput(dateString) {
+        if (!dateString) return '';
+        var date = new Date(dateString);
+        return date.toISOString().split('T')[0];
+    }
 
-            $('.trang-thai-diem-danh').each(function () {
-                var buoiHocId = $(this).data('buoihoc-id');
-                var giangvienId = $(this).data('giangvien-id');
-                var trangThai = $(this).val();
-                if (trangThai == -1) return;
-                danhSachDiemDanh.push({
-                    BuoiHocId: buoiHocId,
-                    AppUserId: giangvienId,
-                    TrangThai: trangThai
-                });
-            });
+    let currentFromDate = new Date($('input[name="fromDate"]').val() || new Date());
+    let currentToDate = new Date($('input[name="toDate"]').val() || new Date());
 
-            if (danhSachDiemDanh.length === 0) {
-                alert("Không có dữ liệu để lưu.");
-                return;
-            }
+    function changeWeek(offsetDays) {
+        let today = new Date();
 
-            $.ajax({
-                url: '@Url.Action("LuuDiemDanh", "DiemDanhGiangVien")',
-                method: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(danhSachDiemDanh),
-                success: function (res) {
-                    if (res.success) {
-                        alert(res.message || "Lưu điểm danh thành công!");
-                        res.updatedAttendance.forEach(function (att) {
-                            var dropdown = $('select[data-giangvien-id="' + att.AppUserId + '"][data-buoihoc-id="' + att.BuoiHocId + '"]');
-                            dropdown.val(att.TrangThai);
-                        });
-                    } else {
-                        toastr.error(res.message);
-                    }
-                },
-                error: function (err) {
-                    toastr.error("Lỗi khi gửi dữ liệu điểm danh!");
-                    console.error(err);
-                }
-            });
-        });
+        if (offsetDays === 0) {
+            // Reset về tuần hiện tại
+            let dayOfWeek = today.getDay(); // 0 (Sun) - 6 (Sat)
+            let startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+            let endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
 
-        $('form').submit(function (e) {
-            var fromDate = new Date($('input[name="fromDate"]').val());
-            var toDate = new Date($('input[name="toDate"]').val());
-
-            if ($('input[name="fromDate"]').val() && $('input[name="toDate"]').val()) {
-                if (fromDate > toDate) {
-                    alert("Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc.");
-                    e.preventDefault();
-                }
-            }
-        });
-
-        function formatDateForInput(dateString) {
-            if (!dateString) return '';
-            var date = new Date(dateString);
-            return date.toISOString().split('T')[0];
+            currentFromDate = startOfWeek;
+            currentToDate = endOfWeek;
+        } else {
+            // Di chuyển tuần theo offset
+            currentFromDate.setDate(currentFromDate.getDate() + offsetDays);
+            currentToDate.setDate(currentToDate.getDate() + offsetDays);
         }
 
-        var urlParams = new URLSearchParams(window.location.search);
-        $('input[name="fromDate"]').val(formatDateForInput(urlParams.get('fromDate')));
-        $('input[name="toDate"]').val(formatDateForInput(urlParams.get('toDate')));
+        // Cập nhật giá trị input và submit form
+        $('input[name="fromDate"]').val(formatDateForInput(currentFromDate));
+        $('input[name="toDate"]').val(formatDateForInput(currentToDate));
+        $('form').submit();
+    }
+
+    function updateWeekRangeText() {
+        let from = new Date($('input[name="fromDate"]').val());
+        let to = new Date($('input[name="toDate"]').val());
+        if (!isNaN(from.getTime()) && !isNaN(to.getTime())) {
+            let fromStr = from.toLocaleDateString('vi-VN');
+            let toStr = to.toLocaleDateString('vi-VN');
+            $('#weekRangeText').text(`${fromStr} đến ${toStr}`);
+        }
+    }
+
+    $(document).ready(function () {
+        // Cập nhật text hiển thị tuần khi load
+        updateWeekRangeText();
+
+        // Khi thay đổi 2 input date thủ công cũng cập nhật text
+        $('input[name="fromDate"], input[name="toDate"]').on('change', function () {
+            updateWeekRangeText();
+        });
+
+        // Lưu điểm danh theo từng select box
+        $('.trang-thai-diem-danh').change(function () {
+            let buoiHocId = $(this).data('buoihoc-id');
+            let giangVienId = $(this).data('giangvien-id');
+            let trangThai = $(this).val();
+
+            $.ajax({
+                url: '@Url.Action("SaveDiemDanh", "DiemDanhGiangVien")',
+                type: 'POST',
+                data: { buoiHocId: buoiHocId, giangVienId: giangVienId, trangThai: trangThai },
+                success: function (response) {
+                    if (response.success) {
+                        toastr.success('Cập nhật điểm danh thành công!');
+                    } else {
+                        toastr.error('Lỗi khi cập nhật điểm danh.');
+                    }
+                },
+                error: function () {
+                    toastr.error('Có lỗi xảy ra khi cập nhật điểm danh.');
+                }
+            });
+        });
+
+        // Lưu tất cả điểm danh
+        $('#btnLuuDiemDanh').click(function () {
+            $('form').submit();
+        });
     });
 </script>

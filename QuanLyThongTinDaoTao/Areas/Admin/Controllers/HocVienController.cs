@@ -131,7 +131,8 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         // GET: Admin/HocVien/Edit/{id}
         public async Task<ActionResult> Edit(string id)
         {
-            if (string.IsNullOrEmpty(id)) return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            if (string.IsNullOrEmpty(id)) 
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
 
             var hocVien = await UserManager.FindByIdAsync(id);
             if (hocVien == null) return HttpNotFound();
