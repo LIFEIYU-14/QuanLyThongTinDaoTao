@@ -68,7 +68,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 foreach (var diemDanh in danhSachDiemDanh)
                 {
                     var existingRecord = db.DiemDanhs_GVs
-                        .FirstOrDefault(d => d.AppUserId == diemDanh.AppUserId && d.BuoiHocId == diemDanh.BuoiHocId);
+                        .FirstOrDefault(d => d.GiangVienId == diemDanh.GiangVienId && d.BuoiHocId == diemDanh.BuoiHocId);
 
                     if (existingRecord == null)
                     {
@@ -84,7 +84,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
                     updatedAttendance.Add(new
                     {
-                        diemDanh.AppUserId,
+                        diemDanh.GiangVienId,
                         diemDanh.BuoiHocId,
                         diemDanh.TrangThai
                     });

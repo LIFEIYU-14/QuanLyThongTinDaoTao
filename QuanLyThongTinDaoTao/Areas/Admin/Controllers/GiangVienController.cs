@@ -16,7 +16,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
     [Authorize(Roles = "Admin")]
     public class GiangVienController : Controller
     {
-        private DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
+        private readonly DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
 
         private AppUserManager _userManager;
         public AppUserManager UserManager
@@ -25,212 +25,216 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             private set => _userManager = value;
         }
 
-        // GET: Admin/GiangVien
         public ActionResult Index()
         {
-            var dsGiangVien = db.GiangViens.ToList();
-            return View(dsGiangVien);
+            var list = db.GiangViens.Include(g => g.AppUser).ToList();
+            return View(list);
         }
 
-        // GET: Admin/GiangVien/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: Admin/GiangVien/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(GiangVien gv)
+        public async Task<ActionResult> Create(GiangVien model)
         {
             if (!ModelState.IsValid)
-                return View(gv);
+                return View(model);
 
-            if (db.Users.Any(u => u.Email == gv.Email))
+            // Kiểm tra email đã tồn tại
+            var existingUser = await UserManager.FindByEmailAsync(model.Email);
+            if (existingUser != null)
             {
                 ModelState.AddModelError("Email", "Email đã tồn tại trong hệ thống.");
-                return View(gv);
+                return View(model);
             }
 
-            // Tạo mã giảng viên
-            var lastGV = db.GiangViens
-                .OrderByDescending(g => g.MaGiangVien)
-                .FirstOrDefault();
-
-            int lastNumber = 0;
-            if (lastGV != null && int.TryParse(lastGV.MaGiangVien.Substring(2), out int number))
+            try
             {
-                lastNumber = number;
-            }
+                // Sinh mã giảng viên duy nhất
+                var lastGiangVien = db.GiangViens
+                       .OrderByDescending(g => g.MaGiangVien)
+                       .FirstOrDefault();
 
-            gv.MaGiangVien = "GV" + (lastNumber + 1).ToString("D3");
-            gv.UserName = gv.Email;
-            gv.NgayTao = DateTime.Now;
-            gv.NgayCapNhat = DateTime.Now;
-            gv.QR_Code_GV = Guid.NewGuid().ToString();
+                int number = 1;
+                if (lastGiangVien != null && lastGiangVien.MaGiangVien.StartsWith("GV"))
+                {
+                    string numberPart = lastGiangVien.MaGiangVien.Substring(2); 
+                    if (int.TryParse(numberPart, out int lastNumber))
+                    {
+                        number = lastNumber + 1;
+                    }
+                }
 
-            string matKhauGoc = gv.MaGiangVien + "123456";
+                string maGiangVien = "GV" + number.ToString("D3"); // GV001, GV002, ...
+                model.MaGiangVien = maGiangVien;
 
-            var result = await UserManager.CreateAsync(gv, matKhauGoc);
-            if (!result.Succeeded)
-            {
-                foreach (var err in result.Errors)
-                    ModelState.AddModelError("", err);
-                return View(gv);
-            }
+                // Tạo AppUser
+                var appUser = new AppUser
+                {
+                    UserName = model.Email,
+                    Email = model.Email,
+                    EmailConfirmed = true,
+                    NgayTao = DateTime.Now,
+                    NgayCapNhat = DateTime.Now
+                };
 
-            await UserManager.AddToRoleAsync(gv.Id, "GiangVien");
+                string defaultPassword = model.MaGiangVien + "123456";
+                var result = await UserManager.CreateAsync(appUser, defaultPassword);
 
-            // Tạo QR code
-            var giangVienService = new GiangVienService(db);
-            string qrCodeBase64 = giangVienService.GenerateQRCodeForTeacher(gv.Id);
+                if (!result.Succeeded)
+                {
+                    foreach (var error in result.Errors)
+                        ModelState.AddModelError("", error);
+                    return View(model);
+                }
 
-            // Cập nhật QR code
-            var gvInDb = await db.GiangViens.FindAsync(gv.Id);
-            if (gvInDb != null)
-            {
-                gvInDb.QR_Code_GV = qrCodeBase64;
+                // Gán role Giảng Viên
+                await UserManager.AddToRoleAsync(appUser.Id, "GiangVien");
+
+                // Gán dữ liệu giảng viên
+                model.GiangVienId = Guid.NewGuid().ToString();
+                model.AppUserId = appUser.Id;
+
+                db.GiangViens.Add(model);
                 await db.SaveChangesAsync();
+
+                try
+                {
+                    // Sinh mã QR và gửi email
+                    var giangVienService = new GiangVienService(db);
+                    string qrBase64 = giangVienService.GenerateQRCodeForTeacher(model.GiangVienId);
+                    model.QR_Code_GV = qrBase64;
+                    await db.SaveChangesAsync();
+
+                    var emailService = new EmailService();
+                    await emailService.SendTeacherAccountWithQrEmail(model.Email, model.Email, defaultPassword, qrBase64);
+
+                    TempData["Success"] = "Tạo giảng viên và gửi email QR thành công!";
+                }
+                catch (Exception ex)
+                {
+                    TempData["Warning"] = "Tạo giảng viên thành công, nhưng lỗi khi gửi email: " + ex.Message;
+                }
+
+                return RedirectToAction("Index");
             }
-
-            // Gửi email
-            var emailService = new EmailService();
-            await emailService.SendTeacherAccountWithQrEmail(gv.Email, gv.UserName, matKhauGoc, qrCodeBase64);
-
-            TempData["Success"] = "Thêm giảng viên thành công và đã gửi Email!";
-            return RedirectToAction("Index");
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Lỗi khi thêm giảng viên: " + ex.Message);
+                return View(model);
+            }
         }
 
 
-        // GET: Admin/GiangVien/Edit/{id}
+
+
         public async Task<ActionResult> Edit(string id)
         {
-            if (string.IsNullOrEmpty(id))
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            if (string.IsNullOrEmpty(id)) return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
 
             var gv = await db.GiangViens.FindAsync(id);
-            if (gv == null)
-                return HttpNotFound();
+            if (gv == null) return HttpNotFound();
 
             return View(gv);
         }
 
-        // POST: Admin/GiangVien/Edit/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(GiangVien gv, string newPassword)
+        public async Task<ActionResult> Edit(GiangVien model, string newPassword)
         {
-            if (!ModelState.IsValid)
-                return View(gv);
+            if (!ModelState.IsValid) return View(model);
 
-            try
+            var gv = await db.GiangViens.FindAsync(model.GiangVienId);
+            if (gv == null) return HttpNotFound();
+
+            gv.HoVaTen = model.HoVaTen;
+            gv.NgaySinh = model.NgaySinh;
+            gv.Email = model.Email;
+            gv.SoDienThoai = model.SoDienThoai;
+            gv.ChuyenMon = model.ChuyenMon;
+            gv.HocHam = model.HocHam;
+
+            if (!string.IsNullOrEmpty(newPassword))
             {
-                var existingGV = await db.GiangViens.FindAsync(gv.Id);
-                if (existingGV == null)
-                    return HttpNotFound();
-
-                // Cập nhật thông tin cá nhân
-                existingGV.HoVaTen = gv.HoVaTen;
-                existingGV.NgaySinh = gv.NgaySinh;
-                existingGV.SoDienThoai = gv.SoDienThoai;
-                existingGV.Email = gv.Email;
-                existingGV.ChuyenMon = gv.ChuyenMon;
-                existingGV.HocHam = gv.HocHam;
-                existingGV.NgayCapNhat = DateTime.Now;
-                existingGV.UserName = gv.Email;
-
-                // Cập nhật mật khẩu nếu nhập
-                if (!string.IsNullOrWhiteSpace(newPassword))
+                var token = await UserManager.GeneratePasswordResetTokenAsync(gv.AppUserId);
+                var resetResult = await UserManager.ResetPasswordAsync(gv.AppUserId, token, newPassword);
+                if (!resetResult.Succeeded)
                 {
-                    var token = await UserManager.GeneratePasswordResetTokenAsync(existingGV.Id);
-                    var resetResult = await UserManager.ResetPasswordAsync(existingGV.Id, token, newPassword);
-                    if (!resetResult.Succeeded)
-                    {
-                        foreach (var err in resetResult.Errors)
-                            ModelState.AddModelError("", err);
-                        return View(gv);
-                    }
+                    foreach (var e in resetResult.Errors)
+                        ModelState.AddModelError("", e);
+                    return View(model);
                 }
-
-                db.Entry(existingGV).State = EntityState.Modified;
-                await db.SaveChangesAsync();
-
-                TempData["Success"] = "Cập nhật giảng viên thành công!";
-                return RedirectToAction("Index");
             }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", "Lỗi khi cập nhật giảng viên: " + ex.Message);
-                return View(gv);
-            }
+
+            db.Entry(gv).State = EntityState.Modified;
+            await db.SaveChangesAsync();
+
+            TempData["Success"] = "Cập nhật giảng viên thành công.";
+            return RedirectToAction("Index");
         }
 
-        // GET: Admin/GiangVien/Delete/{id}
         public async Task<ActionResult> Delete(string id)
         {
-            if (string.IsNullOrEmpty(id))
+            if (string.IsNullOrEmpty(id)) 
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
 
-            var gv = await db.GiangViens.FindAsync(id);
+            var gv = await db.GiangViens
+                .Include(g => g.ThongBaos)
+                .FirstOrDefaultAsync(g => g.GiangVienId == id);
+
             if (gv == null)
             {
-                TempData["Error"] = "Giảng viên không tồn tại!";
+                TempData["Error"] = "Không tìm thấy giảng viên.";
                 return RedirectToAction("Index");
             }
 
-            try
+            // Xóa quan hệ phụ
+            db.DiemDanhs_GVs.RemoveRange(db.DiemDanhs_GVs.Where(d => d.GiangVienId == id));
+            db.GiangVien_BuoiHoc.RemoveRange(db.GiangVien_BuoiHoc.Where(b => b.GiangVienId == id));
+
+            foreach (var tb in gv.ThongBaos.ToList())
             {
-                // Xóa dữ liệu liên quan
-                var diemDanhs = db.DiemDanhs_GVs.Where(d => d.AppUserId == gv.Id);
-                db.DiemDanhs_GVs.RemoveRange(diemDanhs);
-
-                var giangVienBuoiHocs = db.GiangVien_BuoiHoc.Where(gvh => gvh.AppUserId == gv.Id);
-                db.GiangVien_BuoiHoc.RemoveRange(giangVienBuoiHocs);
-
-                var thongBaos = db.ThongBaos
-                    .Where(t => t.GiangViens.Any(gvItem => gvItem.Id == gv.Id))
-                    .ToList();
-
-                foreach (var thongBao in thongBaos)
+                tb.GiangViens.Remove(gv);
+                if (!tb.GiangViens.Any())
                 {
-                    thongBao.GiangViens.Remove(gv);
-                    if (!thongBao.GiangViens.Any())
-                    {
-                        db.ThongBaos.Remove(thongBao);
-                    }
+                    db.ThongBaos.Remove(tb);
                 }
+            }
 
-                db.GiangViens.Remove(gv); // Xóa khỏi bảng GiangVien
-                await db.SaveChangesAsync(); // Lưu thay đổi DB đầu tiên
+            // Lưu AppUserId để xử lý sau khi xóa GV
+            var appUserId = gv.AppUserId;
 
-                // Xóa user khỏi Identity
-                var appUser = await UserManager.FindByIdAsync(gv.Id);
-                if (appUser != null)
+            // Xóa giảng viên
+            db.GiangViens.Remove(gv);
+            await db.SaveChangesAsync();
+
+            // Xóa tài khoản người dùng nếu có
+            if (!string.IsNullOrEmpty(appUserId))
+            {
+                var user = await UserManager.FindByIdAsync(appUserId);
+                if (user != null)
                 {
-                    var resultDelete = await UserManager.DeleteAsync(appUser);
-                    if (!resultDelete.Succeeded)
+                    var deleteResult = await UserManager.DeleteAsync(user);
+                    if (!deleteResult.Succeeded)
                     {
-                        TempData["Error"] = "Lỗi khi xóa giảng viên: " + string.Join(", ", resultDelete.Errors);
+                        TempData["Error"] = "Đã xóa giảng viên nhưng không xóa được tài khoản người dùng: " 
+                                            + string.Join(", ", deleteResult.Errors);
                         return RedirectToAction("Index");
                     }
                 }
+            }
 
-                TempData["Success"] = "Xóa giảng viên thành công!";
-                return RedirectToAction("Index");
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = "Lỗi khi xóa giảng viên: " + ex.Message;
-                return RedirectToAction("Index");
-            }
+            TempData["Success"] = "Xóa giảng viên và tài khoản thành công.";
+            return RedirectToAction("Index");
         }
 
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing)
-                db.Dispose();
-
+            if (disposing) db.Dispose();
             base.Dispose(disposing);
         }
     }

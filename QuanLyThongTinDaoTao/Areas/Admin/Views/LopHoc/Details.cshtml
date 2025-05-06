@@ -7,230 +7,156 @@
     var buoiHocs = ViewBag.BuoiHocs as List<BuoiHoc>;
 }
 
+
 <div class="container mt-5">
     <div class="card shadow-lg">
         <div class="card-header bg-primary text-white text-center">
             <h3><i class="fa-solid fa-circle-info"></i> Chi Tiết Lớp Học: @Model.TenLopHoc</h3>
         </div>
 
-        <!-- Tab Navigation -->
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">
-                    <i class="fa-solid fa-info-circle"></i> Thông tin
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="lessons-tab" data-bs-toggle="tab" data-bs-target="#lessons" type="button" role="tab">
-                    <i class="fa-solid fa-calendar-days"></i> Buổi học
-                </button>
-            </li>
-        </ul>
+        <!-- Tabs -->
+    <ul class="nav nav-tabs nav-fill" id="myTab" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">
+                <i class="fa-solid fa-info-circle me-1"></i>Thông tin
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="lessons-tab" data-bs-toggle="tab" data-bs-target="#lessons" type="button" role="tab">
+                <i class="fa-solid fa-calendar-days me-1"></i>Buổi học
+            </button>
+        </li>
+    </ul>
 
-        <div class="card-body fs-5 tab-content">
-            <!-- Thông tin lớp học -->
-            <div class="tab-pane fade show active" id="info" role="tabpanel">
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <p><strong><i class="fa-solid fa-id-card"></i> Mã Lớp Học:</strong> @Model.MaLopHoc</p>
-                        <p><strong><i class="fa-solid fa-book"></i> Tên Lớp Học:</strong> @Model.TenLopHoc</p>
-                        <p><strong><i class="fa-solid fa-credit-card"></i> Số Tín Chỉ:</strong> @Model.SoTinChi</p>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <p><strong><i class="fa-solid fa-calendar-day"></i> Ngày Bắt Đầu:</strong> @Model.NgayBatDau.ToString("dd/MM/yyyy")</p>
-                        <p><strong><i class="fa-solid fa-calendar-check"></i> Ngày Kết Thúc:</strong> @Model.NgayKetThuc.ToString("dd/MM/yyyy")</p>
-                        <p><strong><i class="fa-solid fa-users"></i> Số Lượng Tối Đa:</strong> @Model.SoLuongToiDa</p>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <p>
-                            <strong><i class="fa-solid fa-graduation-cap"></i> Khóa Học:</strong>
-                            @(Model.KhoaHoc != null ? Model.KhoaHoc.TenKhoaHoc : "Chưa có")
-                        </p>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <p><strong><i class="fa-solid fa-file-lines"></i> Mô Tả:</strong></p>
-                    <div class="border rounded p-3 bg-light">@Html.Raw(Model.MoTa)</div>
-                </div>
-
-                <div class="mb-3">
-                    <h4 class="text-primary"><i class="fa-solid fa-paperclip"></i> Tệp Đính Kèm</h4>
-                    @if (Model.LopHocAttachments.Any())
-                    {
-                        <ul class="list-group mt-3">
-                            @foreach (var attachment in Model.LopHocAttachments)
-                            {
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <a href="@Url.Content(attachment.Attachment.FilePath)" target="_blank" class="text-decoration-none">
-                                        <i class="fa-solid fa-file me-2"></i>@attachment.Attachment.FileName
-                                    </a>
-                                    <span class="badge bg-primary rounded-pill">@attachment.Attachment.FileType</span>
-                                </li>
-                            }
-                        </ul>
-                    }
-                    else
-                    {
-                        <div class="alert alert-info mt-3">Không có tệp đính kèm</div>
-                    }
-                </div>
+<div class="card-body tab-content fs-5">
+    <!-- Tab: Thông tin -->
+    <div class="tab-pane fade show active" id="info" role="tabpanel">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong><i class="fa-solid fa-id-card me-1"></i> Mã Lớp Học:</strong> @Model.MaLopHoc</p>
+                <p><strong><i class="fa-solid fa-book me-1"></i> Tên Lớp Học:</strong> @Model.TenLopHoc</p>
+                <p><strong><i class="fa-solid fa-credit-card me-1"></i> Số Tín Chỉ:</strong> @Model.SoTinChi</p>
+                <p><strong><i class="fa-solid fa-graduation-cap me-1"></i> Khóa Học:</strong> @(Model.KhoaHoc?.TenKhoaHoc ?? "Chưa có")</p>
             </div>
-
-            <!-- Danh sách buổi học -->
-            <div class="tab-pane fade" id="lessons" role="tabpanel">
-                @if (buoiHocs != null && buoiHocs.Any())
-                {
-                    <div class="row">
-                        @foreach (var buoiHoc in buoiHocs)
-                        {
-                            var trangThaiText = buoiHoc.TrangThai == TrangThaiBuoiHoc.SapDienRa ? "Sắp Diễn Ra"
-                                : buoiHoc.TrangThai == TrangThaiBuoiHoc.DangDienRa ? "Đang Diễn Ra"
-                                : "Đã Kết Thúc";
-                            var badgeClass = buoiHoc.TrangThai == TrangThaiBuoiHoc.SapDienRa ? "bg-primary"
-                                : buoiHoc.TrangThai == TrangThaiBuoiHoc.DangDienRa ? "bg-success"
-                                : "bg-secondary";
-
-                            <div class="col-md-4 mb-4">
-                                <div class="card shadow h-100">
-                                    <div class="card-header bg-info text-white text-center">
-                                        <h5 class="mb-0">@buoiHoc.NgayHoc.ToString("dd/MM/yyyy")</h5>
-                                    </div>
-                                    <div class="card-body text-center">
-                                        <p><strong>⏰ Giờ học:</strong> @buoiHoc.GioBatDau - @buoiHoc.GioKetThuc</p>
-                                        <p><strong>📌 Trạng thái:</strong> <span class="badge @badgeClass">@trangThaiText</span></p>
-                                        <div class="d-flex justify-content-center gap-2 mt-3">
-                                            <a href="@Url.Action("DanhSachHocVien","BuoiHoc", new { id = buoiHoc.BuoiHocId })" class="btn btn-info btn-sm">
-                                                <i class="fas fa-users"></i> Học viên
-                                            </a>
-                                            <a href="@Url.Action("Edit", "BuoiHoc", new { id = buoiHoc.BuoiHocId })" class="btn btn-warning btn-sm">
-                                                <i class="fa-solid fa-edit"></i> Sửa
-                                            </a>
-                                            <form action="@Url.Action("Delete", "BuoiHoc", new { id = buoiHoc.BuoiHocId })" method="post"
-                                                  onsubmit="return confirm('Bạn có chắc chắn muốn xóa buổi học này?');" style="display:inline;">
-                                                @Html.AntiForgeryToken()
-                                                <button type="submit" class="btn btn-danger btn-sm">
-                                                    <i class="fas fa-trash-alt"></i> Xóa
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                }
-                else
-                {
-                    <div class="alert alert-info text-center">
-                        <i class="fa-solid fa-circle-info"></i> Lớp học chưa có buổi học nào
-                    </div>
-                }
-
-                <div class="text-center mt-3">
-                    <a href="@Url.Action("Create", "BuoiHoc", new { lopHocId = Model.LopHocId })" class="btn btn-success">
-                        <i class="fa-solid fa-plus"></i> Thêm buổi học mới
-                    </a>
-                </div>
+            <div class="col-md-6">
+                <p><strong><i class="fa-solid fa-calendar-day me-1"></i> Ngày Bắt Đầu:</strong> @Model.NgayBatDau.ToString("dd/MM/yyyy")</p>
+                <p><strong><i class="fa-solid fa-calendar-check me-1"></i> Ngày Kết Thúc:</strong> @Model.NgayKetThuc.ToString("dd/MM/yyyy")</p>
+                <p><strong><i class="fa-solid fa-users me-1"></i> Số Lượng Tối Đa:</strong> @Model.SoLuongToiDa</p>
             </div>
         </div>
 
-        <div class="card-footer text-center">
-            <a href="@Url.Action("Index")" class="btn btn-secondary btn-lg me-2">
-                <i class="fa-solid fa-arrow-left me-2"></i>Quay Lại
-            </a>
-            <a href="@Url.Action("Edit", new { id = Model.LopHocId })" class="btn btn-warning btn-lg me-2">
-                <i class="fa-solid fa-pen-to-square me-2"></i>Chỉnh Sửa
-            </a>
-            <a href="@Url.Action("Delete", new { id = Model.LopHocId })" class="btn btn-danger btn-lg"
-               onclick="return confirm('Bạn có chắc chắn muốn xóa lớp học này?');">
-                <i class="fa-solid fa-trash-can me-2"></i>Xóa
+        <div class="mb-4">
+            <p><strong><i class="fa-solid fa-file-lines me-1"></i> Mô Tả:</strong></p>
+            <div class="border rounded p-3 bg-light">@Html.Raw(Model.MoTa)</div>
+        </div>
+
+        <div>
+            <h4 class="text-primary"><i class="fa-solid fa-paperclip me-1"></i> Tệp Đính Kèm</h4>
+            @if (Model.LopHocAttachments.Any())
+            {
+                <ul class="list-group mt-3">
+                    @foreach (var attachment in Model.LopHocAttachments)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <a href="@Url.Content(attachment.Attachment.FilePath)" target="_blank">
+                                <i class="fa-solid fa-file me-2"></i>@attachment.Attachment.FileName
+                            </a>
+                            <span class="badge bg-primary">@attachment.Attachment.FileType</span>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <div class="alert alert-info mt-3">Không có tệp đính kèm</div>
+            }
+        </div>
+    </div>
+
+    <!-- Tab: Buổi học -->
+    <div class="tab-pane fade" id="lessons" role="tabpanel">
+        @if (buoiHocs != null && buoiHocs.Any())
+        {
+            <div class="row">
+                @foreach (var buoiHoc in buoiHocs)
+                {
+                    var trangThaiText = buoiHoc.TrangThai == TrangThaiBuoiHoc.SapDienRa ? "Sắp Diễn Ra"
+                        : buoiHoc.TrangThai == TrangThaiBuoiHoc.DangDienRa ? "Đang Diễn Ra"
+                        : "Đã Kết Thúc";
+                    var badgeClass = buoiHoc.TrangThai == TrangThaiBuoiHoc.SapDienRa ? "bg-primary"
+                        : buoiHoc.TrangThai == TrangThaiBuoiHoc.DangDienRa ? "bg-success"
+                        : "bg-secondary";
+
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow h-100">
+                            <div class="card-header text-white text-center bg-info">
+                                <h5 class="mb-0">@buoiHoc.NgayHoc.ToString("dd/MM/yyyy")</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <p><strong>⏰ Giờ học:</strong> @buoiHoc.GioBatDau - @buoiHoc.GioKetThuc</p>
+                                <p><strong>📌 Trạng thái:</strong> <span class="badge @badgeClass">@trangThaiText</span></p>
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a href="@Url.Action("DanhSachHocVien", "BuoiHoc", new { id = buoiHoc.BuoiHocId })" class="btn btn-info btn-sm">
+                                        <i class="fas fa-users"></i> Học viên
+                                    </a>
+                                    <a href="@Url.Action("Edit", "BuoiHoc", new { id = buoiHoc.BuoiHocId })" class="btn btn-warning btn-sm">
+                                        <i class="fa-solid fa-edit"></i> Sửa
+                                    </a>
+                                    <form method="post" action="@Url.Action("Delete", "BuoiHoc", new { id = buoiHoc.BuoiHocId })"
+                                          onsubmit="return confirm('Bạn có chắc chắn muốn xóa buổi học này?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-trash-alt"></i> Xóa
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info text-center">
+                <i class="fa-solid fa-circle-info"></i> Lớp học chưa có buổi học nào
+            </div>
+        }
+
+        <div class="text-center mt-4">
+            <a href="@Url.Action("Create", "BuoiHoc", new { lopHocId = Model.LopHocId })" class="btn btn-success">
+                <i class="fa-solid fa-plus"></i> Thêm buổi học mới
             </a>
         </div>
     </div>
 </div>
 
-    <script>
-        // Kích hoạt tab khi có hash trong URL
-        $(document).ready(function () {
-            if (window.location.hash) {
-                $('.nav-tabs button[data-bs-target="' + window.location.hash + '"]').tab('show');
-            }
+<div class="card-footer text-center">
+    <a href="@Url.Action("Index")" class="btn btn-secondary btn-lg me-2">
+        <i class="fa-solid fa-arrow-left me-2"></i>Quay Lại
+    </a>
+    <a href="@Url.Action("Edit", new { id = Model.LopHocId })" class="btn btn-warning btn-lg me-2">
+        <i class="fa-solid fa-pen-to-square me-2"></i>Chỉnh Sửa
+    </a>
+    <a href="@Url.Action("Delete", new { id = Model.LopHocId })" class="btn btn-danger btn-lg"
+       onclick="return confirm('Bạn có chắc chắn muốn xóa lớp học này?');">
+        <i class="fa-solid fa-trash-can me-2"></i>Xóa
+    </a>
+</div>
+    </div>
+</div>
 
-            // Thêm hash vào URL khi tab được chọn
-            $('button[data-bs-toggle="tab"]').on('click', function (e) {
-                history.pushState(null, null, $(this).attr('data-bs-target'));
-            });
+<!-- JavaScript giữ tab khi reload -->
+<script>
+    $(document).ready(function () {
+        const hash = window.location.hash;
+        if (hash) {
+            $('.nav-tabs button[data-bs-target="' + hash + '"]').tab('show');
+        }
+
+        $('button[data-bs-toggle="tab"]').on('click', function () {
+            const target = $(this).attr('data-bs-target');
+            history.pushState(null, null, target);
         });
-    </script>
-
-<style>
-    .card-header {
-        font-size: 1.5rem;
-        padding: 1.25rem;
-    }
-
-    .nav-tabs {
-        border-bottom: 2px solid #dee2e6;
-    }
-
-        .nav-tabs .nav-link {
-            font-size: 1.1rem;
-            padding: 0.75rem 1.5rem;
-            color: #495057;
-        }
-
-            .nav-tabs .nav-link.active {
-                font-weight: bold;
-                color: #0d6efd;
-                border-bottom: 3px solid #0d6efd;
-            }
-
-    .tab-content {
-        padding: 1.5rem;
-    }
-
-    .card-body p {
-        margin-bottom: 1rem;
-    }
-
-    .btn-lg {
-        padding: 0.5rem 1.5rem;
-        font-size: 1.125rem;
-    }
-
-    .list-group-item {
-        padding: 1rem;
-        transition: all 0.3s;
-    }
-
-        .list-group-item:hover {
-            background-color: #f8f9fa;
-        }
-
-    .bg-light {
-        background-color: #f8f9fa !important;
-    }
-
-    strong {
-        color: #0d6efd;
-    }
-
-    .card {
-        border-radius: 12px;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        }
-
-    .badge {
-        font-size: 13px;
-        padding: 6px 10px;
-    }
-</style>
+    });
+</script>

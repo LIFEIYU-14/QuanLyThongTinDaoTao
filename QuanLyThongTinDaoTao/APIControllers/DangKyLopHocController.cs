@@ -46,7 +46,6 @@ namespace QuanLyThongTinDaoTao.APIControllers
         // POST: api/dangky/verify
         [HttpPost]
         [Route("verify")]
-    
         public async Task<IHttpActionResult> VerifyOtp([FromBody] VerifyOtpRequest model)
         {
             var email = model.Email?.Trim();
@@ -63,34 +62,41 @@ namespace QuanLyThongTinDaoTao.APIControllers
             OtpCache.Remove("OTP_" + email);
             OtpCache.Remove("HocVienData_" + email);
 
-            var hocVien = UserManager.Users
-                            .OfType<HocVien>()
-                            .FirstOrDefault(h => h.Email == email);
-
-            if (hocVien == null)
+            var appUser = await UserManager.FindByEmailAsync(email);
+            if (appUser == null)
             {
-                var newHocVien = new HocVien
+                appUser = new AppUser
                 {
                     UserName = email,
+                    Email = email
+                };
+                var result = await UserManager.CreateAsync(appUser, "123456"); // hoặc random + gửi reset
+                if (!result.Succeeded)
+                    return Content(HttpStatusCode.InternalServerError, new { error = string.Join("; ", result.Errors) });
+
+                await UserManager.AddToRoleAsync(appUser.Id, "HocVien");
+            }
+
+            // Kiểm tra HocVien đã gắn với AppUser chưa
+            var hocVien = db.HocViens.FirstOrDefault(h => h.AppUserId == appUser.Id);
+            if (hocVien == null)
+            {
+                hocVien = new HocVien
+                {
+                    HocVienId = Guid.NewGuid().ToString(),
                     MaHocVien = DateTime.Now.Year + hocVienData.NgaySinh.Year.ToString() + new Random().Next(1000, 9999),
                     Email = email,
-                    EmailConfirmed = true,
                     HoVaTen = hocVienData.HoVaTen,
                     NgaySinh = hocVienData.NgaySinh,
                     SoDienThoai = hocVienData.SoDienThoai,
                     CoQuanLamViec = hocVienData.CoQuanLamViec,
                     QR_Code_HV = Guid.NewGuid().ToString(),
-                    IsConfirmed = true
+                    IsConfirmed = true,
+                    AppUserId = appUser.Id
                 };
 
-                var password = "123456"; // consider generating random or allow reset
-                var createResult = await UserManager.CreateAsync(newHocVien, password);
-                if (!createResult.Succeeded)
-                    return Content(HttpStatusCode.InternalServerError, new { error = string.Join("; ", createResult.Errors) });
-
-                await UserManager.AddToRoleAsync(newHocVien.Id, "HocVien");
-
-                hocVien = newHocVien;
+                db.HocViens.Add(hocVien);
+                db.SaveChanges();
             }
 
             var errors = new List<string>();
@@ -105,7 +111,7 @@ namespace QuanLyThongTinDaoTao.APIControllers
                     continue;
                 }
 
-                bool daDangKy = db.DangKyHocs.Any(d => d.AppUserId == hocVien.Id && d.LopHocId == lopHocId);
+                bool daDangKy = db.DangKyHocs.Any(d => d.HocVienId == hocVien.HocVienId && d.LopHocId == lopHocId);
                 if (daDangKy)
                 {
                     errors.Add($"Bạn đã đăng ký lớp {lopHoc.TenLopHoc} trước đó.");
@@ -116,7 +122,7 @@ namespace QuanLyThongTinDaoTao.APIControllers
                 {
                     DangKyId = Guid.NewGuid(),
                     LopHocId = lopHocId,
-                    AppUserId = hocVien.Id,
+                    HocVienId = hocVien.HocVienId,
                     IsConfirmed = true,
                     NgayDangKy = DateTime.Now
                 });
@@ -125,10 +131,10 @@ namespace QuanLyThongTinDaoTao.APIControllers
 
             db.SaveChanges();
 
-            string qrCode = hocVienService.GenerateQRCodeForStudent(hocVien.Id);
+            string qrCode = hocVienService.GenerateQRCodeForStudent(hocVien.HocVienId);
             await emailService.SendQrCodeEmail(hocVien.Email, qrCode);
 
-            var result = new
+            var resultObj = new
             {
                 message = "Đăng ký thành công.",
                 redirectUrl = Url.Content("~/Courses/Index"),
@@ -136,8 +142,7 @@ namespace QuanLyThongTinDaoTao.APIControllers
                 errors = errors
             };
 
-            return Ok(result);
+            return Ok(resultObj);
         }
-
     }
 }

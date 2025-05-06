@@ -63,17 +63,20 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             ViewBag.BuoiHoc = buoiHoc;
             return View(danhSachHocVien); // Trả đúng List<HocVien>
         }
+
+
         // Tạo buổi học (GET)
+
+
+        [HttpGet]
         public ActionResult Create(Guid? lopHocId)
         {
             var model = new BuoiHoc();
-    
+           
             if (lopHocId.HasValue)
             {
                 var lopHoc = db.LopHocs.FirstOrDefault(k => k.LopHocId == lopHocId.Value);
                 ViewBag.TenLopHoc = lopHoc?.TenLopHoc;
-                ViewBag.NgayBatDau = lopHoc?.NgayBatDau;
-                ViewBag.NgayKetThuc = lopHoc?.NgayKetThuc;
                 model.LopHocId = lopHocId.Value;
             }
 
@@ -82,19 +85,27 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             {
                 ViewBag.LopHocList = db.LopHocs.ToList();
             }
-            ViewBag.GiangVienList = db.GiangViens.ToList();
             return View(model);
         }
+
         // Tạo buổi học (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(BuoiHoc model, Guid LopHocId, HttpPostedFileBase[] attachments, string[] selectedGiangViens)
-
         {
             if (!ModelState.IsValid)
             {
                 ViewBag.LopHocList = db.LopHocs.ToList();
-                ViewBag.GiangVienList = db.GiangViens.ToList();
+
+                if (model.LopHocId != Guid.Empty)
+                {
+                    var lopHocEntity = db.LopHocs.FirstOrDefault(k => k.LopHocId == model.LopHocId);
+                    if (lopHocEntity != null)
+                    {
+                        ViewBag.LopHoc = lopHocEntity;
+                    }
+                }
+
                 return View(model);
             }
 
@@ -140,7 +151,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 {
                     bool isGiangVienBusy = db.GiangVien_BuoiHoc
                         .Include(gv => gv.BuoiHoc)
-                        .Any(gv => gv.AppUserId == giangVienId &&
+                        .Any(gv => gv.GiangVienId == giangVienId &&
                               gv.BuoiHoc.NgayHoc == model.NgayHoc &&
                               ((model.GioBatDau >= gv.BuoiHoc.GioBatDau && model.GioBatDau < gv.BuoiHoc.GioKetThuc) ||
                                (model.GioKetThuc > gv.BuoiHoc.GioBatDau && model.GioKetThuc <= gv.BuoiHoc.GioKetThuc) ||
@@ -175,7 +186,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                         {
                             Id = Guid.NewGuid(),
                             BuoiHocId = model.BuoiHocId,
-                            AppUserId = giangVienId
+                            GiangVienId = giangVienId
                         });
                     }
                 }
@@ -205,7 +216,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
             ViewBag.LopHocList = db.LopHocs.ToList();
             ViewBag.GiangVienList = db.GiangViens.ToList();
-            ViewBag.GiangVienDaChon = buoiHoc.GiangVien_BuoiHocs?.Select(g => g.AppUserId).ToList();
+            ViewBag.GiangVienDaChon = buoiHoc.GiangVien_BuoiHocs?.Select(g => g.GiangVienId).ToList();
             return View(buoiHoc);
         }
 
@@ -218,8 +229,15 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             {
                 ViewBag.LopHocList = db.LopHocs.ToList();
                 ViewBag.GiangVienList = db.GiangViens.ToList();
+                var lopHocEntity = db.LopHocs.FirstOrDefault(k => k.LopHocId == LopHocId);
+                if (lopHocEntity != null)
+                {
+                    ViewBag.TenLopHoc = lopHocEntity.TenLopHoc;
+                }
+
                 return View(model);
             }
+         
 
             var buoiHoc = db.BuoiHocs.Find(model.BuoiHocId);
             if (buoiHoc == null)
@@ -271,7 +289,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 {
                     bool isGiangVienBusy = db.GiangVien_BuoiHoc
                         .Include(gv => gv.BuoiHoc)
-                        .Any(gv => gv.AppUserId == giangVienId &&
+                        .Any(gv => gv.GiangVienId == giangVienId &&
                               gv.BuoiHoc.NgayHoc == model.NgayHoc &&
                               gv.BuoiHoc.BuoiHocId != model.BuoiHocId && // Loại trừ buổi học hiện tại
                               ((model.GioBatDau >= gv.BuoiHoc.GioBatDau && model.GioBatDau < gv.BuoiHoc.GioKetThuc) ||
@@ -305,8 +323,8 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
             // Lấy danh sách ID giảng viên sẽ bị xóa (có trong DB nhưng không có trong danh sách chọn)
             var giangVienIdsToRemove = existingGiangVienBuoiHoc
-                    .Where(gv => selectedGiangViens == null || !selectedGiangViens.Contains(gv.AppUserId))
-                    .Select(gv => gv.AppUserId)
+                    .Where(gv => selectedGiangViens == null || !selectedGiangViens.Contains(gv.GiangVienId))
+                    .Select(gv => gv.GiangVienId)
                     .ToList();
 
 
@@ -315,7 +333,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             {
                 var diemDanhToRemove = db.DiemDanhs_GVs
                     .Where(d => d.BuoiHocId == model.BuoiHocId &&
-                           giangVienIdsToRemove.Contains(d.AppUserId))
+                           giangVienIdsToRemove.Contains(d.GiangVienId))
                     .ToList();
 
                 db.DiemDanhs_GVs.RemoveRange(diemDanhToRemove);
@@ -337,7 +355,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                         {
                             Id = Guid.NewGuid(),
                             BuoiHocId = model.BuoiHocId,
-                            AppUserId = giangVienId
+                            GiangVienId = giangVienId
                         });
                     }
                 }
@@ -522,15 +540,15 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             var selectedGVIds = buoiHocId != null
                 ? db.GiangVien_BuoiHoc
                     .Where(x => x.BuoiHocId == buoiHocId)
-                    .Select(x => x.AppUserId)
+                    .Select(x => x.GiangVienId)
                     .ToList()
                 : new List<string>();
 
             var danhSach = allGVs.Select(gv => new
             {
-                gv.Id, // AppUserId vì GiangVien kế thừa từ AppUser
+                gv.GiangVienId, // AppUserId vì GiangVien kế thừa từ AppUser
                 gv.HoVaTen,
-                IsSelected = selectedGVIds.Contains(gv.Id),
+                IsSelected = selectedGVIds.Contains(gv.GiangVienId),
                 IsBusy = db.BuoiHocs.Any(b =>
                     b.BuoiHocId != buoiHocId && // bỏ qua chính nó
                     b.NgayHoc == ngayHoc &&
@@ -539,7 +557,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                         (gioKetThuc > b.GioBatDau && gioKetThuc <= b.GioKetThuc) ||
                         (gioBatDau <= b.GioBatDau && gioKetThuc >= b.GioKetThuc)
                     ) &&
-                    b.GiangVien_BuoiHocs.Any(g => g.AppUserId == gv.Id)
+                    b.GiangVien_BuoiHocs.Any(g => g.GiangVienId == gv.GiangVienId)
                 )
             });
 

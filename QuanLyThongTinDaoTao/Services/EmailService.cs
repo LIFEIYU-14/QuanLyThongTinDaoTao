@@ -86,8 +86,6 @@ namespace QuanLyThongTinDaoTao.Services
                 throw;
             }
         }
-
-
         public async Task SendTeacherAccountWithQrEmail(string toEmail, string taiKhoan, string matKhau, string qrCodeBase64)
         {
             try
@@ -98,7 +96,6 @@ namespace QuanLyThongTinDaoTao.Services
                     mail.To.Add(toEmail);
                     mail.Subject = "Thông tin tài khoản và mã QR điểm danh";
 
-                    // Tạo AlternateView để hỗ trợ hình ảnh inline
                     var htmlBody = $@"
                 <p>Chào bạn,</p>
                 <p>Tài khoản giảng viên của bạn đã được tạo:</p>
@@ -109,37 +106,42 @@ namespace QuanLyThongTinDaoTao.Services
                 <p>Đây là mã QR dùng để điểm danh:</p>
                 <p><img src='cid:qrCodeImage' alt='QR Code' /></p>";
 
-                    var alternateView = AlternateView.CreateAlternateViewFromString(htmlBody, null, "text/html");
+                    var alternateView = AlternateView.CreateAlternateViewFromString(htmlBody, null, MediaTypeNames.Text.Html);
 
-                    // Chuyển base64 thành stream ảnh
+                    // Xử lý nếu chuỗi có "data:image/png;base64,"
+                    if (qrCodeBase64.StartsWith("data:image", StringComparison.OrdinalIgnoreCase))
+                    {
+                        qrCodeBase64 = qrCodeBase64.Substring(qrCodeBase64.IndexOf(",") + 1);
+                    }
+
                     byte[] qrBytes = Convert.FromBase64String(qrCodeBase64);
-                    var stream = new MemoryStream(qrBytes);
 
-                    var linkedResource = new LinkedResource(stream, "image/png")
+                    // Quan trọng: tạo stream rồi giữ tham chiếu
+                    MemoryStream stream = new MemoryStream(qrBytes);
+
+                    var linkedResource = new LinkedResource(stream, MediaTypeNames.Image.Jpeg) // hoặc "image/png"
                     {
                         ContentId = "qrCodeImage",
-                        TransferEncoding = System.Net.Mime.TransferEncoding.Base64,
-                        ContentType = new ContentType("image/png"),
-                        ContentLink = new Uri("cid:qrCodeImage")
+                        TransferEncoding = TransferEncoding.Base64
                     };
 
                     alternateView.LinkedResources.Add(linkedResource);
-
                     mail.AlternateViews.Add(alternateView);
-
                     mail.IsBodyHtml = true;
 
                     using (var smtp = new SmtpClient(smtpHost, smtpPort))
                     {
                         smtp.Credentials = new NetworkCredential(smtpUser, smtpPass);
                         smtp.EnableSsl = true;
-                        await smtp.SendMailAsync(mail);
+
+                        // Gửi mail đồng bộ (vì .NET Framework 4.8 không hỗ trợ async hoàn toàn với SmtpClient)
+                        smtp.Send(mail);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Lỗi khi gửi email tài khoản GV: {ex.Message}");
+                Console.WriteLine("Email error: " + ex.ToString());
                 throw;
             }
         }

@@ -14,7 +14,7 @@
             @using (Html.BeginForm("Edit", "GiangVien", FormMethod.Post))
             {
                 @Html.AntiForgeryToken()
-                @Html.HiddenFor(model => model.Id)
+                @Html.HiddenFor(model => model.GiangVienId)
 
                 <div class="row">
                     <div class="col-md-6 mb-3">

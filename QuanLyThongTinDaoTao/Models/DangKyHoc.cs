@@ -12,11 +12,12 @@ namespace QuanLyThongTinDaoTao.Models
         public Guid DangKyId { get; set; } = Guid.NewGuid();
 
         [Required]
-        public string AppUserId { get; set; }
+        public string HocVienId { get; set; }
 
-        [ForeignKey("AppUserId")]
+        [ForeignKey("HocVienId")]
         public virtual HocVien HocVien { get; set; }
 
+        [Required]
         public Guid LopHocId { get; set; }
 
         [ForeignKey("LopHocId")]

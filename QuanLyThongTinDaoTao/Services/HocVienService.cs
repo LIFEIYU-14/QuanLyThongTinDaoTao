@@ -19,7 +19,7 @@ public class HocVienService
     public string GenerateQRCodeForStudent(string hocVienId)
     {
         // Lấy thông tin học viên theo Id (string)
-        var hocVien = _context.HocViens.FirstOrDefault(hv => hv.Id == hocVienId);
+        var hocVien = _context.HocViens.FirstOrDefault(hv => hv.HocVienId == hocVienId);
         if (hocVien == null) return null;
 
         var qrInfo = new

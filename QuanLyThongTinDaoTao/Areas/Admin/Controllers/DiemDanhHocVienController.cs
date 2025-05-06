@@ -21,7 +21,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             if (User.IsInRole("GiangVien"))
             {
                 var buoiHoc = db.GiangVien_BuoiHoc
-                                .Where(gb => gb.GiangVien.Id == userId)
+                                .Where(gb => gb.GiangVien.GiangVienId == userId)
                                 .Select(gb => gb.BuoiHoc)
                                 .ToList();
 
@@ -105,7 +105,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 {
                     // Check if attendance for this student and session already exists
                     var existingRecord = db.DiemDanhs_HVs
-                        .FirstOrDefault(d => d.AppUserId == diemDanh.AppUserId && d.BuoiHocId == diemDanh.BuoiHocId);
+                        .FirstOrDefault(d => d.HocVienId == diemDanh.HocVienId && d.BuoiHocId == diemDanh.BuoiHocId);
 
                     if (existingRecord == null)
                     {
@@ -122,7 +122,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
                     updatedAttendance.Add(new
                     {
-                        diemDanh.AppUserId,
+                        diemDanh.HocVienId,
                         diemDanh.BuoiHocId,
                         diemDanh.TrangThai
                     });

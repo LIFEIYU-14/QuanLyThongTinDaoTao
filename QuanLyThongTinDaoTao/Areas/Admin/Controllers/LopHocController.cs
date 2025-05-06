@@ -113,9 +113,15 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             if (!ModelState.IsValid)
             {
                 ViewBag.KhoaHocList = db.KhoaHocs.ToList();
+
+                var khoaHocEntity = db.KhoaHocs.FirstOrDefault(k => k.KhoaHocId == KhoaHocId);
+                if (khoaHocEntity != null)
+                {
+                    ViewBag.TenKhoaHoc = khoaHocEntity.TenKhoaHoc;
+                }
+
                 return View(model);
             }
-
             // Kiểm tra trùng mã lớp học
             if (db.LopHocs.Any(l => l.MaLopHoc == model.MaLopHoc))
             {
@@ -123,7 +129,13 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 ViewBag.KhoaHocList = db.KhoaHocs.ToList();
                 return View(model);
             }
-
+            // Kiểm tra trùng Tên lớp học
+            if (db.LopHocs.Any(l => l.TenLopHoc == model.TenLopHoc))
+            {
+                ModelState.AddModelError("TenLopHoc", "Tên lớp học đã tồn tại.");
+                ViewBag.KhoaHocList = db.KhoaHocs.ToList();
+                return View(model);
+            }
             model.LopHocId = Guid.NewGuid();
             model.NgayTao = DateTime.Now;
             model.NgayCapNhat = DateTime.Now;

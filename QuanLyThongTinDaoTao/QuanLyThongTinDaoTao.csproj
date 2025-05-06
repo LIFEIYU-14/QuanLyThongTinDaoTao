@@ -269,8 +269,17 @@
     <Compile Include="Migrations\202504230709478_fixQR.Designer.cs">
       <DependentUpon>202504230709478_fixQR.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202505031522543_Fix-indentity.cs" />
+    <Compile Include="Migrations\202505031522543_Fix-indentity.Designer.cs">
+      <DependentUpon>202505031522543_Fix-indentity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202505031548384_Fix-indentity2.cs" />
+    <Compile Include="Migrations\202505031548384_Fix-indentity2.Designer.cs">
+      <DependentUpon>202505031548384_Fix-indentity2.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ModelsHelper\DangKyHocRequest.cs" />
+    <Compile Include="ModelsHelper\LopHocDetailsViewModel.cs" />
     <Compile Include="ModelsHelper\VerifyOtpRequest.cs" />
     <Compile Include="Models\AppUser.cs" />
     <Compile Include="Models\Attachment.cs" />
@@ -480,6 +489,7 @@
     <Content Include="Areas\Admin\Views\PhanQuyen\Edit.cshtml" />
     <Content Include="Areas\Admin\Views\Login\DangNhap.cshtml" />
     <Content Include="Areas\Admin\Views\DiemDanhHocVien\DanhSachBuoiDayGV.cshtml" />
+    <Content Include="Areas\Admin\Views\HocVien\Details.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -555,6 +565,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202504230709478_fixQR.resx">
       <DependentUpon>202504230709478_fixQR.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202505031522543_Fix-indentity.resx">
+      <DependentUpon>202505031522543_Fix-indentity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202505031548384_Fix-indentity2.resx">
+      <DependentUpon>202505031548384_Fix-indentity2.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -1,51 +1,85 @@
 ﻿@model IEnumerable<QuanLyThongTinDaoTao.Models.HocVien>
 @{
-    ViewBag.Title = "DanhSachHocVien";
+    ViewBag.Title = "Danh Sách Học Viên";
     Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
     var buoiHoc = ViewBag.BuoiHoc as QuanLyThongTinDaoTao.Models.BuoiHoc;
 }
-<div class="card shadow mb-4">
-    <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">
-            Danh sách học viên - Buổi học: @buoiHoc.NgayHoc.ToString("dd/MM/yyyy") (@buoiHoc.GioBatDau.ToString(@"hh\:mm") - @buoiHoc.GioKetThuc.ToString(@"hh\:mm"))
-            <br />
-            Lớp học: @buoiHoc.LopHoc.TenLopHoc
-        </h6>
-    </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                <thead>
-                    <tr>
-                        <th>STT</th>
-                        <th>Mã HV</th>
-                        <th>Họ và tên</th>
-                        <th>Email</th>
-                        <th>SĐT</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @{ int stt = 1; }
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>@stt</td>
-                            <td>@item.MaHocVien</td>
-                            <td>@item.HoVaTen</td>
-                            <td>@item.Email</td>
-                            <td>@item.SoDienThoai</td>
-                           
-                        </tr>
-                        stt++;
-                    }
-                </tbody>
-            </table>
+<div class="container mt-4">
+    <div class="card shadow-lg rounded-4">
+        <div class="card-header bg-primary text-white text-center">
+            <h4>
+                <i class="fa-solid fa-users-line"></i> Danh sách học viên -
+                <span class="fw-bold">@buoiHoc.NgayHoc.ToString("dd/MM/yyyy")</span>
+                (<span class="text-light">@buoiHoc.GioBatDau.ToString(@"hh\:mm") - @buoiHoc.GioKetThuc.ToString(@"hh\:mm")</span>)
+                <br />
+                <small class="text-white-50">Lớp học: <strong>@buoiHoc.LopHoc.TenLopHoc</strong></small>
+            </h4>
+        </div>
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered align-middle text-center">
+                        <thead class="table-secondary">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col"><i class="fa-solid fa-id-card"></i> Mã HV</th>
+                                <th scope="col"><i class="fa-solid fa-user"></i> Họ và Tên</th>
+                                <th scope="col"><i class="fa-solid fa-envelope"></i> Email</th>
+                                <th scope="col"><i class="fa-solid fa-phone"></i> SĐT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int stt = 1;
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@stt</td>
+                                        <td class="fw-bold">@item.MaHocVien</td>
+                                        <td>@item.HoVaTen</td>
+                                        <td>
+                                            <a href="mailto:@item.Email" class="text-decoration-none">@item.Email</a>
+                                        </td>
+                                        <td>@item.SoDienThoai</td>
+                                    </tr>
+                                    stt++;
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center">
+                    <i class="fa-solid fa-circle-info"></i> Buổi học chưa có học viên tham gia.
+                </div>
+            }
+        </div>
+        <div class="card-footer text-end">
+            <a href="@Url.Action("Index", new { id = buoiHoc.BuoiHocId })" class="btn btn-secondary btn-lg">
+                <i class="fas fa-arrow-left me-2"></i> Quay lại
+            </a>
         </div>
     </div>
 </div>
 
-<div>
-    <a href="@Url.Action("Index", new { id = buoiHoc.BuoiHocId })" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i> Quay lại
-    </a>
-</div>
+<style>
+    .table th, .table td {
+        vertical-align: middle;
+    }
+
+    .table thead th {
+        background-color: #e9ecef;
+    }
+
+    .card {
+        border-radius: 16px;
+    }
+
+    .btn-lg {
+        font-size: 1.1rem;
+        padding: 0.6rem 1.5rem;
+    }
+</style>

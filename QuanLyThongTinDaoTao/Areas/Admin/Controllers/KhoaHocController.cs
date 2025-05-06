@@ -89,7 +89,12 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                     ModelState.AddModelError("MaKhoaHoc", "Mã khóa học đã tồn tại");
                     return View(model);
                 }
-
+                // Kiểm tra trùng Tên lớp học
+                if (db.KhoaHocs.Any(l => l.TenKhoaHoc == model.TenKhoaHoc))
+                {
+                    ModelState.AddModelError("TenKhoaHoc", "Tên khóa học đã tồn tại.");       
+                    return View(model);
+                }
                 model.KhoaHocId = Guid.NewGuid();
                 model.NgayTao = DateTime.Now;
                 model.NgayCapNhat = DateTime.Now;

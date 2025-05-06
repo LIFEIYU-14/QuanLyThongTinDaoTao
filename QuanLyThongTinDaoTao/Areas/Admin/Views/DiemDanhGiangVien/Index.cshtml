@@ -91,7 +91,7 @@
 
                         foreach (var gv in buoiHoc.GiangVien_BuoiHocs)
                         {
-                            var diemDanh = diemDanhs?.FirstOrDefault(d => d.BuoiHocId == buoiHoc.BuoiHocId && d.AppUserId == gv.AppUserId);
+                            var diemDanh = diemDanhs?.FirstOrDefault(d => d.BuoiHocId == buoiHoc.BuoiHocId && d.GiangVienId == gv.GiangVienId);
 
                             <tr>
                                 @if (firstRow)
@@ -115,7 +115,7 @@
                                 <td width="200px">
                                     <select class="form-control trang-thai-diem-danh"
                                             data-buoihoc-id="@buoiHoc.BuoiHocId"
-                                            data-giangvien-id="@gv.AppUserId">
+                                            data-giangvien-id="@gv.GiangVienId">
                                         <option value="-1" class="text-center" @(diemDanh == null ? "selected" : "")>Chưa điểm danh</option>
                                         <option value="0" class="text-center" @(diemDanh?.TrangThai == DiemDanh_GV.TrangThaiDiemDanhGV.CoMat ? "selected" : "")>Có mặt</option>
                                         <option value="1" class="text-center" @(diemDanh?.TrangThai == DiemDanh_GV.TrangThaiDiemDanhGV.VangCoPhep ? "selected" : "")>Vắng có phép</option>

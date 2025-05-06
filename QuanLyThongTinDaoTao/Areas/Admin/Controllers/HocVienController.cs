@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -27,10 +28,10 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             private set { _userManager = value; }
         }
 
-        // Hiển thị danh sách học viên
+        // GET: Admin/HocVien
         public ActionResult Index(string searchString)
         {
-            var hocViens = db.HocViens.AsQueryable();
+            var hocViens = db.HocViens.Include(hv => hv.AppUser).AsQueryable();
 
             if (!string.IsNullOrEmpty(searchString))
             {
@@ -38,6 +39,23 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             }
 
             return View(hocViens.ToList());
+        }
+
+        // GET: Admin/HocVien/Details/5
+        public ActionResult Details(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+
+            var hocVien = db.HocViens
+                            .Include(h => h.DangKyHocs.Select(d => d.LopHoc))
+                            .Include(h => h.AppUser)
+                            .FirstOrDefault(h => h.HocVienId == id);
+
+            if (hocVien == null)
+                return HttpNotFound();
+
+            return View(hocVien);
         }
 
         // GET: Admin/HocVien/Create
@@ -52,11 +70,9 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         public async Task<ActionResult> Create(HocVien model)
         {
             if (!ModelState.IsValid)
-            {
                 return View(model);
-            }
 
-            // Kiểm tra email trùng
+            // Kiểm tra email đã tồn tại
             var existingUser = await UserManager.FindByEmailAsync(model.Email);
             if (existingUser != null)
             {
@@ -66,114 +82,125 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
             try
             {
-                // Tạo mã học viên
-                model.MaHocVien = DateTime.Now.Year + model.NgaySinh.Year.ToString() + new Random().Next(1000, 9999);
-
-                // Gán username (tài khoản) là mã học viên
-                model.UserName = model.MaHocVien;
-
-                // Tạo mật khẩu mặc định
-                string defaultPassword = model.MaHocVien + "123456";
-
-                // Thiết lập các ngày tạo, cập nhật
-                model.NgayTao = DateTime.Now;
-                model.NgayCapNhat = DateTime.Now;
-
-                // Reset QR_Code_HV (tạo sau)
-                model.QR_Code_HV = "";
-
-                // Tạo user bằng UserManager
-                var result = await UserManager.CreateAsync(model, defaultPassword);
-                if (result.Succeeded)
+                // Tạo AppUser
+                var appUser = new AppUser
                 {
-                    // Gán role "HocVien"
-                    await UserManager.AddToRoleAsync(model.Id, "HocVien");
+                    UserName = model.Email,
+                    Email = model.Email,
+                    NgayTao = DateTime.Now,
+                    NgayCapNhat = DateTime.Now
+                };
 
-                    // Tạo QR code cho học viên bằng Id (string)
+                string defaultPassword = model.NgaySinh.ToString("yyyyMMdd") + "@" + new Random().Next(1000, 9999);
+                var result = await UserManager.CreateAsync(appUser, defaultPassword);
+
+                if (!result.Succeeded)
+                {
+                    foreach (var error in result.Errors)
+                        ModelState.AddModelError("", error);
+                    return View(model);
+                }
+
+                // Gán role học viên
+                await UserManager.AddToRoleAsync(appUser.Id, "HocVien");
+
+                // Sinh mã học viên
+                string maHocVien;
+                do
+                {
+                    maHocVien = DateTime.Now.Year + model.NgaySinh.Year.ToString() + new Random().Next(1000, 9999);
+                }
+                while (db.HocViens.Any(h => h.MaHocVien == maHocVien));
+
+                model.MaHocVien = maHocVien;
+                model.HocVienId = Guid.NewGuid().ToString();
+                model.AppUserId = appUser.Id;
+                model.IsConfirmed = true;
+
+                // Thêm học viên vào DB
+                db.HocViens.Add(model);
+                await db.SaveChangesAsync();
+
+                try
+                {
+                    // Gửi email QR code
                     var hocVienService = new HocVienService(db);
-                    string qrBase64 = hocVienService.GenerateQRCodeForStudent(model.Id);
+                    string qrBase64 = hocVienService.GenerateQRCodeForStudent(model.HocVienId);
 
-                    // Cập nhật mã QR code trong database
-                    // Truy vấn lại HocVien từ DbContext để update (không dùng createdUser.HocVien)
-                    var hocVienEntity = db.HocViens.FirstOrDefault(hv => hv.Email == model.Email);
-
-                    if (hocVienEntity != null)
-                    {
-                        hocVienEntity.QR_Code_HV = qrBase64;
-                        db.Entry(hocVienEntity).State = System.Data.Entity.EntityState.Modified;
-                        await db.SaveChangesAsync();
-                    }
-
-                    // Gửi email chứa QR code
                     var emailService = new EmailService();
                     await emailService.SendQrCodeEmail(model.Email, qrBase64);
 
-                    TempData["Success"] = "Thêm học viên thành công và đã gửi email!";
-                    return RedirectToAction("Index");
+                    TempData["Success"] = "Thêm học viên và gửi email QR thành công!";
+                }
+                catch (Exception ex)
+                {
+                    // Vẫn thêm học viên, chỉ là lỗi khi gửi email
+                    TempData["Warning"] = "Thêm học viên thành công, nhưng lỗi khi gửi email: " + ex.Message;
                 }
 
-                else
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError("", error);
-                    }
-                }
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError("", "Lỗi khi thêm học viên: " + ex.Message);
+                return View(model);
             }
-
-            return View(model);
         }
 
-        // GET: Admin/HocVien/Edit/{id}
-        public async Task<ActionResult> Edit(string id)
+
+
+
+        // GET: Admin/HocVien/Edit/5
+        public ActionResult Edit(string id)
         {
-            if (string.IsNullOrEmpty(id)) 
+            if (string.IsNullOrEmpty(id))
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
 
-            var hocVien = await UserManager.FindByIdAsync(id);
-            if (hocVien == null) return HttpNotFound();
+            var hocVien = db.HocViens.FirstOrDefault(h => h.HocVienId == id);
+            if (hocVien == null)
+                return HttpNotFound();
 
             return View(hocVien);
         }
 
-        // POST: Admin/HocVien/Edit/{id}
+        // POST: Admin/HocVien/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(HocVien model)
         {
             if (!ModelState.IsValid)
+                return View(model);
+
+            var hocVien = db.HocViens.FirstOrDefault(h => h.HocVienId == model.HocVienId);
+            if (hocVien == null)
             {
+                ModelState.AddModelError("", "Học viên không tồn tại.");
                 return View(model);
             }
 
             try
             {
-                var existingHV = await db.HocViens.FindAsync(model.Id);
-                if (existingHV == null)
-                    return HttpNotFound();
+                // Cập nhật thông tin HocVien
+                hocVien.HoVaTen = model.HoVaTen;
+                hocVien.Email = model.Email;
+                hocVien.NgaySinh = model.NgaySinh;
 
-                // Cập nhật thông tin
-                existingHV.HoVaTen = model.HoVaTen;
-                existingHV.NgaySinh = model.NgaySinh;
-                existingHV.SoDienThoai = model.SoDienThoai;
-                existingHV.Email = model.Email;
-                existingHV.UserName = model.Email; 
-                existingHV.CoQuanLamViec = model.CoQuanLamViec;
-                existingHV.NgayCapNhat = DateTime.Now;
-
-                var updateResult = await UserManager.UpdateAsync(existingHV);
-                if (!updateResult.Succeeded)
+                var user = await UserManager.FindByIdAsync(hocVien.AppUserId);
+                if (user != null)
                 {
-                    foreach (var error in updateResult.Errors)
+                    user.Email = model.Email;
+                    user.UserName = model.Email;
+                    var updateResult = await UserManager.UpdateAsync(user);
+                    if (!updateResult.Succeeded)
                     {
-                        ModelState.AddModelError("", error);
+                        foreach (var error in updateResult.Errors)
+                            ModelState.AddModelError("", error);
+                        return View(model);
                     }
-                    return View(model);
                 }
+
+                db.Entry(hocVien).State = EntityState.Modified;
+                await db.SaveChangesAsync();
 
                 TempData["Success"] = "Cập nhật học viên thành công!";
                 return RedirectToAction("Index");
@@ -181,46 +208,58 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             catch (Exception ex)
             {
                 ModelState.AddModelError("", "Lỗi khi cập nhật học viên: " + ex.Message);
+                return View(model);
             }
-
-            return View(model);
         }
+
 
         // GET: Admin/HocVien/Delete/{id}
         public async Task<ActionResult> Delete(string id)
         {
-            if (string.IsNullOrEmpty(id)) return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            if (string.IsNullOrEmpty(id))
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
 
-            var hocVien = await UserManager.FindByIdAsync(id);
+            var hocVien = await db.HocViens
+                .Include(h => h.DiemDanh_HVs)
+                .Include(h => h.DangKyHocs)
+                .FirstOrDefaultAsync(h => h.HocVienId == id);
+
             if (hocVien == null)
             {
-                TempData["Error"] = "Học viên không tồn tại!";
+                TempData["Error"] = "Không tìm thấy học viên.";
                 return RedirectToAction("Index");
             }
 
             try
             {
-                // Xóa các bản ghi liên quan trong bảng DiemDanh_HV
-                var diemDanhs = db.DiemDanhs_HVs.Where(d => d.HocVien.Id == hocVien.Id).ToList();
-                db.DiemDanhs_HVs.RemoveRange(diemDanhs);
+                // Xóa các bản ghi liên quan
+                db.DiemDanhs_HVs.RemoveRange(hocVien.DiemDanh_HVs);
+                db.DangKyHocs.RemoveRange(hocVien.DangKyHocs);
 
-                // Xóa các bản ghi liên quan trong bảng DangKyHoc
-                var hocVienDangKy = db.DangKyHocs.Where(gvh => gvh.HocVien.Id == hocVien.Id).ToList();
-                db.DangKyHocs.RemoveRange(hocVienDangKy);
+                // Lưu AppUserId để xử lý sau khi xóa học viên
+                var appUserId = hocVien.AppUserId;
 
+                // Xóa học viên
+                db.HocViens.Remove(hocVien);
                 await db.SaveChangesAsync();
 
-                // Xóa user qua UserManager
-                var result = await UserManager.DeleteAsync(hocVien);
+                // Xóa tài khoản người dùng nếu có
+                if (!string.IsNullOrEmpty(appUserId))
+                {
+                    var user = await UserManager.FindByIdAsync(appUserId);
+                    if (user != null)
+                    {
+                        var deleteResult = await UserManager.DeleteAsync(user);
+                        if (!deleteResult.Succeeded)
+                        {
+                            TempData["Error"] = "Đã xóa học viên nhưng không xóa được tài khoản người dùng: "
+                                                + string.Join(", ", deleteResult.Errors);
+                            return RedirectToAction("Index");
+                        }
+                    }
+                }
 
-                if (result.Succeeded)
-                {
-                    TempData["Success"] = "Xóa học viên thành công!";
-                }
-                else
-                {
-                    TempData["Error"] = "Lỗi khi xóa học viên: " + string.Join(", ", result.Errors);
-                }
+                TempData["Success"] = "Xóa học viên và tài khoản thành công!";
             }
             catch (Exception ex)
             {
@@ -230,16 +269,14 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
+
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
                 db.Dispose();
-                if (_userManager != null)
-                {
-                    _userManager.Dispose();
-                    _userManager = null;
-                }
+                _userManager?.Dispose();
             }
             base.Dispose(disposing);
         }

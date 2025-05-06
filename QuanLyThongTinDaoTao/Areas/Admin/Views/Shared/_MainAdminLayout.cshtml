@@ -9,10 +9,12 @@
     if (User.Identity.IsAuthenticated)
     {
         var userId = User.Identity.GetUserId();
-        var userManager = HttpContext.Current.GetOwinContext().GetUserManager<AppUserManager>();
-        var roles = userManager.GetRoles(userId);
-
-        role = roles.Contains("Admin") ? "Admin" : roles.Contains("GiangVien") ? "GiangVien" : "";
+        if (!string.IsNullOrEmpty(userId))
+        {
+            var userManager = HttpContext.Current.GetOwinContext().GetUserManager<AppUserManager>();
+            var roles = userManager.GetRoles(userId);
+            role = roles.Contains("Admin") ? "Admin" : roles.Contains("GiangVien") ? "GiangVien" : "";
+        }
     }
 }
 
@@ -48,16 +50,16 @@
         <div class="collapse navbar-collapse" id="navbarSearch">
             <!-- Wrapper để gom cả tìm kiếm và thông tin tài khoản gần nhau -->
             <div class="d-flex align-items-center mx-lg-auto" style="max-width: 700px; width: 100%;">
-                 @*Form tìm kiếm 
-                <form class="d-flex flex-grow-1 me-3">
-                    <div class="input-group">
-                        <input type="search" class="form-control border-0" placeholder="🔍 Tìm kiếm..."
-                               aria-label="Search" value="@ViewBag.Search">
-                        <button class="btn btn-primary" type="submit">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </form>*@
+                @*Form tìm kiếm
+                    <form class="d-flex flex-grow-1 me-3">
+                        <div class="input-group">
+                            <input type="search" class="form-control border-0" placeholder="🔍 Tìm kiếm..."
+                                   aria-label="Search" value="@ViewBag.Search">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>*@
 
                 <!-- User Dropdown (cạnh thanh tìm kiếm) -->
                 <div class="dropdown">
@@ -142,7 +144,7 @@
                             <!-- GIẢNG VIÊN -->
                             <div class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="dropdownGiangVien" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fa fa-keyboard me-2"></i>Quản Lý Giảng Viên
+                                    <i class="fas fa-user-tag me-2"></i>Quản Lý Giảng Viên
                                 </a>
                                 <ul class="dropdown-menu bg-light border-0" aria-labelledby="dropdownGiangVien">
                                     <li><a class="dropdown-item" href="@Url.Action("Index", "GiangVien")">Danh sách Giảng Viên</a></li>
@@ -175,7 +177,7 @@
 
                         <div class="sb-sidenav-footer">
                             @*<div class="small">Logged in as:</div>
-            Start Bootstrap*@
+                                Start Bootstrap*@
                         </div>
                     </div>
                 </div>

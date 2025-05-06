@@ -21,9 +21,9 @@ namespace QuanLyThongTinDaoTao.Models
         public virtual BuoiHoc BuoiHoc { get; set; }
 
         [Required]
-        public string AppUserId { get; set; }
+        public string HocVienId { get; set; }
 
-        [ForeignKey("AppUserId")]
+        [ForeignKey("HocVienId")]
         public virtual HocVien HocVien { get; set; }
 
         public DateTime NgayDiemDanh { get; set; }

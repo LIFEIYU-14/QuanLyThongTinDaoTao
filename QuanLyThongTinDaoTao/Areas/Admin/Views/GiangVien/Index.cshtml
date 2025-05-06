@@ -45,7 +45,7 @@
                         foreach (var gv in Model)
                         {
                             <tr>
-                                <td><input type="checkbox" class="check-item" value="@gv.Id" /></td>
+                                <td><input type="checkbox" class="check-item" value="@gv.GiangVienId" /></td>
                                 <td>@gv.MaGiangVien</td>
                                 <td class="text-start">@gv.HoVaTen</td>
                                 <td>@gv.NgaySinh.ToString("dd/MM/yyyy")</td>
@@ -54,10 +54,10 @@
                                 <td>@gv.HocHam</td>
 
                                 <td>
-                                    <a href="@Url.Action("Edit", new { id = gv.Id })" class="btn btn-sm btn-warning">
+                                    <a href="@Url.Action("Edit", new { id = gv.GiangVienId })" class="btn btn-sm btn-warning">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <a href="@Url.Action("Delete", new { id = gv.Id })" class="btn btn-sm btn-danger"
+                                    <a href="@Url.Action("Delete", new { id = gv.GiangVienId })" class="btn btn-sm btn-danger"
                                        onclick="return confirm('Bạn có chắc chắn muốn xóa giảng viên này?');">
                                         <i class="fas fa-trash-alt"></i>
                                     </a>
@@ -116,48 +116,4 @@
     }
 </script>
 
-<style>
-    .table th, .table td {
-        vertical-align: middle;
-    }
 
-    .table-hover tbody tr:hover {
-        background-color: #f1f1f1;
-    }
-
-    .btn-sm {
-        padding: 0.3rem 0.6rem;
-        font-size: 0.875rem;
-    }
-
-    .btn-warning {
-        background-color: #ffc107;
-        border-color: #ffc107;
-        color: #000;
-    }
-
-        .btn-warning:hover {
-            background-color: #e0a800;
-            border-color: #d39e00;
-            color: #000;
-        }
-
-    .btn-danger {
-        background-color: #dc3545;
-        border-color: #dc3545;
-    }
-
-        .btn-danger:hover {
-            background-color: #c82333;
-            border-color: #bd2130;
-        }
-
-    .table td.text-start {
-        text-align: left;
-    }
-
-    .btn-success {
-        font-size: 1rem;
-        padding: 0.45rem 1rem;
-    }
-</style>

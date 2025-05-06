@@ -20,7 +20,7 @@ public class GiangVienService
     public string GenerateQRCodeForTeacher(string giangVienId)
     {
         // Tìm giảng viên theo Id dạng string
-        var giangVien = _context.GiangViens.FirstOrDefault(gv => gv.Id == giangVienId);
+        var giangVien = _context.GiangViens.FirstOrDefault(gv => gv.GiangVienId == giangVienId);
         if (giangVien == null) return null;
 
         var qrInfo = new

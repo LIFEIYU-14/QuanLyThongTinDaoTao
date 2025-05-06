@@ -21,9 +21,9 @@ namespace QuanLyThongTinDaoTao.Models
         public virtual BuoiHoc BuoiHoc { get; set; }
 
         [Required]
-        public string AppUserId { get; set; }
+        public string GiangVienId { get; set; }
 
-        [ForeignKey("AppUserId")]
+        [ForeignKey("GiangVienId")]
         public virtual GiangVien GiangVien { get; set; }
 
         [Required]
