@@ -247,6 +247,7 @@
     <Compile Include="Controllers\CoursesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\TraCuuController.cs" />
+    <Compile Include="Controllers\TraCuuLichHocController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -476,7 +477,6 @@
     <Content Include="Areas\Admin\Views\GiangVien\Create.cshtml" />
     <Content Include="Areas\Admin\Views\GiangVien\Edit.cshtml" />
     <Content Include="Areas\Admin\Views\LopHoc\_LopHocTablePartial.cshtml" />
-    <Content Include="Areas\Admin\Views\KhoaHoc\ThemLopHoc_KhoaHoc.cshtml" />
     <Content Include="Areas\Admin\Views\HocVien\Edit.cshtml" />
     <Content Include="Areas\Admin\Views\DiemDanhHocVien\Index.cshtml" />
     <Content Include="Areas\Admin\Views\DiemDanhGiangVien\Index.cshtml" />
@@ -521,6 +521,7 @@
     <Content Include="Views\Courses\DanhSachLopHoc.cshtml" />
     <Content Include="Views\TraCuu\Index.cshtml" />
     <Content Include="Views\Courses\Register.cshtml" />
+    <Content Include="Views\TraCuuLichHoc\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

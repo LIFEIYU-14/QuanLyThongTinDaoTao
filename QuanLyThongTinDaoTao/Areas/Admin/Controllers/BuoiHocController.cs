@@ -11,6 +11,7 @@ using QuanLyThongTinDaoTao.Models;
 
 namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class BuoiHocController : Controller
     {
         private DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
@@ -72,11 +73,12 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         public ActionResult Create(Guid? lopHocId)
         {
             var model = new BuoiHoc();
-           
             if (lopHocId.HasValue)
             {
                 var lopHoc = db.LopHocs.FirstOrDefault(k => k.LopHocId == lopHocId.Value);
                 ViewBag.TenLopHoc = lopHoc?.TenLopHoc;
+                ViewBag.NgayBatDau = lopHoc?.NgayBatDau;
+                ViewBag.NgayKetThuc = lopHoc?.NgayKetThuc;
                 model.LopHocId = lopHocId.Value;
             }
 
@@ -546,7 +548,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
             var danhSach = allGVs.Select(gv => new
             {
-                gv.GiangVienId, // AppUserId vì GiangVien kế thừa từ AppUser
+                gv.GiangVienId,
                 gv.HoVaTen,
                 IsSelected = selectedGVIds.Contains(gv.GiangVienId),
                 IsBusy = db.BuoiHocs.Any(b =>

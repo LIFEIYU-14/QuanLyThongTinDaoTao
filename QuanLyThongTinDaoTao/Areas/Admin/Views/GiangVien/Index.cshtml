@@ -15,10 +15,7 @@
                 <i class="bi bi-plus-circle"></i> Thêm giảng viên
             </a>
             <input type="text" class="form-control w-50" id="searchInput" placeholder="Tìm kiếm theo mã, tên, email..." />
-            <button class="btn btn-primary" type="submit">
-                <i class="fas fa-search"></i>
-            </button>
-
+         
             <button class="btn btn-danger d-none" id="btnXoaNhieu" onclick="xoaNhieu()">
                 <i class="bi bi-trash3"></i> Xóa đã chọn
             </button>
@@ -101,7 +98,30 @@
         let anyChecked = $(".check-item:checked").length > 0;
         $("#btnXoaNhieu").toggleClass("d-none", !anyChecked);
     }
+    $(document).ready(function () {
+        $("#searchInput").on("input", function () {
+            var keyword = $(this).val().toLowerCase();
+            $("#giangVienTable tbody tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(keyword) > -1);
+            });
+        });
 
+        // Check all
+        $("#checkAll").click(function () {
+            $(".check-item").prop('checked', $(this).prop('checked'));
+            toggleDeleteButton();
+        });
+
+        // Toggle delete button
+        $(".check-item").on('change', function () {
+            toggleDeleteButton();
+        });
+
+        function toggleDeleteButton() {
+            let anyChecked = $(".check-item:checked").length > 0;
+            $("#btnXoaNhieu").toggleClass("d-none", !anyChecked);
+        }
+    });
     function xoaNhieu() {
         let ids = $(".check-item:checked").map(function () {
             return $(this).val();

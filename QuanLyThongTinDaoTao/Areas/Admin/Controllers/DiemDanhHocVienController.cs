@@ -21,7 +21,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             if (User.IsInRole("GiangVien"))
             {
                 var buoiHoc = db.GiangVien_BuoiHoc
-                                .Where(gb => gb.GiangVien.GiangVienId == userId)
+                                .Where(gb => gb.GiangVien.AppUserId == userId)
                                 .Select(gb => gb.BuoiHoc)
                                 .ToList();
 
@@ -35,12 +35,22 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             // Lấy danh sách lớp học
             var lopHocs = db.LopHocs.ToList();
             ViewBag.LopHocList = lopHocs;
+            ViewBag.KhoaHocList = db.KhoaHocs.ToList();
 
             var danhSachHocVien = db.DangKyHocs
                    .Include(lh => lh.LopHoc)
                    .Include(hv => hv.HocVien)
                    .ToList();
-            return View();
+            return View(danhSachHocVien);
+        }
+        // Lấy danh sách lớp theo khóa học
+        public ActionResult GetLopHocTheoKhoaHoc(Guid? khoaHocId)
+        {
+            var lopHocs = db.LopHocs
+                .Where(lh => lh.KhoaHocId == khoaHocId)
+                .Select(lh => new { lh.LopHocId, lh.TenLopHoc })
+                .ToList();
+            return Json(lopHocs, JsonRequestBehavior.AllowGet);
         }
 
         // Lấy danh sách buổi học theo lớp học
@@ -90,52 +100,76 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
         // POST: Lưu điểm danh
         [HttpPost]
-        public JsonResult LuuDiemDanh(List<DiemDanh_HV> danhSachDiemDanh)
+        public JsonResult DiemDanhHocVien(string hocVienId, Guid buoiHocId)
         {
-            if (danhSachDiemDanh == null || !danhSachDiemDanh.Any())
-            {
-                return Json(new { success = false, message = "Không có dữ liệu điểm danh." });
-            }
-
             try
             {
-                List<object> updatedAttendance = new List<object>();
-
-                foreach (var diemDanh in danhSachDiemDanh)
+                var existing = db.DiemDanhs_HVs.FirstOrDefault(d => d.HocVienId == hocVienId && d.BuoiHocId == buoiHocId);
+                if (existing != null)
                 {
-                    // Check if attendance for this student and session already exists
-                    var existingRecord = db.DiemDanhs_HVs
-                        .FirstOrDefault(d => d.HocVienId == diemDanh.HocVienId && d.BuoiHocId == diemDanh.BuoiHocId);
-
-                    if (existingRecord == null)
-                    {
-                        // Create a new record if none exists
-                        diemDanh.NgayDiemDanh = DateTime.Now; // Set the current date as the attendance date
-                        db.DiemDanhs_HVs.Add(diemDanh);
-                    }
-                    else
-                    {
-                        // Update existing attendance record
-                        existingRecord.TrangThai = diemDanh.TrangThai;
-                        db.Entry(existingRecord).State = EntityState.Modified;
-                    }
-
-                    updatedAttendance.Add(new
-                    {
-                        diemDanh.HocVienId,
-                        diemDanh.BuoiHocId,
-                        diemDanh.TrangThai
-                    });
+                    return Json(new { success = false, message = "Học viên đã được điểm danh." });
                 }
 
+                var record = new DiemDanh_HV
+                {
+                    DiemDanhId = Guid.NewGuid(),
+                    HocVienId = hocVienId,
+                    BuoiHocId = buoiHocId,
+                    TrangThai = DiemDanh_HV.TrangThaiDiemDanhHV.CoMat,
+                    NgayDiemDanh = DateTime.Now
+                };
+
+                db.DiemDanhs_HVs.Add(record);
                 db.SaveChanges();
 
-                return Json(new { success = true, message = "Điểm danh đã được lưu thành công.", updatedAttendance });
+                return Json(new { success = true });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Có lỗi xảy ra khi lưu điểm danh. " + ex.Message });
+                return Json(new { success = false, message = ex.Message });
             }
         }
+        [HttpPost]
+        public JsonResult HuyDiemDanhHocVien(string hocVienId, Guid buoiHocId)
+        {
+            try
+            {
+                var record = db.DiemDanhs_HVs.FirstOrDefault(d => d.HocVienId == hocVienId && d.BuoiHocId == buoiHocId);
+                if (record == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy bản ghi điểm danh." });
+                }
+
+                db.DiemDanhs_HVs.Remove(record);
+                db.SaveChanges();
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+        [HttpPost]
+        public JsonResult HuyDiemDanhTatCa(Guid buoiHocId)
+        {
+            try
+            {
+                var records = db.DiemDanhs_HVs.Where(d => d.BuoiHocId == buoiHocId).ToList();
+                if (!records.Any())
+                    return Json(new { success = false, message = "Không có học viên nào đã điểm danh." });
+
+                db.DiemDanhs_HVs.RemoveRange(records);
+                db.SaveChanges();
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+
     }
 }

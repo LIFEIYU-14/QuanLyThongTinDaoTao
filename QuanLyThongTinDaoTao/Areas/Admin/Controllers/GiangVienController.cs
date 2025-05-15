@@ -168,7 +168,19 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                     return View(model);
                 }
             }
-
+            var user = await UserManager.FindByIdAsync(model.AppUserId);
+            if (user != null)
+            {
+                user.Email = model.Email;
+                user.UserName = model.Email;
+                var updateResult = await UserManager.UpdateAsync(user);
+                if (!updateResult.Succeeded)
+                {
+                    foreach (var error in updateResult.Errors)
+                        ModelState.AddModelError("", error);
+                    return View(model);
+                }
+            }
             db.Entry(gv).State = EntityState.Modified;
             await db.SaveChangesAsync();
 

@@ -20,14 +20,13 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         private readonly string[] hinhDaiDienExtensions = { ".jpg", ".jpeg", ".png" };
 
         // Hiển thị danh sách Khóa học
-        public ActionResult Index(int? page)
+        public ActionResult Index()
         {
-            int pageSize = 12; // Số lượng khóa học trên mỗi trang
-            int pageNumber = (page ?? 1); // Trang mặc định là trang 1
+
 
             var khoaHocs = db.KhoaHocs.Include(k => k.KhoaHocAttachments)
                                        .OrderByDescending(k => k.NgayTao)
-                                       .ToPagedList(pageNumber, pageSize);
+                                        .ToList();
 
             return View(khoaHocs);
         }

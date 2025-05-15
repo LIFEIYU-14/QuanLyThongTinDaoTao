@@ -21,11 +21,20 @@
                         <label class="form-label">Lớp Học</label>
                         <input type="text" class="form-control" value="@ViewBag.TenLopHoc" readonly />
                     </div>
+                    if (ViewBag.NgayBatDau != null && ViewBag.NgayKetThuc != null)
+                    {
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Thời Gian Học</label>
+                            <input type="text" class="form-control"
+                                   value="@(((DateTime)ViewBag.NgayBatDau).ToString("dd/MM/yyyy")) - @(((DateTime)ViewBag.NgayKetThuc).ToString("dd/MM/yyyy"))"
+                                   readonly />
+                        </div>
+                    }
                 }
                 else
                 {
                     <div class="mb-3">
-                          @Html.Label("LopHocId", "Lớp Học", new { @class = "form-label" })
+                        @Html.Label("LopHocId", "Lớp Học", new { @class = "form-label" })
                         <select class="form-control" name="LopHocId" required>
                             <option value="">-- Chọn Lớp Học --</option>
                             @foreach (var lopHoc in ViewBag.LopHocList)
@@ -68,7 +77,7 @@
                     @Html.LabelFor(model => model.GhiChu, "Ghi Chú", new { @class = "form-label" })
                     @Html.TextAreaFor(model => model.GhiChu, new { @class = "form-control", rows = 5, id = "GhiChu" })
                 </div>
-        
+
                 <!-- Tệp Đính Kèm -->
                 <div class="mb-3">
                     <label for="attachments" class="form-label">Tệp Đính Kèm (JPG, PNG, PDF, DOCX, TXT)</label>

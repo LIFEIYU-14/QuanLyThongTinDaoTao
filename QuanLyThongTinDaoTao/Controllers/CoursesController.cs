@@ -54,17 +54,49 @@ namespace QuanLyThongTinDaoTao.Controllers
 
         public ActionResult DanhSachLopHoc(Guid? id)
         {
-
-            var khoaHoc = db.KhoaHocs.Include(k => k.LopHocs)
-                                     .Include(k => k.KhoaHocAttachments)
-                                     .FirstOrDefault(k => k.KhoaHocId == id.Value);
+            var khoaHoc = db.KhoaHocs
+                .Include(k => k.LopHocs.Select(l => l.BuoiHocs)) // Load buổi học
+                .Include(k => k.KhoaHocAttachments)
+                .FirstOrDefault(k => k.KhoaHocId == id.Value);
 
             if (khoaHoc == null)
                 return HttpNotFound("Không tìm thấy khóa học.");
 
+            // Tìm danh sách lớp học có buổi học trùng giờ
+            var lopHocList = khoaHoc.LopHocs.ToList();
+            var lopTrungGio = new HashSet<Guid>(); // Set để lưu các lớp bị trùng giờ
+
+            // Kiểm tra trùng giờ giữa các buổi học
+            for (int i = 0; i < lopHocList.Count; i++)
+            {
+                var lopHocI = lopHocList[i];
+                var buoiHocsI = lopHocI.BuoiHocs;
+
+                for (int j = i + 1; j < lopHocList.Count; j++)
+                {
+                    var lopHocJ = lopHocList[j];
+                    var buoiHocsJ = lopHocJ.BuoiHocs;
+
+                    // Kiểm tra trùng giờ giữa các buổi học của 2 lớp
+                    bool trungGio = buoiHocsI.Any(b1 => buoiHocsJ.Any(b2 =>
+                        b1.NgayHoc == b2.NgayHoc &&
+                        b1.GioBatDau < b2.GioKetThuc &&
+                        b2.GioBatDau < b1.GioKetThuc));
+
+                    if (trungGio)
+                    {
+                        lopTrungGio.Add(lopHocI.LopHocId);
+                        lopTrungGio.Add(lopHocJ.LopHocId);
+                    }
+                }
+            }
+
+            ViewBag.LopTrungGio = lopTrungGio;
             ViewBag.KhoaHoc = khoaHoc;
-            return View(khoaHoc.LopHocs.ToList());
+
+            return View(lopHocList);
         }
+
 
 
         [HttpPost]

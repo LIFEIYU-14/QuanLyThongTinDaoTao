@@ -1,15 +1,15 @@
-﻿using System;
+﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
+using QuanLyThongTinDaoTao.Identity;
+using QuanLyThongTinDaoTao.Models;
+using QuanLyThongTinDaoTao.Services;
+using System;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
-using QuanLyThongTinDaoTao.Identity;
-using QuanLyThongTinDaoTao.Models;
-using QuanLyThongTinDaoTao.Services;
 
 namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 {
@@ -147,20 +147,18 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             }
         }
 
-
-
-
         // GET: Admin/HocVien/Edit/5
-        public ActionResult Edit(string id)
+        public async Task<ActionResult> Edit(string id)
         {
             if (string.IsNullOrEmpty(id))
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
 
-            var hocVien = db.HocViens.FirstOrDefault(h => h.HocVienId == id);
+            var hocVien = await db.HocViens.FindAsync(id);
             if (hocVien == null)
                 return HttpNotFound();
 
             return View(hocVien);
+
         }
 
         // POST: Admin/HocVien/Edit/5
@@ -177,13 +175,14 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 ModelState.AddModelError("", "Học viên không tồn tại.");
                 return View(model);
             }
-
             try
             {
                 // Cập nhật thông tin HocVien
                 hocVien.HoVaTen = model.HoVaTen;
                 hocVien.Email = model.Email;
                 hocVien.NgaySinh = model.NgaySinh;
+                hocVien.SoDienThoai = model.SoDienThoai;
+                hocVien.CoQuanLamViec = model.CoQuanLamViec;
 
                 var user = await UserManager.FindByIdAsync(hocVien.AppUserId);
                 if (user != null)

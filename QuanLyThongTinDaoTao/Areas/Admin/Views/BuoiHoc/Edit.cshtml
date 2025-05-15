@@ -211,8 +211,8 @@
                     if (gv.IsBusy && gv.IsSelected) {
                         html = `
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="selectedGiangViens" value="${gv.Id}" id="gv_${gv.Id}" ${isChecked} />
-                                <label class="form-check-label text-warning" for="gv_${gv.Id}">${gv.HoVaTen} (bận - đã chọn)</label>
+                                <input class="form-check-input" type="checkbox" name="selectedGiangViens" value="${gv.GiangVienId}" id="gv_${gv.GiangVienId}" ${isChecked} />
+                                <label class="form-check-label text-warning" for="gv_${gv.GiangVienId}">${gv.HoVaTen} (bận - đã chọn)</label>
                             </div>`;
                                     } else if (gv.IsBusy) {
                                         html = `
@@ -223,8 +223,8 @@
                                     } else {
                                         html = `
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="selectedGiangViens" value="${gv.Id}" id="gv_${gv.Id}" ${isChecked} />
-                                <label class="form-check-label" for="gv_${gv.Id}">${gv.HoVaTen}</label>
+                                <input class="form-check-input" type="checkbox" name="selectedGiangViens" value="${gv.GiangVienId}" id="gv_${gv.GiangVienId}" ${isChecked} />
+                                <label class="form-check-label" for="gv_${gv.GiangVienId}">${gv.HoVaTen}</label>
                             </div>`;
                     }
 

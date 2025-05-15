@@ -9,17 +9,19 @@
         <h3 class="mb-5">   <i class="fas fa-user-tag me-2"></i>ĐIỂM DANH HỌC VIÊN</h3>
     </div>
     <div class="card-header text-white text-center d-flex flex-wrap align-items-center justify-content-center gap-2 mb-3 mt-4">
-        <!-- Dropdown chọn lớp học -->
-        <select class="form-select w-100 mb-0" id="LopHocId">
-            <option value="">-- Chọn Lớp Học Điểm Danh --</option>
-            @foreach (var lopHoc in ViewBag.LopHocList)
+        <!-- Dropdown chọn Khóa học -->
+        <select class="form-select w-100 mb-3" id="KhoaHocId">
+            <option value="">-- Chọn Khóa Học --</option>
+            @foreach (var khoaHoc in ViewBag.KhoaHocList)
             {
-                <option value="@lopHoc.LopHocId">Lớp: @lopHoc.TenLopHoc</option>
+                <option value="@khoaHoc.KhoaHocId">Khóa: @khoaHoc.TenKhoaHoc</option>
             }
         </select>
+
+        <div id="lopHocListContainer" class="d-flex flex-wrap gap-2 justify-content-center mt-2 mb-3"></div>
+
     </div>
     <div class="bg-light rounded p-4 shadow-sm">
-
 
         <!-- Danh sách buổi học của lớp được chọn -->
         <div id="buoiHocContainer" class="mb-3"></div>
@@ -36,7 +38,7 @@
         return date.toISOString().split("T")[0];
     }
 
-    function changeWeek(days) {
+    function changeWeek(days, lopHocId = null) {
         if (days === 0) {
             currentWeekStart = new Date();
         } else {
@@ -44,13 +46,13 @@
         }
 
         var startDate = getFormattedDate(getWeekStart(currentWeekStart));
-        var lopHocId = $('#LopHocId').val();
-        if (!lopHocId) return;
+        var selectedLopHocId = lopHocId || $('.lop-hoc-btn.active').data('id');
+        if (!selectedLopHocId) return;
 
         $.ajax({
             url: '@Url.Action("FilterByLopHoc")',
             type: 'GET',
-            data: { lopHocId: lopHocId, startDate: startDate },
+            data: { lopHocId: selectedLopHocId, startDate: startDate },
             success: function (res) {
                 $('#buoiHocContainer').html(res);
                 $('#hocVienContainer').html('');
@@ -61,6 +63,7 @@
         });
     }
 
+
     function getWeekStart(date) {
         var d = new Date(date);
         var day = d.getDay();
@@ -69,8 +72,51 @@
         return d;
     }
 
+    $('#KhoaHocId').change(function () {
+    var khoaHocId = $(this).val();
+
+    $('#buoiHocContainer').empty();
+    $('#hocVienContainer').empty();
+    $('#lopHocListContainer').empty();
+
+    if (!khoaHocId) return;
+
+        $.ajax({
+            url: '@Url.Action("GetLopHocTheoKhoaHoc")',
+            type: 'GET',
+            data: { khoaHocId: khoaHocId },
+            success: function (res) {
+                var html = '';
+                $.each(res, function (i, lopHoc) {
+                    html += `<button class="btn btn-outline-primary btn-sm me-2 lop-hoc-btn" data-id="${lopHoc.LopHocId}">
+                                ${lopHoc.TenLopHoc}
+                             </button>`;
+                });
+                $('#lopHocListContainer').html(html);
+            },
+            error: function () {
+                alert("Không thể tải danh sách lớp học.");
+            }
+        });
+    });
+    $(document).on('click', '.lop-hoc-btn', function () {
+        $('.lop-hoc-btn').removeClass('active'); // Xóa class active khỏi tất cả nút
+        $(this).addClass('active');              // Thêm class active cho nút đang được click
+        var lopHocId = $(this).data('id');
+        currentWeekStart = new Date();
+        changeWeek(0, lopHocId);
+    });
+
+
     $('#LopHocId').change(function () {
         currentWeekStart = new Date();
         changeWeek(0);
     });
 </script>
+<style>
+    .lop-hoc-btn.active {
+        background-color: #ff0000;
+        color: white;
+        border-color: #ff0000;
+    }
+</style>

@@ -11,20 +11,49 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
     public class DiemDanhGiangVienController : Controller
     {
         private DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
+        [HttpGet]
+        public JsonResult LayLopHocTheoKhoaHoc(Guid khoaHocId)
+        {
+            var lopHocs = db.LopHocs
+                .Where(l => l.KhoaHocId == khoaHocId)
+                .Select(l => new { l.LopHocId, l.TenLopHoc })
+                .ToList();
+
+            return Json(lopHocs, JsonRequestBehavior.AllowGet);
+        }
 
         public ActionResult Index(DateTime? fromDate, DateTime? toDate, Guid? lopHocId, string trangThaiBuoiHoc)
         {
-            // Lưu giá trị filter vào ViewBag để giữ lại khi reload trang
             ViewBag.FromDate = fromDate?.ToString("yyyy-MM-dd");
             ViewBag.ToDate = toDate?.ToString("yyyy-MM-dd");
             ViewBag.SelectedLopHocId = lopHocId;
-            // Lấy danh sách buổi học với giảng viên được phân công
+
+
+            // Lấy danh sách khóa học để dropdown
+            ViewBag.KhoaHocs = db.KhoaHocs.ToList();
+
+            if (lopHocId.HasValue)
+            {
+                var lopHoc = db.LopHocs.Find(lopHocId.Value);
+                if (lopHoc != null)
+                {
+                    ViewBag.SelectedKhoaHocId = lopHoc.KhoaHocId;
+                    ViewBag.LopHocs = db.LopHocs.Where(l => l.KhoaHocId == lopHoc.KhoaHocId).ToList();
+                }
+                else
+                {
+                    ViewBag.LopHocs = new List<LopHoc>();
+                }
+            }
+            else
+            {
+                ViewBag.LopHocs = new List<LopHoc>();
+            }
             var query = db.BuoiHocs
                 .Include(b => b.LopHoc)
                 .Include(b => b.GiangVien_BuoiHocs.Select(g => g.GiangVien))
                 .AsQueryable();
 
-            // Áp dụng bộ lọc
             if (fromDate.HasValue)
                 query = query.Where(b => b.NgayHoc >= fromDate.Value);
 
@@ -41,10 +70,9 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             }
 
             var buoiHocs = query.OrderBy(b => b.NgayHoc)
-                               .ThenBy(b => b.GioBatDau)
-                               .ToList();
+                                .ThenBy(b => b.GioBatDau)
+                                .ToList();
 
-            // Lấy tất cả điểm danh để hiển thị
             var diemDanhs = db.DiemDanhs_GVs.ToList();
 
             ViewBag.DiemDanhs = diemDanhs;
@@ -52,62 +80,78 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             return View(buoiHocs);
         }
 
-
         [HttpPost]
-        public JsonResult LuuDiemDanh(List<DiemDanh_GV> danhSachDiemDanh)
+        public JsonResult LuuDiemDanh(Guid buoiHocId, string giangVienId, int trangThai)
         {
-            if (danhSachDiemDanh == null || !danhSachDiemDanh.Any())
-            {
-                return Json(new { success = false, message = "Không có dữ liệu điểm danh." });
-            }
-
             try
             {
-                List<object> updatedAttendance = new List<object>();
+                var existing = db.DiemDanhs_GVs
+                    .FirstOrDefault(d => d.BuoiHocId == buoiHocId && d.GiangVienId == giangVienId);
 
-                foreach (var diemDanh in danhSachDiemDanh)
+                if (existing == null)
                 {
-                    var existingRecord = db.DiemDanhs_GVs
-                        .FirstOrDefault(d => d.GiangVienId == diemDanh.GiangVienId && d.BuoiHocId == diemDanh.BuoiHocId);
-
-                    if (existingRecord == null)
+                    existing = new DiemDanh_GV
                     {
-                        diemDanh.NgayDiemDanh = DateTime.Now;
-                        db.DiemDanhs_GVs.Add(diemDanh);
-                    }
-                    else
-                    {
-                        existingRecord.TrangThai = diemDanh.TrangThai;
-                        existingRecord.NgayDiemDanh = DateTime.Now;
-                        db.Entry(existingRecord).State = EntityState.Modified;
-                    }
-
-                    updatedAttendance.Add(new
-                    {
-                        diemDanh.GiangVienId,
-                        diemDanh.BuoiHocId,
-                        diemDanh.TrangThai
-                    });
+                        BuoiHocId = buoiHocId,
+                        GiangVienId = giangVienId,
+                        TrangThai = (DiemDanh_GV.TrangThaiDiemDanhGV)trangThai,
+                        NgayDiemDanh = DateTime.Now
+                    };
+                    db.DiemDanhs_GVs.Add(existing);
+                }
+                else
+                {
+                    existing.TrangThai = (DiemDanh_GV.TrangThaiDiemDanhGV)trangThai;
+                    existing.NgayDiemDanh = DateTime.Now;
+                    db.Entry(existing).State = EntityState.Modified;
                 }
 
                 db.SaveChanges();
-
-                return Json(new
-                {
-                    success = true,
-                    message = "Điểm danh đã được lưu thành công.",
-                    updatedAttendance
-                });
+                return Json(new { success = true });
             }
             catch (Exception ex)
             {
-                return Json(new
-                {
-                    success = false,
-                    message = "Có lỗi xảy ra khi lưu điểm danh: " + ex.Message
-                });
+                return Json(new { success = false, message = ex.Message });
             }
         }
 
+        [HttpPost]
+        public JsonResult HuyDiemDanh(Guid buoiHocId, string giangVienId)
+        {
+            try
+            {
+                var record = db.DiemDanhs_GVs.FirstOrDefault(d => d.GiangVienId == giangVienId && d.BuoiHocId == buoiHocId);
+                if (record == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy bản ghi điểm danh." });
+                }
+
+                db.DiemDanhs_GVs.Remove(record);
+                db.SaveChanges();
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        // API mới để hủy tất cả điểm danh của 1 buổi học
+        [HttpPost]
+        public JsonResult HuyTatCaDiemDanh(Guid buoiHocId)
+        {
+            try
+            {
+                var danhSachDiemDanh = db.DiemDanhs_GVs.Where(d => d.BuoiHocId == buoiHocId).ToList();
+                db.DiemDanhs_GVs.RemoveRange(danhSachDiemDanh);
+                db.SaveChanges();
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
     }
 }
