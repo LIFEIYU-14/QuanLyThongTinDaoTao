@@ -12,15 +12,20 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
     {
         private DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
         [HttpGet]
-        public JsonResult LayLopHocTheoKhoaHoc(Guid khoaHocId)
+        public JsonResult LayGiangVienTheoLopHoc(Guid lopHocId)
         {
-            var lopHocs = db.LopHocs
-                .Where(l => l.KhoaHocId == khoaHocId)
-                .Select(l => new { l.LopHocId, l.TenLopHoc })
+            var giangviens = db.GiangVien_BuoiHoc
+                .Where(g => g.BuoiHoc.LopHocId == lopHocId)
+                .Select(g => new {
+                    g.GiangVien.GiangVienId,
+                    g.GiangVien.HoVaTen
+                })
+                .Distinct()  // để không lặp Giảng viên nếu dạy nhiều buổi
                 .ToList();
 
-            return Json(lopHocs, JsonRequestBehavior.AllowGet);
+            return Json(giangviens, JsonRequestBehavior.AllowGet);
         }
+
 
         public ActionResult Index(DateTime? fromDate, DateTime? toDate, Guid? lopHocId, string trangThaiBuoiHoc)
         {
@@ -28,27 +33,6 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             ViewBag.ToDate = toDate?.ToString("yyyy-MM-dd");
             ViewBag.SelectedLopHocId = lopHocId;
 
-
-            // Lấy danh sách khóa học để dropdown
-            ViewBag.KhoaHocs = db.KhoaHocs.ToList();
-
-            if (lopHocId.HasValue)
-            {
-                var lopHoc = db.LopHocs.Find(lopHocId.Value);
-                if (lopHoc != null)
-                {
-                    ViewBag.SelectedKhoaHocId = lopHoc.KhoaHocId;
-                    ViewBag.LopHocs = db.LopHocs.Where(l => l.KhoaHocId == lopHoc.KhoaHocId).ToList();
-                }
-                else
-                {
-                    ViewBag.LopHocs = new List<LopHoc>();
-                }
-            }
-            else
-            {
-                ViewBag.LopHocs = new List<LopHoc>();
-            }
             var query = db.BuoiHocs
                 .Include(b => b.LopHoc)
                 .Include(b => b.GiangVien_BuoiHocs.Select(g => g.GiangVien))
@@ -77,6 +61,8 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
             ViewBag.DiemDanhs = diemDanhs;
             ViewBag.LopHocs = db.LopHocs.ToList();
+            ViewBag.KhoaHocList = db.KhoaHocs.ToList();
+            // Lấy danh sách khóa học để dropdown
             return View(buoiHocs);
         }
 

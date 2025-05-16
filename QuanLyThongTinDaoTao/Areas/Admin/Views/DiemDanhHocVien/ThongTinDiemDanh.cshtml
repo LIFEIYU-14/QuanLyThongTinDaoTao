@@ -4,9 +4,11 @@
     ViewBag.Title = "Điểm danh buổi học";
     Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
 
-    // Lấy thông tin buổi học từ ViewBag
     var buoiHoc = ViewBag.BuoiHoc as BuoiHoc;
     var diemDanhs = ViewBag.DiemDanhs as List<DiemDanh_HV>;
+    var diemDanhsGV = ViewBag.GiangVienDiemDanh as List<DiemDanh_GV>;
+    var tatCaGiangVien = ViewBag.TatCaGiangVien as List<GiangVien>;
+    var danhSachIdDaDiemDanh = ViewBag.DanhSachIdDaDiemDanh as List<string>;
     int stt = 1;
 }
 
@@ -76,12 +78,48 @@
                 }
             </tbody>
         </table>
+
+
+
+        @foreach (var gv in tatCaGiangVien)
+        {
+            bool daDiemDanhGV = danhSachIdDaDiemDanh.Contains(gv.GiangVienId);
+            <div class="mb-3 border rounded p-3 bg-white shadow-sm">
+                <p><strong>Họ tên:</strong> @gv.HoVaTen</p>
+                <p>
+                    <strong>Trạng thái điểm danh:</strong>
+                    @if (daDiemDanhGV)
+                    {
+                        <span class="text-success"><i class="fas fa-check-circle"></i> Đã điểm danh</span>
+                    }
+                    else
+                    {
+                        <span class="text-danger">Chưa điểm danh</span>
+                    }
+                </p>
+                <div>
+                    @if (!daDiemDanhGV)
+                    {
+                        <button class="btn btn-primary btn-sm btn-diemdanh-gv" data-giangvien-id="@gv.GiangVienId">
+                            <i class="fas fa-check"></i> Điểm danh
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-warning btn-sm btn-huydiemdanh-gv" data-giangvien-id="@gv.GiangVienId">
+                            <i class="fas fa-undo"></i> Hủy điểm danh
+                        </button>
+                    }
+                </div>
+            </div>
+        }
+
     </div>
 </div>
 
 <script>
    $(document).ready(function () {
-    // Điểm danh
+    // Điểm danh học viên
     $(document).on('click', '.btn-diemdanh', function () {
         var hocVienId = $(this).data('hocvien-id');
 
@@ -94,7 +132,7 @@
         });
     });
 
-    // Hủy điểm danh
+    // Hủy điểm danh học viên
     $(document).on('click', '.btn-huydiemdanh', function () {
         var hocVienId = $(this).data('hocvien-id');
 
@@ -107,7 +145,7 @@
         });
     });
 
-    // Hủy tất cả
+    // Hủy điểm danh tất cả học viên
     $('#btnHuyTatCa').click(function () {
         if (!confirm("Bạn có chắc muốn hủy điểm danh tất cả học viên không?")) return;
 
@@ -118,7 +156,31 @@
             else alert(res.message);
         });
     });
+
+    // Điểm danh giảng viên
+    $(document).on('click', '.btn-diemdanh-gv', function () {
+        var giangVienId = $(this).data('giangvien-id');
+
+        $.post('@Url.Action("DiemDanhGiangVien")', {
+            giangVienId: giangVienId,
+            buoiHocId: '@buoiHoc.BuoiHocId'
+        }, function (res) {
+            if (res.success) location.reload();
+            else alert(res.message);
+        });
+    });
+
+    // Hủy điểm danh giảng viên
+    $(document).on('click', '.btn-huydiemdanh-gv', function () {
+        var giangVienId = $(this).data('giangvien-id');
+
+        $.post('@Url.Action("HuyDiemDanhGiangVien")', {
+            giangVienId: giangVienId,
+            buoiHocId: '@buoiHoc.BuoiHocId'
+        }, function (res) {
+            if (res.success) location.reload();
+            else alert(res.message);
+        });
+    });
 });
-
 </script>
-

@@ -13,21 +13,22 @@
 <div class="container-fluid pt-4 px-4">
     <div class="bg-light rounded p-4 shadow-sm">
         <h4 class="text-primary fw-bold"><i class="fas fa-calendar-check"></i> Điểm Danh Giảng Viên</h4>
+        <div class="card-header text-white text-center d-flex flex-wrap align-items-center justify-content-center gap-2 mb-3 mt-4">
+            <!-- Dropdown chọn Khóa học -->
+            <select class="form-select w-100 mb-3" id="KhoaHocId">
+                <option value="">-- Chọn Khóa Học --</option>
+                @foreach (var khoaHoc in ViewBag.KhoaHocList)
+                {
+                    <option value="@khoaHoc.KhoaHocId">Khóa: @khoaHoc.TenKhoaHoc</option>
+                }
+            </select>
 
-        @if (buoiHoc != null)
-        {
-            <div class="mb-3">
-                <strong>Lớp học:</strong> @buoiHoc.LopHoc.TenLopHoc <br />
-                <strong>Ngày học:</strong> @buoiHoc.NgayHoc.ToString("dddd, dd/MM/yyyy") <br />
-                <strong>Giờ học:</strong> @buoiHoc.GioBatDau - @buoiHoc.GioKetThuc <br />
-            </div>
+            <div id="lopHocListContainer" class="d-flex flex-wrap gap-2 justify-content-center mb-3"></div>
+            <div id="giangVienListContainer" class="d-flex flex-wrap gap-2 justify-content-center mb-3"></div>
 
-            <div class="text-end mb-3">
-                <button class="btn btn-danger btn-sm" id="btnHuyTatCaGV">
-                    <i class="fas fa-times-circle"></i> Hủy điểm danh tất cả Giảng viên
-                </button>
-            </div>
-        }
+
+        </div>
+
 
         <table class="table table-bordered table-hover">
             <thead class="table-success text-center">
@@ -87,44 +88,90 @@
         </table>
     </div>
 </div>
-
 <script>
-    $(document).ready(function () {
-        // Điểm danh giảng viên
-        $(document).on('click', '.btn-diemdanh-gv', function () {
-            var buoiHocId = $(this).data('buoihoc');
-            var giangVienId = $(this).data('gv');
+    $(function() {
+        // Khi chọn Khóa học => load danh sách Lớp
+        $('#KhoaHocId').change(function() {
+            var khoaHocId = $(this).val();
+            $('#lopHocListContainer').empty();
+            $('#giangVienListContainer').empty();
+            if (!khoaHocId) return;
 
-            $.post('@Url.Action("LuuDiemDanh")', {
-                buoiHocId: buoiHocId,
-                giangVienId: giangVienId,
-                trangThai: 0
-            }, function (res) {
-                if (res.success) {
-                    location.reload();
-                } else {
-                    alert(res.message || 'Lỗi khi điểm danh.');
-                }
-            });
+            $.getJSON('@Url.Action("LayLopHocTheoKhoaHoc")', { khoaHocId: khoaHocId })
+             .done(function(lops) {
+                lops.forEach(function(l) {
+                    var chk = $('<div class="form-check me-3">')
+                        .append($('<input type="radio" name="lopHoc" class="form-check-input">')
+                            .attr('id', 'lop-'+l.LopHocId)
+                            .val(l.LopHocId))
+                        .append($('<label class="form-check-label">')
+                            .attr('for', 'lop-'+l.LopHocId)
+                            .text(l.TenLopHoc));
+                    $('#lopHocListContainer').append(chk);
+                });
+             });
         });
 
-        // Hủy điểm danh giảng viên
-        $(document).on('click', '.btn-huydiemdanh-gv', function () {
-            var buoiHocId = $(this).data('buoihoc');
-            var giangVienId = $(this).data('gv');
+        // Khi tích chọn 1 Lớp => load danh sách Giảng viên
+        $(document).on('change', 'input[name="lopHoc"]', function() {
+            var lopHocId = $(this).val();
+            $('#giangVienListContainer').empty();
+            if (!lopHocId) return;
 
-            $.post('@Url.Action("HuyDiemDanh")', {
-                buoiHocId: buoiHocId,
-                giangVienId: giangVienId
-            }, function (res) {
-                if (res.success) {
-                    location.reload();
-                } else {
-                    alert(res.message || 'Lỗi khi hủy điểm danh.');
+            $.getJSON('@Url.Action("LayGiangVienTheoLopHoc")', { lopHocId: lopHocId })
+             .done(function(gvs) {
+                if (!gvs.length) {
+                    $('#giangVienListContainer').append('<p>Chưa có giảng viên nào.</p>');
+                    return;
                 }
-            });
+                gvs.forEach(function(gv) {
+                    var card = $('<div class="card p-2 m-1" style="min-width:150px;">')
+                        .append('<p class="mb-1">' + gv.HoVaTen + '</p>')
+                        .append('<button class="btn btn-sm btn-primary btn-diemdanh-gv" ' +
+                                'data-buoihoc-id="" data-giangvien-id="'+ gv.GiangVienId +'">' +
+                                '<i class="fas fa-check"></i> Điểm danh</button>');
+                    $('#giangVienListContainer').append(card);
+                });
+             });
         });
 
-      
+       $(document).ready(function () {
+     // Điểm danh giảng viên
+     $(document).on('click', '.btn-diemdanh-gv', function () {
+         var buoiHocId = $(this).data('buoihoc');
+         var giangVienId = $(this).data('gv');
+
+         $.post('@Url.Action("LuuDiemDanh")', {
+             buoiHocId: buoiHocId,
+             giangVienId: giangVienId,
+             trangThai: 0
+         }, function (res) {
+             if (res.success) {
+                 location.reload();
+             } else {
+                 alert(res.message || 'Lỗi khi điểm danh.');
+             }
+         });
+     });
+
+     // Hủy điểm danh giảng viên
+     $(document).on('click', '.btn-huydiemdanh-gv', function () {
+         var buoiHocId = $(this).data('buoihoc');
+         var giangVienId = $(this).data('gv');
+
+         $.post('@Url.Action("HuyDiemDanh")', {
+             buoiHocId: buoiHocId,
+             giangVienId: giangVienId
+         }, function (res) {
+             if (res.success) {
+                 location.reload();
+             } else {
+                 alert(res.message || 'Lỗi khi hủy điểm danh.');
+             }
+         });
+     });
+
+
+ });
     });
 </script>

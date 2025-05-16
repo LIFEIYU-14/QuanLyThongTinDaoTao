@@ -38,9 +38,11 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             ViewBag.KhoaHocList = db.KhoaHocs.ToList();
 
             var danhSachHocVien = db.DangKyHocs
-                   .Include(lh => lh.LopHoc)
-                   .Include(hv => hv.HocVien)
+                   .Include(dk => dk.LopHoc)
+                   .Include(dk => dk.HocVien)
+                   .Include(dk => dk.LopHoc.BuoiHocs.Select(bh => bh.GiangVien_BuoiHocs.Select(gvbh => gvbh.GiangVien)))
                    .ToList();
+
             return View(danhSachHocVien);
         }
         // Lấy danh sách lớp theo khóa học
@@ -75,7 +77,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             ViewBag.LopHocId = lopHocId.Value;
             return PartialView("_BuoiHocListPartial", buoiHocs);
         }
-        // Trang điểm danh chi tiết: hiển thị thông tin buổi học và danh sách học viên
+        // Trang điểm danh chi tiết: hiển thị thông tin buổi học và danh sách học viên, giảng viên
         public ActionResult ThongTinDiemDanh(Guid buoiHocId)
         {
             var buoiHoc = db.BuoiHocs
@@ -84,19 +86,45 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             if (buoiHoc == null)
                 return HttpNotFound();
 
+            // Danh sách học viên đã đăng ký lớp của buổi học
             var danhSachHocVien = db.DangKyHocs
                 .Include(dk => dk.HocVien)
                 .Where(dk => dk.LopHocId == buoiHoc.LopHoc.LopHocId)
                 .ToList();
 
+            // Danh sách học viên đã được điểm danh
             var diemDanhs = db.DiemDanhs_HVs
                 .Where(dd => dd.BuoiHocId == buoiHocId)
                 .ToList();
 
+            // Danh sách giảng viên đã điểm danh
+            var diemDanhsGV = db.DiemDanhs_GVs
+                .Include(d => d.GiangVien)
+                .Where(d => d.BuoiHocId == buoiHocId)
+                .ToList();
+
+            // Danh sách tất cả giảng viên tham gia buổi học
+            var tatCaGiangVien = db.GiangVien_BuoiHoc
+                .Include(g => g.GiangVien)
+                .Where(g => g.BuoiHocId == buoiHocId)
+                .Select(g => g.GiangVien)
+                .Distinct()
+                .ToList();
+
+            // Danh sách ID giảng viên đã điểm danh (để kiểm tra trạng thái trong view)
+            var danhSachIdDaDiemDanh = diemDanhsGV.Select(gv => gv.GiangVienId).ToList();
+
+            // Gán ViewBag để truyền dữ liệu sang View
             ViewBag.BuoiHoc = buoiHoc;
             ViewBag.DiemDanhs = diemDanhs;
+            ViewBag.GiangVienDiemDanh = diemDanhsGV;
+            ViewBag.TatCaGiangVien = tatCaGiangVien;
+            ViewBag.DanhSachIdDaDiemDanh = danhSachIdDaDiemDanh;
+
             return View(danhSachHocVien);
         }
+
+
 
         // POST: Lưu điểm danh
         [HttpPost]
@@ -129,6 +157,37 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
+        // POST: Lưu điểm danh
+        [HttpPost]
+        public JsonResult DiemDanhGiangVien(string giangVienId, Guid buoiHocId)
+        {
+            try
+            {
+                var existing = db.DiemDanhs_GVs.FirstOrDefault(d => d.GiangVienId == giangVienId && d.BuoiHocId == buoiHocId);
+                if (existing != null)
+                {
+                    return Json(new { success = false, message = "Giảng viên đã được điểm danh." });
+                }
+
+                var record = new DiemDanh_GV
+                {
+                    DiemDanhId = Guid.NewGuid(),
+                    GiangVienId = giangVienId,
+                    BuoiHocId = buoiHocId,
+                    TrangThai = DiemDanh_GV.TrangThaiDiemDanhGV.CoMat,
+                    NgayDiemDanh = DateTime.Now
+                };
+
+                db.DiemDanhs_GVs.Add(record);
+                db.SaveChanges();
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
         [HttpPost]
         public JsonResult HuyDiemDanhHocVien(string hocVienId, Guid buoiHocId)
         {
@@ -141,6 +200,27 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 }
 
                 db.DiemDanhs_HVs.Remove(record);
+                db.SaveChanges();
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+        [HttpPost]
+        public JsonResult HuyDiemDanhGiangVien(string giangVienId, Guid buoiHocId)
+        {
+            try
+            {
+                var record = db.DiemDanhs_GVs.FirstOrDefault(d => d.GiangVienId == giangVienId && d.BuoiHocId == buoiHocId);
+                if (record == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy bản ghi điểm danh." });
+                }
+
+                db.DiemDanhs_GVs.Remove(record);
                 db.SaveChanges();
 
                 return Json(new { success = true });
