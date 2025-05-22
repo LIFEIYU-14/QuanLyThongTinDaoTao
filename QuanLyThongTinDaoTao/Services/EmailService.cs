@@ -145,6 +145,38 @@ namespace QuanLyThongTinDaoTao.Services
                 throw;
             }
         }
+        public async Task SendEmail(string toEmail, string subject, string body)
+        {
+            try
+            {
+                var fromAddress = new MailAddress(smtpUser, "Quản Lý Đào Tạo");
+                var toAddress = new MailAddress(toEmail);
+
+                using (var smtp = new SmtpClient(smtpHost, smtpPort))
+                {
+                    smtp.EnableSsl = true;
+                    smtp.Credentials = new NetworkCredential(fromAddress.Address, smtpPass);
+                    smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+                    smtp.Timeout = 20000;
+
+                    using (var message = new MailMessage(fromAddress, toAddress)
+                    {
+                        Subject = subject,
+                        Body = body,
+                        IsBodyHtml = true
+                    })
+                    {
+                        await smtp.SendMailAsync(message);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi hoặc xử lý tùy ý
+                System.Diagnostics.Debug.WriteLine("Email error: " + ex);
+                throw;
+            }
+        }
 
     }
 }

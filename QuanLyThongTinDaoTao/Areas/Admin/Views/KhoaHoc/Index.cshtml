@@ -5,7 +5,6 @@
     Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
 }
 
-<!-- Courses Start -->
 <div class="container-xxl py-5">
     <div class="container">
         <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
@@ -18,60 +17,69 @@
                 <i class="bi bi-plus-circle"></i> Thêm Khóa Học
             </a>
             <input type="text" class="form-control w-50" id="searchInput" placeholder="Tìm kiếm Khóa Học" />
-
             <button class="btn btn-danger d-none" id="btnXoaNhieu" onclick="xoaNhieu()">
-                <i class="bi bi-trash3"></i> Xóa đã chọn
+                <i class="bi bi-trash3"></i> Xóa Tất Cả
             </button>
         </div>
 
-        <div class="row g-4 justify-content-center" id="courseList">
-            @foreach (var khoaHoc in Model)
-            {
-                var imagePath = !string.IsNullOrEmpty(khoaHoc.HinhDaiDienKhoaHoc)
-                    ? Url.Content(khoaHoc.HinhDaiDienKhoaHoc)
-                    : (khoaHoc.KhoaHocAttachments?
-                         .FirstOrDefault(a => a.Attachment != null &&
-                                              (a.Attachment.FileType.ToLower().Contains("jpg")
-                                               || a.Attachment.FileType.ToLower().Contains("png")
-                                               || a.Attachment.FileType.ToLower().Contains("jpeg")))?
-                          .Attachment?.FilePath ?? Url.Content("~/Upload/KhoaHoc/default.png"));
+        <!-- Table List View -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle text-center" id="courseTable">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width: 50px;"><input type="checkbox" id="checkAll" /></th>
+                        <th>STT</th>
+                        <th>Hình</th>
+                        <th>Tên Khóa Học</th>
+                        <th>Thời Lượng</th>
+                        <th>Thao Tác</th>
+                    </tr>
+                </thead> 
+                <tbody>
+                    @{ int stt = 1; }
 
-                <div class="col-lg-4 col-md-6 wow fadeInUp course-card" data-tenkhoahoc="@khoaHoc.TenKhoaHoc.ToLower()" data-wow-delay="0.1s">
-                    <div class="course-item bg-secondary">
-                        <div class="position-relative overflow-hidden">
-                            <a href="@Url.Action("Details", "KhoaHoc", new { id = khoaHoc.KhoaHocId })">
-                                <img class="img-fluid" src='@imagePath' alt="@khoaHoc.TenKhoaHoc" />
-                            </a>
-                            <div class="w-100 d-flex justify-content-center position-absolute bottom-0 start-0 mb-4">
-                                <a href="@Url.Action("Details", "KhoaHoc", new { id = khoaHoc.KhoaHocId })" class="flex-shrink-0 btn btn-sm btn-primary px-3" style="border-radius: 30px 0 0 30px;">Thông Tin Chi Tiết</a>
-                                <a href="@Url.Action("Edit", "KhoaHoc", new { id = khoaHoc.KhoaHocId })" class="flex-shrink-0 btn btn-sm btn-danger px-3" style="border-radius: 0 30px 30px 0;">Chỉnh sửa</a>
-                            </div>
-                        </div>
-                        <div class="text-center p-4 pb-0">
-                            <h3 class="mb-0">$149.00</h3>
-                            <h5 class="mb-4">@khoaHoc.TenKhoaHoc</h5>
-                        </div>
-                        <div class="d-flex border-top">
-                            <small class="flex-fill text-center border-end py-2">
-                                <i class="fa fa-clock text-primary me-2"></i>@khoaHoc.ThoiLuong <span class="fw-bold text-secondary">tiết</span>
-                            </small>
-                            <small class="flex-fill text-center py-2"><i class="fa fa-user text-primary me-2"></i>số lượng người học</small>
-                        </div>
-                    </div>
-                </div>
-            }
+                    @foreach (var khoaHoc in Model)
+                    {
+                        var imagePath = !string.IsNullOrEmpty(khoaHoc.HinhDaiDienKhoaHoc)
+                            ? Url.Content(khoaHoc.HinhDaiDienKhoaHoc)
+                            : (khoaHoc.KhoaHocAttachments?
+                                 .FirstOrDefault(a => a.Attachment != null &&
+                                                      (a.Attachment.FileType.ToLower().Contains("jpg")
+                                                       || a.Attachment.FileType.ToLower().Contains("png")
+                                                       || a.Attachment.FileType.ToLower().Contains("jpeg")))?
+                                  .Attachment?.FilePath ?? Url.Content("~/Upload/KhoaHoc/default.png"));
+
+                        <tr class="course-row" data-tenkhoahoc="@khoaHoc.TenKhoaHoc.ToLower()">
+                            <td><input type="checkbox" class="check-item" value="@khoaHoc.KhoaHocId" /></td>
+                            <td>@stt</td>
+                            <td>
+                                <img src="@imagePath" alt="@khoaHoc.TenKhoaHoc" class="img-thumbnail" style="width: 100px; height: auto;" />
+                            </td>
+                            <td>@khoaHoc.TenKhoaHoc</td>
+                            <td>@khoaHoc.ThoiLuong tiết</td>
+                            <td>
+                                <a href="@Url.Action("Details", "KhoaHoc", new { id = khoaHoc.KhoaHocId })" class="btn btn-sm btn-info me-1">
+                                    <i class="fas fa-eye"></i> Chi tiết
+                                </a>
+                                <a href="@Url.Action("Edit", "KhoaHoc", new { id = khoaHoc.KhoaHocId })" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i> Sửa
+                                </a>
+                            </td>
+                        </tr>
+                        stt++;
+                    }
+                </tbody>
+            </table>
         </div>
-
     </div>
 </div>
-
 
 <script>
     $(document).ready(function () {
         $('#searchInput').on('keyup', function () {
             var keyword = $(this).val().toLowerCase();
 
-            $('.course-card').each(function () {
+            $('.course-row').each(function () {
                 var tenKhoaHoc = $(this).data('tenkhoahoc');
 
                 if (tenKhoaHoc.includes(keyword)) {
@@ -82,4 +90,18 @@
             });
         });
     });
+    // Check all
+    $("#checkAll").click(function () {
+        $(".check-item").prop('checked', $(this).prop('checked'));
+        toggleDeleteButton();
+    });
+    // Toggle delete button
+    $(".check-item").on('change', function () {
+        toggleDeleteButton();
+    });
+
+    function toggleDeleteButton() {
+        let anyChecked = $(".check-item:checked").length > 0;
+        $("#btnXoaNhieu").toggleClass("d-none", !anyChecked);
+    }
 </script>

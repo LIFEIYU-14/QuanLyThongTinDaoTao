@@ -55,47 +55,52 @@ namespace QuanLyThongTinDaoTao.Controllers
         public ActionResult DanhSachLopHoc(Guid? id)
         {
             var khoaHoc = db.KhoaHocs
-                .Include(k => k.LopHocs.Select(l => l.BuoiHocs)) // Load buổi học
+                .Include(k => k.LopHocs.Select(l => l.BuoiHocs))
                 .Include(k => k.KhoaHocAttachments)
                 .FirstOrDefault(k => k.KhoaHocId == id.Value);
 
             if (khoaHoc == null)
                 return HttpNotFound("Không tìm thấy khóa học.");
 
-            // Tìm danh sách lớp học có buổi học trùng giờ
             var lopHocList = khoaHoc.LopHocs.ToList();
-            var lopTrungGio = new HashSet<Guid>(); // Set để lưu các lớp bị trùng giờ
 
-            // Kiểm tra trùng giờ giữa các buổi học
+            // Tạo dictionary: LopHocId => Danh sách LopHocId trùng giờ
+            var lopTrungGioMap = new Dictionary<Guid, List<Guid>>();
+
             for (int i = 0; i < lopHocList.Count; i++)
             {
-                var lopHocI = lopHocList[i];
-                var buoiHocsI = lopHocI.BuoiHocs;
+                var lopI = lopHocList[i];
+                var buoiI = lopI.BuoiHocs;
 
                 for (int j = i + 1; j < lopHocList.Count; j++)
                 {
-                    var lopHocJ = lopHocList[j];
-                    var buoiHocsJ = lopHocJ.BuoiHocs;
+                    var lopJ = lopHocList[j];
+                    var buoiJ = lopJ.BuoiHocs;
 
-                    // Kiểm tra trùng giờ giữa các buổi học của 2 lớp
-                    bool trungGio = buoiHocsI.Any(b1 => buoiHocsJ.Any(b2 =>
+                    bool trungGio = buoiI.Any(b1 => buoiJ.Any(b2 =>
                         b1.NgayHoc == b2.NgayHoc &&
                         b1.GioBatDau < b2.GioKetThuc &&
                         b2.GioBatDau < b1.GioKetThuc));
 
                     if (trungGio)
                     {
-                        lopTrungGio.Add(lopHocI.LopHocId);
-                        lopTrungGio.Add(lopHocJ.LopHocId);
+                        if (!lopTrungGioMap.ContainsKey(lopI.LopHocId))
+                            lopTrungGioMap[lopI.LopHocId] = new List<Guid>();
+                        if (!lopTrungGioMap.ContainsKey(lopJ.LopHocId))
+                            lopTrungGioMap[lopJ.LopHocId] = new List<Guid>();
+
+                        lopTrungGioMap[lopI.LopHocId].Add(lopJ.LopHocId);
+                        lopTrungGioMap[lopJ.LopHocId].Add(lopI.LopHocId);
                     }
                 }
             }
 
-            ViewBag.LopTrungGio = lopTrungGio;
             ViewBag.KhoaHoc = khoaHoc;
+            ViewBag.LopTrungGioMap = lopTrungGioMap;
 
             return View(lopHocList);
         }
+
 
 
 

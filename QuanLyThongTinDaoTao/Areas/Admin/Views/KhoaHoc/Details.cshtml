@@ -49,61 +49,74 @@
                         <h5 class="text-primary"><i class="fa-solid fa-paperclip"></i> Tệp Đính Kèm</h5>
                         @if (Model.KhoaHocAttachments != null && Model.KhoaHocAttachments.Any())
                         {
-                            <div class="row g-2">
-                                @foreach (var attachment in Model.KhoaHocAttachments)
-                                {
-                                    string fileType = attachment?.Attachment?.FileType?.ToLower();
-                                    string iconClass = "fa-file";
-                                    string badgeColor = "bg-secondary";
+                            var fileGroups = Model.KhoaHocAttachments
+                                .GroupBy(a => a.Attachment.FileType?.ToLower())
+                                .ToList();
 
-                                    switch (fileType)
+                            <div class="accordion" id="accordionFiles">
+                                @{
+                                    int index = 0;
+                                    foreach (var group in fileGroups)
                                     {
-                                        case "pdf":
-                                            iconClass = "fa-file-pdf";
-                                            badgeColor = "bg-danger";
-                                            break;
-                                        case "doc":
-                                        case "docx":
-                                            iconClass = "fa-file-word";
-                                            badgeColor = "bg-primary";
-                                            break;
-                                        case "txt":
-                                            iconClass = "fa-file-alt";
-                                            badgeColor = "bg-dark";
-                                            break;
-                                        case "xls":
-                                        case "xlsx":
-                                            iconClass = "fa-file-excel";
-                                            badgeColor = "bg-success";
-                                            break;
-                                        case "jpg":
-                                        case "jpeg":
-                                        case "png":
-                                            <div class="col-6">
-                                                <img src="@Url.Content(attachment.Attachment.FilePath)" class="img-thumbnail" />
-                                                <div class="text-center mt-1">
-                                                    <a href="@Url.Content(attachment.Attachment.FilePath)" target="_blank" class="btn btn-sm btn-outline-primary">Xem ảnh</a>
+                                        var fileType = group.Key.ToUpper();
+                                        var collapseId = $"collapse{index}";
+                                        var headingId = $"heading{index}";
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="@headingId">
+                                                <button class="accordion-button collapsed" type="button"
+                                                        data-bs-toggle="collapse" data-bs-target="#@collapseId"
+                                                        aria-expanded="false" aria-controls="@collapseId">
+                                                    📁 @fileType
+                                                </button>
+                                            </h2>
+                                            <div id="@collapseId" class="accordion-collapse collapse"
+                                                 aria-labelledby="@headingId" data-bs-parent="#accordionFiles">
+                                                <div class="accordion-body">
+                                                    <div class="row">
+                                                        @foreach (var attachment in group)
+                                                        {
+                                                            var filePath = Url.Content(attachment.Attachment.FilePath);
+                                                            var fileName = attachment.Attachment.FileName;
+                                                            var ext = group.Key;
+
+                                                            if (ext == "jpg" || ext == "png" || ext == "jpeg")
+                                                            {
+                                                                <div class="col-md-3 mb-3">
+                                                                    <div class="card h-100">
+                                                                        <img src="@filePath" class="card-img-top img-fluid" alt="@fileName" />
+                                                                        <div class="card-body p-2 text-center">
+                                                                            <a href="@filePath" target="_blank" class="btn btn-sm btn-outline-primary">Xem ảnh</a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            }
+                                                            else
+                                                            {
+                                                                <div class="col-md-12 mb-2">
+                                                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                                                        <div class="text-truncate" style="max-width: 70%;">
+                                                                            <i class="fas fa-file me-2"></i>
+                                                                            <a href="@filePath" target="_blank" title="@fileName">@fileName</a>
+                                                                        </div>
+                                                                        <span class="badge bg-secondary">@ext.ToUpper()</span>
+                                                                    </div>
+                                                                </div>
+                                                            }
+                                                        }
+                                                    </div>
                                                 </div>
                                             </div>
-                                            continue;
-                                    }
-
-                                    <div class="col-12">
-                                        <div class="d-flex justify-content-between align-items-center border rounded p-2 bg-white shadow-sm">
-                                            <div>
-                                                <i class="fas @iconClass me-2"></i>
-                                                <a href="@Url.Content(attachment.Attachment.FilePath)" target="_blank">@attachment.Attachment.FileName</a>
-                                            </div>
-                                            <span class="badge @badgeColor">@attachment.Attachment.FileType</span>
                                         </div>
-                                    </div>
+                                        index++;
+                                    }
                                 }
                             </div>
                         }
                         else
                         {
-                            <div class="alert alert-warning mt-2">Không có tệp đính kèm.</div>
+                            <div class="alert alert-info">Không có tài liệu</div>
                         }
+
                     </div>
 
                 </div>

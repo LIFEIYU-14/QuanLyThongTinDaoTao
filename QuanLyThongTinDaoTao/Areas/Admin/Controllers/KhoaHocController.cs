@@ -276,7 +276,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         }
         // Upload tệp đính kèm
 
-        private void UploadAttachments(Guid khoaHocId, HttpPostedFileBase[] attachments)
+        public void UploadAttachments(Guid khoaHocId, HttpPostedFileBase[] attachments)
         {
 
             if (attachments == null || !attachments.Any())

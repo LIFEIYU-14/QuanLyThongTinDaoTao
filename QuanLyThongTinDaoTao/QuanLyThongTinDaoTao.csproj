@@ -458,7 +458,6 @@
     <Content Include="Asset\scss\bootstrap\scss\_variables.scss" />
     <Content Include="Areas\Admin\Views\Shared\_MainAdminLayout.cshtml" />
     <Content Include="Areas\Admin\Views\HomeAdmin\Index.cshtml" />
-    <Content Include="Areas\Admin\Views\KhoaHoc\Index.cshtml" />
     <Content Include="Areas\Admin\Views\KhoaHoc\Create.cshtml" />
     <Content Include="Areas\Admin\Views\KhoaHoc\Details.cshtml" />
     <Content Include="Areas\Admin\Views\KhoaHoc\Edit.cshtml" />
@@ -490,6 +489,8 @@
     <Content Include="Areas\Admin\Views\Login\DangNhap.cshtml" />
     <Content Include="Areas\Admin\Views\DiemDanhHocVien\DanhSachBuoiDayGV.cshtml" />
     <Content Include="Areas\Admin\Views\HocVien\Details.cshtml" />
+    <Content Include="Areas\Admin\Views\KhoaHoc\Index.cshtml" />
+    <Content Include="Areas\Admin\Views\LopHoc\DanhSachHocVien.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />

@@ -5,6 +5,7 @@
 @foreach (var lophoc in Model)
 {
     <tr class="text-center">
+        <td><input type="checkbox" class="check-item" value="@lophoc.LopHocId" /></td>
         <td>@stt</td>
         <td>@lophoc.MaLopHoc</td>
         <td>@lophoc.TenLopHoc</td>
@@ -51,8 +52,27 @@
             <a href="@Url.Action("Delete", new { id = lophoc.LopHocId })" class="btn btn-danger btn-sm m-2" onclick="return confirm('Bạn có chắc chắn muốn xóa lớp học này?');">
                 <i class="fas fa-trash-alt"></i> Xóa
             </a>
+            <a href="@Url.Action("DanhSachHocVien", new { id = lophoc.LopHocId })" class="btn btn-danger btn-sm m-2">
+                Danh Sách Học Viên
+            </a>
         </td>
     </tr>
     stt++;
 }
 
+<script>
+    // Check all
+    $("#checkAll").click(function () {
+        $(".check-item").prop('checked', $(this).prop('checked'));
+        toggleDeleteButton();
+    });
+    // Toggle delete button
+    $(".check-item").on('change', function () {
+        toggleDeleteButton();
+    });
+
+    function toggleDeleteButton() {
+        let anyChecked = $(".check-item:checked").length > 0;
+        $("#btnXoaNhieu").toggleClass("d-none", !anyChecked);
+    }
+</script>

@@ -5,75 +5,93 @@
     Layout = "~/Views/Shared/_MainLayout.cshtml";
 }
 @{
-    var khoaHoc = ViewBag.KhoaHoc as QuanLyThongTinDaoTao.Models.KhoaHoc;
+    var khoaHoc = ViewBag.KhoaHoc as QuanLyThongTinDaoTao.Models.KhoaHoc; var lopTrungGio = ViewBag.LopTrungGio as HashSet<Guid>;
 }
 
 @if (khoaHoc != null)
 {
+    var imagePath = !string.IsNullOrEmpty(khoaHoc.HinhDaiDienKhoaHoc)
+    ? Url.Content(khoaHoc.HinhDaiDienKhoaHoc)
+    : (khoaHoc.KhoaHocAttachments?
+         .FirstOrDefault(a => a.Attachment != null &&
+                              (a.Attachment.FileType.ToLower().Contains("jpg")
+                               || a.Attachment.FileType.ToLower().Contains("png")
+                               || a.Attachment.FileType.ToLower().Contains("jpeg")))?
+          .Attachment?.FilePath ?? Url.Content("~/Upload/KhoaHoc/default.png"));
     <div class="container-xxl py-5">
         <div class="container">
             <div class="row">
                 <div class="col-lg-4">
-                    <img src="@(string.IsNullOrEmpty(khoaHoc.HinhDaiDienKhoaHoc) ? "/images/default-course.jpg" : khoaHoc.HinhDaiDienKhoaHoc)"
-                         class="img-fluid rounded"
-                         alt="@khoaHoc.TenKhoaHoc">
+                    <img class="img-fluid" src="@imagePath" alt="@khoaHoc.TenKhoaHoc">
                 </div>
                 <div class="col-lg-8 d-flex align-items-center">
                     <div class="w-100 text-center text-lg-start mt-3 mt-lg-0">
                         <h3 class="fw-bold">Khóa Học : @khoaHoc.TenKhoaHoc</h3>
                         <p>NỘI DUNG: @Html.Raw(khoaHoc.MoTa)</p>
-                        <p>TÀI LIỆU KHÓA HỌC</p>
+                        <p class="fw-bold">TÀI LIỆU KHÓA HỌC</p>
+
                         @if (khoaHoc.KhoaHocAttachments != null && khoaHoc.KhoaHocAttachments.Any())
-
                         {
-                            <div class="row">
-                                @foreach (var attachment in khoaHoc.KhoaHocAttachments)
-                                {
-                                    string fileType = attachment?.Attachment?.FileType?.ToLower();
-                                    string iconClass = "fa-file";
-                                    string badgeColor = "bg-secondary";
+                            var fileGroups = khoaHoc.KhoaHocAttachments
+                                .GroupBy(a => a.Attachment.FileType?.ToLower())
+                                .ToList();
 
-                                    switch (fileType)
+                            <div class="accordion" id="accordionFiles">
+                                @{
+                                    int index = 0;
+                                    foreach (var group in fileGroups)
                                     {
-                                        case "pdf":
-                                            iconClass = "fa-file-pdf";
-                                            badgeColor = "bg-danger";
-                                            break;
-                                        case "docx":
-                                        case "doc":
-                                            iconClass = "fa-file-word";
-                                            badgeColor = "bg-primary";
-                                            break;
-                                        case "txt":
-                                            iconClass = "fa-file-alt";
-                                            badgeColor = "bg-dark";
-                                            break;
-                                        case "xlsx":
-                                        case "xls":
-                                            iconClass = "fa-file-excel";
-                                            badgeColor = "bg-success";
-                                            break;
-                                        case "jpg":
-                                        case "jpeg":
-                                        case "png":
-                                            <div class="col-6 mb-2">
-                                                <img src="@Url.Content(attachment.Attachment.FilePath)" class="img-thumbnail" alt="@attachment.Attachment.FileName">
-                                                <div class="text-center mt-1">
-                                                    <a href="@Url.Content(attachment.Attachment.FilePath)" target="_blank" class="btn btn-sm btn-outline-primary">Xem Ảnh</a>
+                                        var fileType = group.Key.ToUpper();
+                                        var collapseId = $"collapse{index}";
+                                        var headingId = $"heading{index}";
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="@headingId">
+                                                <button class="accordion-button collapsed" type="button"
+                                                        data-bs-toggle="collapse" data-bs-target="#@collapseId"
+                                                        aria-expanded="false" aria-controls="@collapseId">
+                                                    📁 @fileType
+                                                </button>
+                                            </h2>
+                                            <div id="@collapseId" class="accordion-collapse collapse"
+                                                 aria-labelledby="@headingId" data-bs-parent="#accordionFiles">
+                                                <div class="accordion-body">
+                                                    <div class="row">
+                                                        @foreach (var attachment in group)
+                                                        {
+                                                            var filePath = Url.Content(attachment.Attachment.FilePath);
+                                                            var fileName = attachment.Attachment.FileName;
+                                                            var ext = group.Key;
+
+                                                            if (ext == "jpg" || ext == "png" || ext == "jpeg")
+                                                            {
+                                                                <div class="col-md-3 mb-3">
+                                                                    <div class="card h-100">
+                                                                        <img src="@filePath" class="card-img-top img-fluid" alt="@fileName" />
+                                                                        <div class="card-body p-2 text-center">
+                                                                            <a href="@filePath" target="_blank" class="btn btn-sm btn-outline-primary">Xem ảnh</a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            }
+                                                            else
+                                                            {
+                                                                <div class="col-md-12 mb-2">
+                                                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                                                        <div class="text-truncate" style="max-width: 70%;">
+                                                                            <i class="fas fa-file me-2"></i>
+                                                                            <a href="@filePath" target="_blank" title="@fileName">@fileName</a>
+                                                                        </div>
+                                                                        <span class="badge bg-secondary">@ext.ToUpper()</span>
+                                                                    </div>
+                                                                </div>
+                                                            }
+                                                        }
+                                                    </div>
                                                 </div>
                                             </div>
-                                            continue;
-                                    }
-
-                                    <div class="col-12 mb-2">
-                                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <i class="fas @iconClass me-2"></i>
-                                                <a href="@Url.Content(attachment.Attachment.FilePath)" target="_blank">@attachment.Attachment.FileName</a>
-                                            </div>
-                                            <span class="badge @badgeColor rounded-pill">@attachment.Attachment.FileType</span>
                                         </div>
-                                    </div>
+                                        index++;
+                                    }
                                 }
                             </div>
                         }
@@ -81,6 +99,9 @@
                         {
                             <div class="alert alert-info">Không có tài liệu</div>
                         }
+
+
+
                     </div>
                 </div>
             </div>
@@ -113,16 +134,21 @@
                                             @{ int stt = 1; }
                                             @foreach (var lophoc in Model)
                                             {
-                                                <tr>
+
+
+                                                <tr class="">
                                                     <td>
                                                         @if (lophoc.TrangThai == LopHoc.TrangThaiLopHoc.SapMo)
                                                         {
-                                                            <input type="checkbox" name="selectedLopHocIds" value="@lophoc.LopHocId" />
+                                                            <input type="checkbox" class="class-checkbox" name="selectedLopHocIds" value="@lophoc.LopHocId" />
                                                         }
                                                     </td>
                                                     <td>@stt</td>
                                                     <td>@lophoc.MaLopHoc</td>
-                                                    <td>@lophoc.TenLopHoc</td>
+                                                    <td>
+                                                        @lophoc.TenLopHoc
+
+                                                    </td>
                                                     <td>@lophoc.SoTinChi</td>
                                                     <td>@lophoc.NgayBatDau.ToString("dd/MM/yyyy")</td>
                                                     <td>@lophoc.NgayKetThuc.ToString("dd/MM/yyyy")</td>
@@ -150,10 +176,10 @@
                                                         }
                                                         <span class="badge @badgeClass">@trangThaiText</span>
                                                     </td>
-                                              
                                                 </tr>
                                                 stt++;
                                             }
+
                                         </tbody>
                                     </table>
                                 </div>
@@ -187,37 +213,70 @@ else
     </div>
 }
 
-    <script>
-    $(document).ready(function() {
-        // Xử lý khi click nút đăng ký lớp học đã chọn
-        $('#registerForm').submit(function(e) {
+<script>
+    $(document).ready(function () {
+        const lopTrungGioMap = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.LopTrungGioMap));
+
+        // Khi người dùng check 1 lớp
+        $('.class-checkbox').change(function () {
+            // Bỏ disable tất cả checkbox trước
+            $('.class-checkbox').prop('disabled', false);
+
+            // Danh sách checkbox đang được chọn
+            const checkedBoxes = $('.class-checkbox:checked');
+
+            // Tập hợp các lớp trùng giờ cần disable
+            const disabledSet = new Set();
+
+            // Duyệt qua từng lớp đang được chọn để lấy các lớp trùng giờ
+            checkedBoxes.each(function () {
+                const id = $(this).val();
+                const trungGioList = lopTrungGioMap[id] || [];
+                trungGioList.forEach(function (trungId) {
+                    // Không disable lớp đã được chọn
+                    if (!$('.class-checkbox[value="' + trungId + '"]').is(':checked')) {
+                        disabledSet.add(trungId);
+                    }
+                });
+            });
+
+            // Disable các checkbox theo danh sách đã gom lại
+            $('.class-checkbox').each(function () {
+                const id = $(this).val();
+                if (disabledSet.has(id)) {
+                    $(this).prop('disabled', true);
+                }
+            });
+        });
+
+
+
+        $('#registerForm').submit(function (e) {
             e.preventDefault();
 
-            // Kiểm tra xem có lớp nào được chọn không
-            var selectedClasses = $('.class-checkbox:checked');
-            if (selectedClasses.length === 0) {
+            const selected = $('.class-checkbox:checked');
+            if (selected.length === 0) {
                 alert('Vui lòng chọn ít nhất một lớp học để đăng ký.');
                 return false;
             }
 
-            // Lấy danh sách ID lớp học đã chọn
-            var selectedIds = selectedClasses.map(function() {
+            const selectedIds = selected.map(function () {
                 return $(this).val();
             }).get();
 
-            // Submit form với danh sách ID
             $.ajax({
                 url: $(this).attr('action'),
                 type: 'POST',
                 data: { selectedLopHocIds: selectedIds },
-                success: function(response) {
-                    // Chuyển hướng đến trang đăng ký
+                success: function (response) {
                     window.location.href = '@Url.Action("Register", "Courses")?selectedLopHocIds=' + selectedIds.join(',');
                 },
-                error: function(xhr) {
+                error: function (xhr) {
                     alert('Có lỗi xảy ra: ' + xhr.responseText);
                 }
             });
         });
     });
-    </script>
+</script>
+
+

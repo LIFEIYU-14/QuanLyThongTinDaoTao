@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using QuanLyThongTinDaoTao.Models;
+using QuanLyThongTinDaoTao.Services;
 
 namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 {
@@ -480,6 +483,73 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 return Json(new { uploaded = 0, error = new { message = "Lỗi: " + ex.Message } });
             }
         }
+        // GET: Admin/LopHoc/DanhSachHocVien/{id}
+        public ActionResult DanhSachHocVien(Guid id)
+        {
+            // Lấy danh sách học viên của lớp học có id = id
+            var danhSachHocVien = db.HocViens
+                .Where(hv => hv.DangKyHocs.Any(lh => lh.LopHocId == id))  // Giả sử quan hệ là HocVien có danh sách LopHoc
+                .ToList();
+
+            ViewBag.LopHocId = id;
+            var lopHoc = db.LopHocs.Find(id);
+            ViewBag.TenLopHoc = lopHoc?.TenLopHoc ?? "Lớp học không tồn tại";
+
+            return View(danhSachHocVien);
+        }
+        [HttpPost]
+        public async Task<ActionResult> GuiMailNhacNho(Guid lopHocId, List<string> hocVienIds)
+        {
+            if (hocVienIds == null || !hocVienIds.Any())
+                return Json(new { success = false, message = "Không có học viên nào được chọn." });
+
+            // Dùng trực tiếp hocVienIds (kiểu string)
+            var dangKyList = db.DangKyHocs
+                .Where(dk => hocVienIds.Contains(dk.HocVienId) && dk.LopHocId == lopHocId)
+                .Include(dk => dk.HocVien)
+                .Include(dk => dk.LopHoc.BuoiHocs)
+                .ToList();
+
+            var emailService = new EmailService();
+
+            foreach (var dangKy in dangKyList)
+            {
+                var hv = dangKy.HocVien;
+                var lop = dangKy.LopHoc;
+
+                var buoiHocSapHoacDang = lop.BuoiHocs
+                    .Where(bh => bh.CurrentTrangThai == TrangThaiBuoiHoc.SapDienRa
+                              || bh.CurrentTrangThai == TrangThaiBuoiHoc.DangDienRa)
+                    .OrderBy(bh => bh.NgayHoc).ThenBy(bh => bh.GioBatDau)
+                    .ToList();
+
+                if (!buoiHocSapHoacDang.Any() || string.IsNullOrWhiteSpace(hv.Email))
+                    continue;
+
+                var sb = new StringBuilder();
+                sb.AppendLine($"Chào {hv.HoVaTen},<br/><br/>");
+                sb.AppendLine($"Bạn đang đăng ký lớp học: <strong>{lop.TenLopHoc}</strong><br/>");
+                sb.AppendLine("Danh sách buổi học sắp tới:<br/>");
+                foreach (var bh in buoiHocSapHoacDang)
+                {
+                    sb.AppendLine($"- Ngày: {bh.NgayHoc:dd/MM/yyyy}, Giờ: {bh.GioBatDau} - {bh.GioKetThuc}<br/>");
+                }
+                sb.AppendLine("<br/>Vui lòng sắp xếp thời gian tham gia học đầy đủ.<br/>");
+                sb.AppendLine("Chúc bạn học tốt!");
+
+                try
+                {
+                    await emailService.SendEmail(hv.Email, $"Nhắc nhở lịch học lớp {lop.TenLopHoc}", sb.ToString());
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Lỗi gửi mail cho {hv.Email}: {ex.Message}");
+                }
+            }
+
+            return Json(new { success = true, message = "Gửi mail nhắc nhở thành công!" });
+        }
+
 
     }
 }
