@@ -565,6 +565,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
             return Json(danhSach);
         }
+        
 
         [HttpPost]
         public ActionResult UploadImage(HttpPostedFileBase upload)

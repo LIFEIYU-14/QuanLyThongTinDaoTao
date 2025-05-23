@@ -11,10 +11,10 @@
         <!-- Action Bar -->
         <div class="card-header text-white text-center d-flex flex-wrap align-items-center justify-content-center gap-2 mb-3 mt-4">
             <a href="@Url.Action("Create")" class="btn btn-success">
-              Thêm học viên
+                Thêm học viên
             </a>
             <input type="text" class="form-control w-50" id="searchInput" placeholder="Tìm kiếm theo mã, tên, email..." />
-           
+
 
             <button class="btn btn-danger d-none" id="btnXoaNhieu" onclick="xoaNhieu()">
                 <i class="bi bi-trash3"></i> Xóa Tất Cả
@@ -44,7 +44,7 @@
                         {
                             <tr>
                                 <td><input type="checkbox" class="check-item" value="@hv.HocVienId" /></td>
-                                 <td>@stt</td>
+                                <td>@stt</td>
                                 <td>@hv.MaHocVien</td>
                                 <td>@hv.HoVaTen</td>
                                 <td>@hv.NgaySinh.ToShortDateString()</td>
@@ -75,15 +75,7 @@
 
         <!-- Pagination -->
         <nav>
-            <ul class="pagination justify-content-center">
-                <li class="page-item"><a class="page-link" href="#">Trang đầu</a></li>
-                <li class="page-item"><a class="page-link" href="#">Trước</a></li>
-                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item"><a class="page-link" href="#">Sau</a></li>
-                <li class="page-item"><a class="page-link" href="#">Trang cuối</a></li>
-            </ul>
+            <ul class="pagination justify-content-center"></ul>
         </nav>
     </div>
 </div>
@@ -137,6 +129,52 @@
             // TODO: AJAX hoặc POST xử lý
         }
     }
+    // phân trang
 
+    const rowsPerPage = 4; // Số dòng mỗi trang
+    let currentPage = 1;
+
+    function renderPagination() {
+        const rows = $('#lopHocTable tbody tr');
+        const totalRows = rows.length;
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+        rows.hide();
+
+        const startIndex = (currentPage - 1) * rowsPerPage;
+        const endIndex = startIndex + rowsPerPage;
+        rows.slice(startIndex, endIndex).show();
+
+        // Render pagination
+        let paginationHtml = '';
+
+        paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+         <a class="page-link" href="#" onclick="changePage(1)">Trang đầu</a></li>`;
+
+        paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+         <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Trước</a></li>`;
+
+        for (let i = 1; i <= totalPages; i++) {
+            paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+             <a class="page-link" href="#" onclick="changePage(${i})">${i}</a></li>`;
+        }
+
+        paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+         <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Sau</a></li>`;
+
+        paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+         <a class="page-link" href="#" onclick="changePage(${totalPages})">Trang cuối</a></li>`;
+
+        $('.pagination').html(paginationHtml);
+    }
+
+    function changePage(page) {
+        currentPage = page;
+        renderPagination();
+    }
+
+    $(function () {
+        renderPagination(); // Gọi lần đầu khi trang load
+    });
 
 </script>

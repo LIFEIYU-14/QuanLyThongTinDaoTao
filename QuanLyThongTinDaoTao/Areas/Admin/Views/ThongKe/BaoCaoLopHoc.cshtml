@@ -1,0 +1,250 @@
+﻿@model List<QuanLyThongTinDaoTao.ModelsHelper.LopHocThongKeViewModel>
+@{
+    ViewBag.Title = "BÁO CÁO LỚP HỌC";
+    Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
+
+    int maxDisplay = 10;
+    bool xemTatCa = Request.QueryString["xemTatCa"] == "true";
+    var displayList = xemTatCa ? Model : Model.OrderByDescending(m => m.NgayBatDau).Take(maxDisplay).ToList();
+}
+
+<div class="container-xxl py-5">
+    <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+        <h3 class="mb-3"><i class="fas fa-chart-bar me-2"></i>@ViewBag.Title</h3>
+    </div>
+
+    <div class="bg-light rounded shadow-sm">
+        <!-- Bộ lọc -->
+        <div class="card-header text-center d-flex flex-wrap justify-content-center gap-3 pt-4" id="filterSection">
+            @using (Html.BeginForm("BaoCaoLopHoc", "ThongKe", FormMethod.Get, new { id = "filterForm", @class = "d-flex flex-wrap gap-2 justify-content-center" }))
+            {
+                <div class="form-group">
+                    <label>Khóa học:</label>
+                    @Html.DropDownList("khoaHocId", new SelectList(ViewBag.KhoaHocs, "KhoaHocId", "TenKhoaHoc"), "Tất cả", new { @class = "form-control auto-submit" })
+                </div>
+                <div class="form-group">
+                    <label>Trạng thái lớp học:</label>
+                    @Html.DropDownList("trangThai", new SelectList(Enum.GetValues(typeof(QuanLyThongTinDaoTao.Models.LopHoc.TrangThaiLopHoc))), "Tất cả", new { @class = "form-control auto-submit" })
+                </div>
+            }
+        </div>
+
+        <!-- Label hiển thị đang lọc -->
+        <div class="text-center mt-2 mb-3">
+            <span class="badge bg-info text-dark px-3 py-2">
+                Đang lọc:
+                @if (!string.IsNullOrEmpty(Request.QueryString["khoaHocId"]))
+                {
+                    var kh = ((IEnumerable<dynamic>)ViewBag.KhoaHocs)?.FirstOrDefault(k => k.KhoaHocId.ToString() == Request.QueryString["khoaHocId"]);
+                    @("Khóa học: " + (kh?.TenKhoaHoc ?? "Tất cả") + " | ")
+                }
+                @if (!string.IsNullOrEmpty(Request.QueryString["trangThai"]))
+                {
+                    var trangThai = Request.QueryString["trangThai"];
+                    @("Trạng thái: " + trangThai)
+                }
+            </span>
+        </div>
+
+        <!-- Cảnh báo nếu quá nhiều lớp -->
+        @if (!xemTatCa && Model.Count > maxDisplay)
+        {
+            <div class="alert alert-warning text-center mt-2">
+                Có <strong>@Model.Count</strong> lớp học. Đang hiển thị <strong>@maxDisplay</strong> lớp gần nhất theo ngày bắt đầu.
+            </div>
+            <div class="text-center mb-3">
+                <a href="@Url.Action("BaoCaoLopHoc", "ThongKe", new { xemTatCa = true, khoaHocId = Request.QueryString["khoaHocId"], trangThai = Request.QueryString["trangThai"] })" class="btn btn-outline-primary">
+                    Xem tất cả lớp học
+                </a>
+            </div>
+        }
+
+        <!-- Bảng dữ liệu -->
+        <div class="table-responsive px-3">
+            <table class="table table-bordered align-middle text-center" id="baoCaoLopHocTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>STT</th>
+                        <th>Tên lớp học</th>
+                        <th>Số học viên</th>
+                        <th>Số buổi học</th>
+                        <th>HV Điểm danh (%)</th>
+                        <th>GV Điểm danh (%)</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày bắt đầu</th>
+                        <th>Ngày kết thúc</th>
+                        <th>Giảng viên</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int stt = 1;
+                        foreach (var item in displayList)
+                        {
+                            <tr>
+                                <td>@stt</td>
+                                <td>@item.TenLopHoc</td>
+                                <td>@item.SoHocVien</td>
+                                <td>@item.SoBuoiHoc</td>
+                                <td>@item.TiLeDiemDanh.ToString("F2")</td>
+                                <td>@item.TiLeDiemDanhGiangVien.ToString("F2")</td>
+                                <td>@item.TrangThai</td>
+                                <td>@item.NgayBatDau.ToString("dd/MM/yyyy")</td>
+                                <td>@item.NgayKetThuc.ToString("dd/MM/yyyy")</td>
+                                <td>@item.GiangVienPhuTrach ?? "Chưa xác định"</td>
+                            </tr>
+                            stt++;
+                        }
+                    }
+                </tbody>
+            </table>
+            <nav>
+                <ul class="pagination justify-content-center"></ul>
+            </nav>
+        </div>
+
+        <!-- Biểu đồ ChartJS -->
+        <div class="mt-5 px-3">
+            <h4 class="text-center mb-4"><i class="fas fa-chart-column me-2"></i>Biểu đồ tỷ lệ điểm danh</h4>
+            <canvas id="chartDiemDanh" height="300" style="max-height: 300px;"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- ChartJS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const rowsPerPage = 5;
+    let currentPage = 1;
+
+    // Lấy tất cả các dòng dữ liệu (rows) trong bảng
+    const rows = $('#baoCaoLopHocTable tbody tr');
+
+    // Khởi tạo chart global để cập nhật dữ liệu sau này
+    const ctx = document.getElementById('chartDiemDanh').getContext('2d');
+    let chart;
+
+    function getDataFromRows(rowsSubset) {
+        const labels = [];
+        const hocVienData = [];
+        const giangVienData = [];
+
+        rowsSubset.each(function () {
+            const cells = $(this).find('td');
+            labels.push(cells.eq(1).text()); // Tên lớp học
+            hocVienData.push(parseFloat(cells.eq(4).text()));
+            giangVienData.push(parseFloat(cells.eq(5).text()));
+        });
+
+        return { labels, hocVienData, giangVienData };
+    }
+
+    function renderChart(data) {
+        if (chart) {
+            chart.destroy();
+        }
+        chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.labels,
+                datasets: [
+                    {
+                        label: 'Học viên (%)',
+                        data: data.hocVienData,
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1,
+                        barPercentage: 0.4,
+                        categoryPercentage: 0.5
+                    },
+                    {
+                        label: 'Giảng viên (%)',
+                        data: data.giangVienData,
+                        backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1,
+                        barPercentage: 0.4,
+                        categoryPercentage: 0.5
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                clip: true,
+                scales: {
+                    y: {
+                        type: 'linear',
+                        beginAtZero: true,
+                        min: 0,
+                        max: 100,
+                        ticks: {
+                            stepSize: 10
+                        }
+                    },
+                    x: {
+                        stacked: false
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                }
+            }
+
+        });
+    }
+
+    function renderPagination() {
+        const totalRows = rows.length;
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+        rows.hide();
+
+        const startIndex = (currentPage - 1) * rowsPerPage;
+        const endIndex = startIndex + rowsPerPage;
+        const rowsToShow = rows.slice(startIndex, endIndex);
+        rowsToShow.show();
+
+        // Cập nhật biểu đồ với dữ liệu trang hiện tại
+        const chartData = getDataFromRows(rowsToShow);
+        renderChart(chartData);
+
+        // Render phân trang
+        let paginationHtml = '';
+
+        paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+          <a class="page-link" href="#" onclick="changePage(1); return false;">Trang đầu</a></li>`;
+
+        paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+          <a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">Trước</a></li>`;
+
+        for (let i = 1; i <= totalPages; i++) {
+            paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+              <a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a></li>`;
+        }
+
+        paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+          <a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;">Sau</a></li>`;
+
+        paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+          <a class="page-link" href="#" onclick="changePage(${totalPages}); return false;">Trang cuối</a></li>`;
+
+        $('.pagination').html(paginationHtml);
+    }
+
+    function changePage(page) {
+        currentPage = page;
+        renderPagination();
+    }
+
+    $(document).ready(function () {
+        $('.auto-submit').on('change', function () {
+            $('#filterForm').submit();
+        });
+
+        renderPagination(); // Gọi lần đầu khi trang load
+    });
+</script>

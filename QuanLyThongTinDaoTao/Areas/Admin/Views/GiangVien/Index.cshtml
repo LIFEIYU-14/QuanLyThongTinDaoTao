@@ -15,7 +15,7 @@
                 <i class="bi bi-plus-circle"></i> Thêm giảng viên
             </a>
             <input type="text" class="form-control w-50" id="searchInput" placeholder="Tìm kiếm theo mã, tên, email..." />
-         
+
             <button class="btn btn-danger d-none" id="btnXoaNhieu" onclick="xoaNhieu()">
                 <i class="bi bi-trash3"></i> Xóa đã chọn
             </button>
@@ -66,18 +66,9 @@
                 </tbody>
             </table>
         </div>
-
         <!-- Pagination -->
         <nav>
-            <ul class="pagination justify-content-center">
-                <li class="page-item"><a class="page-link" href="#">Trang đầu</a></li>
-                <li class="page-item"><a class="page-link" href="#">Trước</a></li>
-                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item"><a class="page-link" href="#">Sau</a></li>
-                <li class="page-item"><a class="page-link" href="#">Trang cuối</a></li>
-            </ul>
+            <ul class="pagination justify-content-center"></ul>
         </nav>
     </div>
 </div>
@@ -134,6 +125,53 @@
             console.log("IDs to delete:", ids);
         }
     }
+    // phân trang
+
+    const rowsPerPage = 4; // Số dòng mỗi trang
+    let currentPage = 1;
+
+    function renderPagination() {
+        const rows = $('#lopHocTable tbody tr');
+        const totalRows = rows.length;
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+        rows.hide();
+
+        const startIndex = (currentPage - 1) * rowsPerPage;
+        const endIndex = startIndex + rowsPerPage;
+        rows.slice(startIndex, endIndex).show();
+
+        // Render pagination
+        let paginationHtml = '';
+
+        paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+       <a class="page-link" href="#" onclick="changePage(1)">Trang đầu</a></li>`;
+
+        paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+       <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Trước</a></li>`;
+
+        for (let i = 1; i <= totalPages; i++) {
+            paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+           <a class="page-link" href="#" onclick="changePage(${i})">${i}</a></li>`;
+        }
+
+        paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+       <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Sau</a></li>`;
+
+        paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+       <a class="page-link" href="#" onclick="changePage(${totalPages})">Trang cuối</a></li>`;
+
+        $('.pagination').html(paginationHtml);
+    }
+
+    function changePage(page) {
+        currentPage = page;
+        renderPagination();
+    }
+
+    $(function () {
+        renderPagination(); // Gọi lần đầu khi trang load
+    });
 </script>
 
 

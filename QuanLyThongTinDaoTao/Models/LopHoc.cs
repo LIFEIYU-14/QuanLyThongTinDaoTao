@@ -52,6 +52,7 @@ namespace QuanLyThongTinDaoTao.Models
         public virtual KhoaHoc KhoaHoc { get; set; }
 
         public virtual ICollection<BuoiHoc> BuoiHocs { get; set; } = new List<BuoiHoc>();
+        public virtual ICollection<DangKyHoc> DangKyHocs { get; set; } = new List<DangKyHoc>();
         public virtual ICollection<LopHocAttachment> LopHocAttachments { get; set; } = new List<LopHocAttachment>();
 
         [NotMapped]

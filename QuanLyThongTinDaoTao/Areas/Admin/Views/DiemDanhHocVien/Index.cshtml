@@ -18,7 +18,8 @@
             }
         </select>
 
-        <div id="lopHocListContainer" class="d-flex flex-wrap gap-2 justify-content-center mt-2 mb-3"></div>
+        <div id="lopHocListContainer" class="d-flex flex-nowrap gap-2 justify-content-start overflow-auto mt-2 mb-3"></div>
+
 
     </div>
     <div class="p-4">
@@ -119,4 +120,50 @@
         color: white;
         border-color: #ff0000;
     }
+    #lopHocListContainer {
+        max-width: 100%;
+        padding: 5px 0;
+        border-bottom: 1px solid #ddd;
+        /* Hiện thanh cuộn ngang khi cần */
+        overflow-x: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #888 #f1f1f1;
+    }
+
+        #lopHocListContainer::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        #lopHocListContainer::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        #lopHocListContainer::-webkit-scrollbar-thumb {
+            background-color: #888;
+            border-radius: 3px;
+        }
+
+    .lop-hoc-btn {
+        flex: 0 0 auto; /* không co dãn, không tràn xuống dòng */
+        border-radius: 20px;
+        padding: 8px 20px;
+        font-weight: 500;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+    }
+
+        .lop-hoc-btn:hover {
+            background-color: #0056b3;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,86,179,0.5);
+        }
+
+        .lop-hoc-btn.active {
+            background-color: #ff0000 !important;
+            color: white !important;
+            border-color: #ff0000 !important;
+            box-shadow: 0 4px 12px rgba(255,0,0,0.6);
+        }
+
 </style>

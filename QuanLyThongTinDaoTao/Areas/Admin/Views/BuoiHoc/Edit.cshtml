@@ -55,18 +55,14 @@
                 </div>
                 <div class="col-md-12 mb-3">
                     <label class="form-label">Chọn Giảng Viên</label>
-
+                    <input type="text" class="form-control mb-2" placeholder="Tìm giảng viên..." id="searchGiangVien" />
                     <div id="giangVienContainer" class="border rounded p-2" style="max-height: 300px; overflow-y: auto;">
-                    
+
                     </div>
 
                 </div>
 
-                <!-- Tệp Đính Kèm -->
-                <div class="mb-3">
-                    <label for="attachments" class="form-label">Tệp Đính Kèm (JPG, PNG, PDF, DOCX, TXT)</label>
-                    <input type="file" name="attachments" id="attachments" class="form-control" multiple />
-                </div>
+
 
                 <div class="col-md-6 mb-3">
                     <label class="form-label fw-semibold">Tệp Đính Kèm (jpg, png, pdf, docx, xlsx, txt)</label>
@@ -109,6 +105,7 @@
         </div>
     </div>
 </div>
+
 
 <style>
     .ck-editor__editable {
@@ -245,5 +242,12 @@
 
         // Gọi khi trang load
         fetchAvailableGiangViens();
+    });
+    document.getElementById("searchGiangVien").addEventListener("keyup", function () {
+        const keyword = this.value.toLowerCase();
+        $("#giangVienContainer .form-check").each(function () {
+            const text = $(this).text().toLowerCase();
+            $(this).toggle(text.includes(keyword));
+        });
     });
 </script>

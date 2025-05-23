@@ -244,6 +244,7 @@
     <Compile Include="Areas\Admin\Controllers\LopHocController.cs" />
     <Compile Include="Areas\Admin\Controllers\HocVienController.cs" />
     <Compile Include="Areas\Admin\Controllers\LoginController.cs" />
+    <Compile Include="Areas\Admin\Controllers\ThongKeController.cs" />
     <Compile Include="Controllers\CoursesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\TraCuuController.cs" />
@@ -281,6 +282,7 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ModelsHelper\DangKyHocRequest.cs" />
     <Compile Include="ModelsHelper\LopHocDetailsViewModel.cs" />
+    <Compile Include="ModelsHelper\LopHocThongKeViewModel.cs" />
     <Compile Include="ModelsHelper\VerifyOtpRequest.cs" />
     <Compile Include="Models\AppUser.cs" />
     <Compile Include="Models\Attachment.cs" />
@@ -491,6 +493,7 @@
     <Content Include="Areas\Admin\Views\HocVien\Details.cshtml" />
     <Content Include="Areas\Admin\Views\KhoaHoc\Index.cshtml" />
     <Content Include="Areas\Admin\Views\LopHoc\DanhSachHocVien.cshtml" />
+    <Content Include="Areas\Admin\Views\ThongKe\BaoCaoLopHoc.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />

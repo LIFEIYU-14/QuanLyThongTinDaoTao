@@ -1,7 +1,8 @@
 ﻿@model List<QuanLyThongTinDaoTao.Models.DangKyHoc>
 @using QuanLyThongTinDaoTao.Models;
+
 @{
-    ViewBag.Title = "Điểm danh buổi học";
+    ViewBag.Title = "Điểm Danh Buổi Học";
     Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
 
     var buoiHoc = ViewBag.BuoiHoc as BuoiHoc;
@@ -12,86 +13,100 @@
     int stt = 1;
 }
 
-<div class="container-fluid pt-4 px-4">
-    <div class="bg-light rounded p-4 shadow-sm">
-        <h4 class="text-primary fw-bold"><i class="fas fa-calendar-check"></i> Điểm Danh Buổi Học</h4>
+<div class="container-xxl py-5">
+    <div class="text-center mb-4">
+        <h3 class="fw-bold text-primary"><i class="fas fa-calendar-check me-2"></i>ĐIỂM DANH BUỔI HỌC</h3>
+    </div>
 
-        <div class="mb-3">
-            <strong>Lớp học:</strong> @buoiHoc.LopHoc.TenLopHoc <br />
-            <strong>Ngày học:</strong> @buoiHoc.NgayHoc.ToString("dddd, dd/MM/yyyy") <br />
-            @if (!string.IsNullOrEmpty(buoiHoc.GhiChu))
-            {
-                <strong>Ghi chú:</strong> @buoiHoc.GhiChu
-            }
-        </div>
+    <div class="bg-light rounded shadow-sm p-4 mb-4">
+        <p><strong>Lớp học:</strong> @buoiHoc.LopHoc.TenLopHoc</p>
+        <p><strong>Ngày học:</strong> @buoiHoc.NgayHoc.ToString("dddd, dd/MM/yyyy")</p>
+        @if (!string.IsNullOrEmpty(buoiHoc.GhiChu))
+        {
+            <p><strong>Ghi chú:</strong> @buoiHoc.GhiChu</p>
+        }
+    </div>
 
-        <div class="text-end mb-2">
-            <button class="btn btn-danger btn-sm" id="btnHuyTatCa"><i class="fas fa-times-circle"></i> Hủy điểm danh tất cả</button>
-        </div>
+    <!-- Danh sách học viên -->
+    <div class="bg-white rounded shadow-sm p-4 mb-5">
+        <h5 class="mb-3 text-success"><i class="fas fa-users"></i> Danh sách học viên</h5>
 
-        <table class="table table-bordered table-hover">
-            <thead class="table-success text-center">
-                <tr>
-                    <th>STT</th>
-                    <th>Mã HV</th>
-                    <th>Họ Tên</th>
-                    <th>Trạng Thái Điểm Danh</th>
-                    <th>Hành động</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var hv in Model)
-                {
-                    var diemDanh = diemDanhs?.FirstOrDefault(dd => dd.HocVienId == hv.HocVienId && dd.BuoiHocId == buoiHoc.BuoiHocId);
-                    bool daDiemDanh = diemDanh != null;
-
-                    <tr class="text-center" data-hocvien-id="@hv.HocVienId">
-                        <td>@stt</td>
-                        <td>@hv.HocVien.MaHocVien</td>
-                        <td>@hv.HocVien.HoVaTen</td>
-                        <td class="trang-thai text-center">
-                            @if (daDiemDanh)
-                            {
-                                <span class="text-success"><i class="fas fa-check-circle"></i> Đã điểm danh</span>
-                            }
-                            else
-                            {
-                                <span>Đã đăng ký</span>
-                            }
-                        </td>
-                        <td>
-                            @if (!daDiemDanh)
-                            {
-                                <button class="btn btn-primary btn-sm btn-diemdanh" data-hocvien-id="@hv.HocVienId">
-                                    <i class="fas fa-check"></i> Điểm danh
-                                </button>
-                            }
-                            else
-                            {
-                                <button class="btn btn-warning btn-sm btn-huydiemdanh" data-hocvien-id="@hv.HocVienId">
-                                    <i class="fas fa-undo"></i> Hủy điểm danh
-                                </button>
-                            }
-                        </td>
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle text-center">
+                <thead class="table-light">
+                    <tr>
+                        <th>STT</th>
+                        <th>Mã HV</th>
+                        <th>Họ và Tên</th>
+                        <th>Trạng thái</th>
+                        <th>Hành động</th>
                     </tr>
-                    stt++;
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var hv in Model)
+                    {
+                        var diemDanh = diemDanhs?.FirstOrDefault(dd => dd.HocVienId == hv.HocVienId && dd.BuoiHocId == buoiHoc.BuoiHocId);
+                        bool daDiemDanh = diemDanh != null;
 
+                        <tr class="hocvien-row">
+                            <td>@stt</td>
+                            <td>@hv.HocVien.MaHocVien</td>
+                            <td>@hv.HocVien.HoVaTen</td>
+                            <td>
+                                @if (daDiemDanh)
+                                {
+                                    <span class="text-success"><i class="fas fa-check-circle"></i> Đã điểm danh</span>
+                                }
+                                else
+                                {
+                                    <span class="text-secondary">Chưa điểm danh</span>
+                                }
+                            </td>
+                            <td>
+                                @if (!daDiemDanh)
+                                {
+                                    <button class="btn btn-sm btn-primary btn-diemdanh" data-hocvien-id="@hv.HocVienId">
+                                        <i class="fas fa-check"></i> Điểm danh
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-sm btn-warning btn-huydiemdanh" data-hocvien-id="@hv.HocVienId">
+                                        <i class="fas fa-undo"></i> Hủy
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                        stt++;
+                    }
+                </tbody>
+            </table>
+            <nav>
+                <ul class="pagination justify-content-center" id="pagination"></ul>
+            </nav>
+        </div>
+    </div>
 
+    <!-- Danh sách giảng viên -->
+    <div class="bg-white rounded shadow-sm p-4">
+        <h5 class="mb-3 text-primary"><i class="fas fa-chalkboard-teacher"></i> Giảng viên phụ trách</h5>
 
         @foreach (var gv in tatCaGiangVien)
         {
+            var diemDanhGV = diemDanhsGV?.FirstOrDefault(d => d.GiangVienId == gv.GiangVienId && d.BuoiHocId == buoiHoc.BuoiHocId);
             bool daDiemDanhGV = danhSachIdDaDiemDanh.Contains(gv.GiangVienId);
-            <div class="mb-3 border rounded p-3 bg-white shadow-sm">
+            <div class="border rounded p-3 mb-3 bg-light">
                 <p><strong>Họ tên:</strong> @gv.HoVaTen</p>
-
                 <p>
-                    <strong>Trạng thái điểm danh:</strong>
+                    <strong>Trạng thái:</strong>
                     @if (daDiemDanhGV)
                     {
-                        <span class="text-success"><i class="fas fa-check-circle"></i> Đã điểm danh</span>
+                        <span class="text-success">
+                            <i class="fas fa-check-circle"></i> Đã điểm danh
+                            <br />
+                        </span>
+                        <strong>Ngày Điểm Danh :</strong> @diemDanhGV.NgayDiemDanh.ToString("HH:mm - dd/MM/yyyy")
+
                     }
                     else
                     {
@@ -101,87 +116,95 @@
                 <div>
                     @if (!daDiemDanhGV)
                     {
-                        <button class="btn btn-primary btn-sm btn-diemdanh-gv" data-giangvien-id="@gv.GiangVienId">
+                        <button class="btn btn-sm btn-primary btn-diemdanh-gv" data-giangvien-id="@gv.GiangVienId">
                             <i class="fas fa-check"></i> Điểm danh
                         </button>
                     }
                     else
                     {
-                        <button class="btn btn-warning btn-sm btn-huydiemdanh-gv" data-giangvien-id="@gv.GiangVienId">
-                            <i class="fas fa-undo"></i> Hủy điểm danh
+                        <button class="btn btn-sm btn-warning btn-huydiemdanh-gv" data-giangvien-id="@gv.GiangVienId">
+                            <i class="fas fa-undo"></i> Hủy
                         </button>
                     }
                 </div>
             </div>
         }
-
     </div>
 </div>
 
-<script>
-   $(document).ready(function () {
-    // Điểm danh học viên
-    $(document).on('click', '.btn-diemdanh', function () {
-        var hocVienId = $(this).data('hocvien-id');
+    <script>
+    $(function () {
+        // Học viên
+        $(document).on('click', '.btn-diemdanh', function () {
+            let id = $(this).data('hocvien-id');
+            $.post('@Url.Action("DiemDanhHocVien")', { hocVienId: id, buoiHocId: '@buoiHoc.BuoiHocId' }, function (res) {
+                if (res.success) location.reload();
+                else alert(res.message);
+            });
+        });
 
-        $.post('@Url.Action("DiemDanhHocVien")', {
-            hocVienId: hocVienId,
-            buoiHocId: '@buoiHoc.BuoiHocId'
-        }, function (res) {
-            if (res.success) location.reload();
-            else alert(res.message);
+        $(document).on('click', '.btn-huydiemdanh', function () {
+            let id = $(this).data('hocvien-id');
+            $.post('@Url.Action("HuyDiemDanhHocVien")', { hocVienId: id, buoiHocId: '@buoiHoc.BuoiHocId' }, function (res) {
+                if (res.success) location.reload();
+                else alert(res.message);
+            });
+        });
+
+        // Giảng viên
+        $(document).on('click', '.btn-diemdanh-gv', function () {
+            let id = $(this).data('giangvien-id');
+            $.post('@Url.Action("DiemDanhGiangVien")', { giangVienId: id, buoiHocId: '@buoiHoc.BuoiHocId' }, function (res) {
+                if (res.success) location.reload();
+                else alert(res.message);
+            });
+        });
+
+        $(document).on('click', '.btn-huydiemdanh-gv', function () {
+            let id = $(this).data('giangvien-id');
+            $.post('@Url.Action("HuyDiemDanhGiangVien")', { giangVienId: id, buoiHocId: '@buoiHoc.BuoiHocId' }, function (res) {
+                if (res.success) location.reload();
+                else alert(res.message);
+            });
         });
     });
 
-    // Hủy điểm danh học viên
-    $(document).on('click', '.btn-huydiemdanh', function () {
-        var hocVienId = $(this).data('hocvien-id');
+    document.addEventListener("DOMContentLoaded", function () {
+        const rows = document.querySelectorAll(".hocvien-row");
+        const rowsPerPage = 5;
+        const pagination = document.getElementById("pagination");
+        const totalPages = Math.ceil(rows.length / rowsPerPage);
 
-        $.post('@Url.Action("HuyDiemDanhHocVien")', {
-            hocVienId: hocVienId,
-            buoiHocId: '@buoiHoc.BuoiHocId'
-        }, function (res) {
-            if (res.success) location.reload();
-            else alert(res.message);
-        });
+        function showPage(page) {
+            rows.forEach((row, index) => {
+                row.style.display = (index >= (page - 1) * rowsPerPage && index < page * rowsPerPage) ? "" : "none";
+            });
+
+            document.querySelectorAll("#pagination .page-item").forEach((li, idx) => {
+                li.classList.toggle("active", idx === page - 1);
+            });
+        }
+
+        function createPagination() {
+            pagination.innerHTML = "";
+            for (let i = 1; i <= totalPages; i++) {
+                const li = document.createElement("li");
+                li.className = "page-item";
+                const a = document.createElement("a");
+                a.className = "page-link";
+                a.href = "#";
+                a.innerText = i;
+                a.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    showPage(i);
+                });
+
+                li.appendChild(a);
+                pagination.appendChild(li);
+            }
+        }
+
+        createPagination();
+        showPage(1);
     });
-
-    // Hủy điểm danh tất cả học viên
-    $('#btnHuyTatCa').click(function () {
-        if (!confirm("Bạn có chắc muốn hủy điểm danh tất cả học viên không?")) return;
-
-        $.post('@Url.Action("HuyDiemDanhTatCa")', {
-            buoiHocId: '@buoiHoc.BuoiHocId'
-        }, function (res) {
-            if (res.success) location.reload();
-            else alert(res.message);
-        });
-    });
-
-    // Điểm danh giảng viên
-    $(document).on('click', '.btn-diemdanh-gv', function () {
-        var giangVienId = $(this).data('giangvien-id');
-
-        $.post('@Url.Action("DiemDanhGiangVien")', {
-            giangVienId: giangVienId,
-            buoiHocId: '@buoiHoc.BuoiHocId'
-        }, function (res) {
-            if (res.success) location.reload();
-            else alert(res.message);
-        });
-    });
-
-    // Hủy điểm danh giảng viên
-    $(document).on('click', '.btn-huydiemdanh-gv', function () {
-        var giangVienId = $(this).data('giangvien-id');
-
-        $.post('@Url.Action("HuyDiemDanhGiangVien")', {
-            giangVienId: giangVienId,
-            buoiHocId: '@buoiHoc.BuoiHocId'
-        }, function (res) {
-            if (res.success) location.reload();
-            else alert(res.message);
-        });
-    });
-});
-</script>
+    </script>

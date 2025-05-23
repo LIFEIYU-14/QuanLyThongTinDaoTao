@@ -15,7 +15,7 @@
                 <i class="bi bi-plus-circle"></i> Thêm lớp học
             </a>
             <input type="text" class="form-control w-50" id="searchInput" placeholder="Tìm kiếm theo mã, tên,.." />
-          
+
             <button class="btn btn-danger d-none" id="btnXoaNhieu" onclick="xoaNhieu()">
                 <i class="bi bi-trash3"></i> Xóa đã chọn
             </button>
@@ -32,28 +32,31 @@
         </div>
 
         <div class="table-responsive">
-            <table class="table table-bordered align-middle">
+            <table class="table table-bordered align-middle" id="lopHocTable">
+
                 <thead class="table-primary text-center">
                     <tr>
-                        <th style="width: 50px;"><input type="checkbox" id="checkAll" /></th>
-
-                        <th>STT</th>
-                        <th>Mã Lớp Học</th>
-                        <th>Tên Lớp Học</th>
-                        <th>Tên Khóa Học</th>
-                        <th>Số Tín Chỉ</th>
-                        <th>Ngày Bắt Đầu</th>
-                        <th>Ngày Kết Thúc</th>
+                        <th><input type="checkbox" id="checkAll" /></th>
+                        <th data-sort="MaLopHoc" onclick="">Mã Lớp Học</th>
+                        <th data-sort="TenLopHoc" onclick="">Tên Lớp Học</th>
+                        <th data-sort="TenKhoaHoc" onclick="">Tên Khóa Học</th>
+                        <th data-sort="SoTinChi" onclick="">Số Tín Chỉ</th>
+                        <th data-sort="NgayBatDau" onclick="">Ngày Bắt Đầu</th>
+                        <th data-sort="NgayKetThuc" onclick="">Ngày Kết Thúc</th>
                         <th>Trạng Thái</th>
                         <th>Hành Động</th>
                     </tr>
                 </thead>
+
                 <tbody id="tableBody">
                     @Html.Partial("_LopHocTablePartial", Model)
                 </tbody>
             </table>
         </div>
-
+        <!-- Pagination -->
+        <nav>
+            <ul class="pagination justify-content-center"></ul>
+        </nav>
     </div>
 </div>
 
@@ -114,4 +117,52 @@
             });
         });
     });
+    // phân trang
+
+    const rowsPerPage = 4; // Số dòng mỗi trang
+    let currentPage = 1;
+
+    function renderPagination() {
+        const rows = $('#lopHocTable tbody tr');
+        const totalRows = rows.length;
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+        rows.hide();
+
+        const startIndex = (currentPage - 1) * rowsPerPage;
+        const endIndex = startIndex + rowsPerPage;
+        rows.slice(startIndex, endIndex).show();
+
+        // Render pagination
+        let paginationHtml = '';
+
+        paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="changePage(1)">Trang đầu</a></li>`;
+
+        paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Trước</a></li>`;
+
+        for (let i = 1; i <= totalPages; i++) {
+            paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+                <a class="page-link" href="#" onclick="changePage(${i})">${i}</a></li>`;
+        }
+
+        paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Sau</a></li>`;
+
+        paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="changePage(${totalPages})">Trang cuối</a></li>`;
+
+        $('.pagination').html(paginationHtml);
+    }
+
+    function changePage(page) {
+        currentPage = page;
+        renderPagination();
+    }
+
+    $(function () {
+        renderPagination(); // Gọi lần đầu khi trang load
+    });
+   
 </script>

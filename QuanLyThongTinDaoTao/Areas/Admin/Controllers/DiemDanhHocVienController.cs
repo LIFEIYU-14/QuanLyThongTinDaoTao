@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNet.Identity;
+using Newtonsoft.Json;
 using QuanLyThongTinDaoTao.Models;
 using System;
 using System.Collections.Generic;
@@ -231,24 +232,42 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             }
         }
         [HttpPost]
-        public JsonResult HuyDiemDanhTatCa(Guid buoiHocId)
+        public JsonResult DiemDanhBangQr(string qrData)
         {
             try
             {
-                var records = db.DiemDanhs_HVs.Where(d => d.BuoiHocId == buoiHocId).ToList();
-                if (!records.Any())
-                    return Json(new { success = false, message = "Không có học viên nào đã điểm danh." });
+                var parsed = JsonConvert.DeserializeObject<dynamic>(qrData);
+                string hocVienId = parsed.HocVienId;
+                Guid buoiHocId = Guid.Parse((string)parsed.BuoiHocId);
 
-                db.DiemDanhs_HVs.RemoveRange(records);
+                // Kiểm tra học viên đã điểm danh chưa
+                var daDiemDanh = db.DiemDanhs_HVs.Any(dd =>
+                    dd.HocVienId == hocVienId && dd.BuoiHocId == buoiHocId);
+
+                if (daDiemDanh)
+                    return Json(new { success = false, message = "Học viên đã điểm danh trước đó!" });
+
+                // Tạo bản ghi điểm danh mới
+                var diemDanh = new DiemDanh_HV
+                {
+                    DiemDanhId = Guid.NewGuid(),
+                    HocVienId = hocVienId,
+                    BuoiHocId = buoiHocId,
+                    NgayDiemDanh = DateTime.Now,
+                    TrangThai = DiemDanh_HV.TrangThaiDiemDanhHV.CoMat
+                };
+
+                db.DiemDanhs_HVs.Add(diemDanh);
                 db.SaveChanges();
 
-                return Json(new { success = true });
+                return Json(new { success = true, message = "Điểm danh thành công!" });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = ex.Message });
+                return Json(new { success = false, message = "QR code không hợp lệ!", error = ex.Message });
             }
         }
+
 
 
     }
