@@ -103,6 +103,9 @@
                                                                     <img src="@filePath" class="card-img-top img-fluid" alt="@fileName" />
                                                                     <div class="card-body p-2 text-center">
                                                                         <a href="@filePath" target="_blank" class="btn btn-sm btn-outline-primary">Xem ảnh</a>
+                                                                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteAttachment('@attachment.Attachment.AttachmentId')">
+                                                                            <i class="fas fa-trash-alt"></i> Xóa
+                                                                        </button>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -115,6 +118,9 @@
                                                                     <div class="text-truncate" style="max-width: 70%;">
                                                                         <i class="fas fa-file me-2"></i>
                                                                         <a href="@filePath" target="_blank" title="@fileName">@fileName</a>
+                                                                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteAttachment('@attachment.Attachment.AttachmentId')">
+                                                                            <i class="fas fa-trash-alt"></i> Xóa
+                                                                        </button>
                                                                     </div>
                                                                     <span class="badge bg-secondary">@ext.ToUpper()</span>
                                                                 </div>

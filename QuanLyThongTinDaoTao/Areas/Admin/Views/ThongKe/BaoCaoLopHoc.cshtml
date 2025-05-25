@@ -1,149 +1,49 @@
 ﻿@model List<QuanLyThongTinDaoTao.ModelsHelper.LopHocThongKeViewModel>
 @{
-    ViewBag.Title = "BÁO CÁO LỚP HỌC";
+    ViewBag.Title = "THỐNG KÊ LỚP HỌC";
     Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
-
-    int maxDisplay = 10;
-    bool xemTatCa = Request.QueryString["xemTatCa"] == "true";
-    var displayList = xemTatCa ? Model : Model.OrderByDescending(m => m.NgayBatDau).Take(maxDisplay).ToList();
 }
 
 <div class="container-xxl py-5">
-    <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
-        <h3 class="mb-3"><i class="fas fa-chart-bar me-2"></i>@ViewBag.Title</h3>
+    <div class="text-center">
+        <h3><i class="fas fa-chart-bar me-2"></i>@ViewBag.Title</h3>
     </div>
 
-    <div class="bg-light rounded shadow-sm">
-        <!-- Bộ lọc -->
-        <div class="card-header text-center d-flex flex-wrap justify-content-center gap-3 pt-4" id="filterSection">
-            @using (Html.BeginForm("BaoCaoLopHoc", "ThongKe", FormMethod.Get, new { id = "filterForm", @class = "d-flex flex-wrap gap-2 justify-content-center" }))
-            {
-                <div class="form-group">
-                    <label>Khóa học:</label>
-                    @Html.DropDownList("khoaHocId", new SelectList(ViewBag.KhoaHocs, "KhoaHocId", "TenKhoaHoc"), "Tất cả", new { @class = "form-control auto-submit" })
-                </div>
-                <div class="form-group">
-                    <label>Trạng thái lớp học:</label>
-                    @Html.DropDownList("trangThai", new SelectList(Enum.GetValues(typeof(QuanLyThongTinDaoTao.Models.LopHoc.TrangThaiLopHoc))), "Tất cả", new { @class = "form-control auto-submit" })
-                </div>
-            }
-        </div>
-
-        <!-- Label hiển thị đang lọc -->
-        <div class="text-center mt-2 mb-3">
-            <span class="badge bg-info text-dark px-3 py-2">
-                Đang lọc:
-                @if (!string.IsNullOrEmpty(Request.QueryString["khoaHocId"]))
-                {
-                    var kh = ((IEnumerable<dynamic>)ViewBag.KhoaHocs)?.FirstOrDefault(k => k.KhoaHocId.ToString() == Request.QueryString["khoaHocId"]);
-                    @("Khóa học: " + (kh?.TenKhoaHoc ?? "Tất cả") + " | ")
-                }
-                @if (!string.IsNullOrEmpty(Request.QueryString["trangThai"]))
-                {
-                    var trangThai = Request.QueryString["trangThai"];
-                    @("Trạng thái: " + trangThai)
-                }
-            </span>
-        </div>
-
-        <!-- Cảnh báo nếu quá nhiều lớp -->
-        @if (!xemTatCa && Model.Count > maxDisplay)
-        {
-            <div class="alert alert-warning text-center mt-2">
-                Có <strong>@Model.Count</strong> lớp học. Đang hiển thị <strong>@maxDisplay</strong> lớp gần nhất theo ngày bắt đầu.
+    <div class="bg-light rounded shadow-sm px-4 py-3">
+        <div class="row g-3 justify-content-center mb-4">
+            <div class="col-md-6 col-lg-5">
+                <label>Khóa học:</label>
+                @Html.DropDownList("KhoaHocId", (SelectList)ViewBag.KhoaHocList, "-- Chọn Khóa học --", new { @class = "form-control", id = "khoaHocSelect" })
             </div>
-            <div class="text-center mb-3">
-                <a href="@Url.Action("BaoCaoLopHoc", "ThongKe", new { xemTatCa = true, khoaHocId = Request.QueryString["khoaHocId"], trangThai = Request.QueryString["trangThai"] })" class="btn btn-outline-primary">
-                    Xem tất cả lớp học
-                </a>
+            <div class="col-md-6 col-lg-5">
+                <label>Lớp học:</label>
+                <select id="lopHocSelect" class="form-control">
+                    <option value="">-- Chọn lớp học --</option>
+                </select>
             </div>
-        }
-
-        <!-- Bảng dữ liệu -->
-        <div class="table-responsive px-3">
-            <table class="table table-bordered align-middle text-center" id="baoCaoLopHocTable">
-                <thead class="table-light">
-                    <tr>
-                        <th>STT</th>
-                        <th>Tên lớp học</th>
-                        <th>Số học viên</th>
-                        <th>Số buổi học</th>
-                        <th>HV Điểm danh (%)</th>
-                        <th>GV Điểm danh (%)</th>
-                        <th>Trạng thái</th>
-                        <th>Ngày bắt đầu</th>
-                        <th>Ngày kết thúc</th>
-                        <th>Giảng viên</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @{
-                        int stt = 1;
-                        foreach (var item in displayList)
-                        {
-                            <tr>
-                                <td>@stt</td>
-                                <td>@item.TenLopHoc</td>
-                                <td>@item.SoHocVien</td>
-                                <td>@item.SoBuoiHoc</td>
-                                <td>@item.TiLeDiemDanh.ToString("F2")</td>
-                                <td>@item.TiLeDiemDanhGiangVien.ToString("F2")</td>
-                                <td>@item.TrangThai</td>
-                                <td>@item.NgayBatDau.ToString("dd/MM/yyyy")</td>
-                                <td>@item.NgayKetThuc.ToString("dd/MM/yyyy")</td>
-                                <td>@item.GiangVienPhuTrach ?? "Chưa xác định"</td>
-                            </tr>
-                            stt++;
-                        }
-                    }
-                </tbody>
-            </table>
-            <nav>
-                <ul class="pagination justify-content-center"></ul>
-            </nav>
         </div>
 
-        <!-- Biểu đồ ChartJS -->
-        <div class="mt-5 px-3">
-            <h4 class="text-center mb-4"><i class="fas fa-chart-column me-2"></i>Biểu đồ tỷ lệ điểm danh</h4>
-            <canvas id="chartDiemDanh" height="300" style="max-height: 300px;"></canvas>
+        <div id="thongKeContainer" class="table-responsive mb-4"></div>
+
+        <div class="mt-5">
+            <h4 class="text-center mb-3"><i class="fas fa-chart-column me-2"></i>Biểu đồ tỷ lệ điểm danh theo buổi học</h4>
+            <div class="card shadow-sm p-3 bg-white rounded" style="height:450px;">
+                <canvas id="chartDiemDanh" height="400"></canvas>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- ChartJS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    const rowsPerPage = 5;
-    let currentPage = 1;
-
-    // Lấy tất cả các dòng dữ liệu (rows) trong bảng
-    const rows = $('#baoCaoLopHocTable tbody tr');
-
-    // Khởi tạo chart global để cập nhật dữ liệu sau này
-    const ctx = document.getElementById('chartDiemDanh').getContext('2d');
     let chart;
 
-    function getDataFromRows(rowsSubset) {
-        const labels = [];
-        const hocVienData = [];
-        const giangVienData = [];
-
-        rowsSubset.each(function () {
-            const cells = $(this).find('td');
-            labels.push(cells.eq(1).text()); // Tên lớp học
-            hocVienData.push(parseFloat(cells.eq(4).text()));
-            giangVienData.push(parseFloat(cells.eq(5).text()));
-        });
-
-        return { labels, hocVienData, giangVienData };
-    }
-
     function renderChart(data) {
-        if (chart) {
-            chart.destroy();
-        }
+        const ctx = document.getElementById('chartDiemDanh').getContext('2d');
+        if (chart) chart.destroy();
+
         chart = new Chart(ctx, {
             type: 'bar',
             data: {
@@ -154,97 +54,118 @@
                         data: data.hocVienData,
                         backgroundColor: 'rgba(54, 162, 235, 0.7)',
                         borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1,
-                        barPercentage: 0.4,
-                        categoryPercentage: 0.5
+                        borderWidth: 1
                     },
                     {
                         label: 'Giảng viên (%)',
                         data: data.giangVienData,
                         backgroundColor: 'rgba(255, 99, 132, 0.7)',
                         borderColor: 'rgba(255, 99, 132, 1)',
-                        borderWidth: 1,
-                        barPercentage: 0.4,
-                        categoryPercentage: 0.5
+                        borderWidth: 1
                     }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                clip: true,
                 scales: {
                     y: {
-                        type: 'linear',
                         beginAtZero: true,
-                        min: 0,
                         max: 100,
                         ticks: {
-                            stepSize: 10
+                            callback: function (value) {
+                                return value + '%';
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Tỷ lệ điểm danh (%)'
                         }
                     },
                     x: {
-                        stacked: false
-                    }
-                },
-                plugins: {
-                    legend: {
-                        position: 'top'
+                        title: {
+                            display: true,
+                            text: 'Buổi học (Ngày - Giờ bắt đầu)'
+                        }
                     }
                 }
             }
-
         });
     }
 
-    function renderPagination() {
-        const totalRows = rows.length;
-        const totalPages = Math.ceil(totalRows / rowsPerPage);
+    $('#khoaHocSelect').change(function () {
+        const khoaHocId = $(this).val();
+        $('#lopHocSelect').empty().append('<option value="">-- Chọn lớp học --</option>');
+        $('#thongKeContainer').empty();
+        if (chart) chart.destroy();
 
-        rows.hide();
-
-        const startIndex = (currentPage - 1) * rowsPerPage;
-        const endIndex = startIndex + rowsPerPage;
-        const rowsToShow = rows.slice(startIndex, endIndex);
-        rowsToShow.show();
-
-        // Cập nhật biểu đồ với dữ liệu trang hiện tại
-        const chartData = getDataFromRows(rowsToShow);
-        renderChart(chartData);
-
-        // Render phân trang
-        let paginationHtml = '';
-
-        paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-          <a class="page-link" href="#" onclick="changePage(1); return false;">Trang đầu</a></li>`;
-
-        paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-          <a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">Trước</a></li>`;
-
-        for (let i = 1; i <= totalPages; i++) {
-            paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
-              <a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a></li>`;
+        if (khoaHocId) {
+            $.getJSON('/Admin/ThongKe/GetLopHocByKhoaHoc', { khoaHocId }, function (data) {
+                data.forEach(lop => {
+                    $('#lopHocSelect').append(`<option value="${lop.LopHocId}">${lop.TenLopHoc}</option>`);
+                });
+            });
         }
+    });
 
-        paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-          <a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;">Sau</a></li>`;
+    $('#lopHocSelect').change(function () {
+        const lopHocId = $(this).val();
+        $('#thongKeContainer').empty();
+        if (chart) chart.destroy();
 
-        paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-          <a class="page-link" href="#" onclick="changePage(${totalPages}); return false;">Trang cuối</a></li>`;
+        if (lopHocId) {
+            $.getJSON('/Admin/ThongKe/GetThongKeBuoiHocTheoLop', { lopHocId }, function (data) {
+                if (data.length === 0) {
+                    $('#thongKeContainer').html('<div class="alert alert-warning">Không có dữ liệu điểm danh cho lớp này.</div>');
+                    return;
+                }
 
-        $('.pagination').html(paginationHtml);
-    }
+                let html = `
+                    <table class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Ngày học</th>
+                                <th>Giờ bắt đầu</th>
+                                <th>Giờ kết thúc</th>
+                                <th>Tổng đăng ký</th>
+                                <th>Số có mặt (HV)</th>
+                                <th>Tỷ lệ điểm danh (HV)</th>
+                                <th>Tỷ lệ điểm danh (GV)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
 
-    function changePage(page) {
-        currentPage = page;
-        renderPagination();
-    }
+                let labels = [];
+                let hocVienData = [];
+                let giangVienData = [];
 
-    $(document).ready(function () {
-        $('.auto-submit').on('change', function () {
-            $('#filterForm').submit();
-        });
+                data.forEach(b => {
+                    html += `
+                        <tr>
+                            <td>${b.NgayHoc}</td>
+                            <td>${b.GioBatDau}</td>
+                            <td>${b.GioKetThuc}</td>
+                            <td>${b.TongDangKy}</td>
+                            <td>${b.SoCoMat}</td>
+                            <td>${b.TiLe}%</td>
+                            <td>${b.TiLeGV}%</td>
+                        </tr>
+                    `;
+                    labels.push(`${b.NgayHoc} - ${b.GioBatDau}`);
+                    hocVienData.push(b.TiLe);
+                    giangVienData.push(b.TiLeGV);
+                });
 
-        renderPagination(); // Gọi lần đầu khi trang load
+                html += '</tbody></table>';
+                $('#thongKeContainer').html(html);
+
+                renderChart({
+                    labels,
+                    hocVienData,
+                    giangVienData
+                });
+            });
+        }
     });
 </script>

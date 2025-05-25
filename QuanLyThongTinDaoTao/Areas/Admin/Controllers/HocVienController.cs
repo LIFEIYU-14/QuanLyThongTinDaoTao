@@ -4,12 +4,14 @@ using QuanLyThongTinDaoTao.Identity;
 using QuanLyThongTinDaoTao.Models;
 using QuanLyThongTinDaoTao.Services;
 using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+
 
 namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 {
@@ -48,15 +50,39 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
 
             var hocVien = db.HocViens
-                            .Include(h => h.DangKyHocs.Select(d => d.LopHoc))
+                            .Include(h => h.DangKyHocs.Select(d => d.LopHoc.KhoaHoc)) // Thêm dòng này
+                            .Include(h => h.DangKyHocs.Select(d => d.LopHoc.BuoiHocs))
                             .Include(h => h.AppUser)
                             .FirstOrDefault(h => h.HocVienId == id);
 
             if (hocVien == null)
                 return HttpNotFound();
 
+            // Lấy danh sách điểm danh học viên
+            var diemDanhData = db.DiemDanhs_HVs
+                                 .Where(dd => dd.HocVienId == id)
+                                 .ToList();
+
+            // Tạo dictionary thống kê: LopHocId -> (SoBuoiHoc, SoBuoiCoMat)
+            var thongKe = new Dictionary<Guid, Tuple<int, int>>();
+
+            foreach (var dangKy in hocVien.DangKyHocs)
+            {
+                var lop = dangKy.LopHoc;
+                int tongBuoi = lop.BuoiHocs.Count;
+                int soBuoiCoMat = diemDanhData.Count(dd => dd.BuoiHoc != null &&
+                                                           dd.BuoiHoc.LopHocId == lop.LopHocId &&
+                                                           dd.TrangThai == DiemDanh_HV.TrangThaiDiemDanhHV.CoMat);
+
+                thongKe[lop.LopHocId] = Tuple.Create(tongBuoi, soBuoiCoMat);
+            }
+
+            ViewBag.ThongKeBuoiHoc = thongKe;
+
             return View(hocVien);
         }
+
+
 
         // GET: Admin/HocVien/Create
         public ActionResult Create()

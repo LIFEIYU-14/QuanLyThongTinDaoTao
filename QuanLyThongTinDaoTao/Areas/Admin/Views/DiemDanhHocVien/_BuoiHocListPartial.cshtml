@@ -62,6 +62,7 @@
                                 {
                                     <a href="@Url.Action("ThongTinDiemDanh", "DiemDanhHocVien", new { buoiHocId = buoiHoc.BuoiHocId })" class="text-decoration-none">
                                         <div class="bg-light border p-2 rounded mb-2 text-start shadow-sm">
+                                            <div class="fw-bold">@buoiHoc.LopHoc.KhoaHoc.TenKhoaHoc</div>
                                             <div class="fw-bold">@buoiHoc.LopHoc.TenLopHoc</div>
                                             <div>Giờ: @(new DateTime(buoiHoc.GioBatDau.Ticks).ToString("HH:mm")) - @(new DateTime(buoiHoc.GioKetThuc.Ticks).ToString("HH:mm"))</div>
                                             <div>Phòng: Zoom</div>

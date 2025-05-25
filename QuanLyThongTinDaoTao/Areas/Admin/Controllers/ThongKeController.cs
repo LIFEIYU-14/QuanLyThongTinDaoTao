@@ -1,74 +1,76 @@
-﻿using QuanLyThongTinDaoTao.Models;
+﻿// Controller: ThongKeController.cs
+using QuanLyThongTinDaoTao.Models;
 using QuanLyThongTinDaoTao.ModelsHelper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using System.Data.Entity;
-using System.IO;
-using System.Net;
-using System.Security.Cryptography;
 
 namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 {
     public class ThongKeController : Controller
     {
-        public  DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
-        // GET: Admin/ThongKe
-        public ActionResult BaoCaoLopHoc(DateTime? from, DateTime? to, Guid? khoaHocId, LopHoc.TrangThaiLopHoc? trangThai)
+        private DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
+
+        public ActionResult BaoCaoLopHoc()
         {
-            ViewBag.KhoaHocs = db.KhoaHocs.ToList();
+            ViewBag.KhoaHocList = new SelectList(db.KhoaHocs.ToList(), "KhoaHocId", "TenKhoaHoc");
+            return View();
+        }
 
-            var query = db.LopHocs.Include("BuoiHocs").Include("DangKyHocs").AsQueryable();
+        public JsonResult GetLopHocByKhoaHoc(Guid khoaHocId)
+        {
+            var lops = db.LopHocs
+                .Where(l => l.KhoaHocId == khoaHocId)
+                .Select(l => new { l.LopHocId, l.TenLopHoc })
+                .ToList();
+            return Json(lops, JsonRequestBehavior.AllowGet);
+        }
 
-            if (from.HasValue)
-                query = query.Where(l => l.NgayBatDau >= from);
-            if (to.HasValue)
-                query = query.Where(l => l.NgayKetThuc <= to);
-            if (khoaHocId.HasValue)
-                query = query.Where(l => l.KhoaHocId == khoaHocId);
-            if (trangThai.HasValue)
-                query = query.Where(l => l.TrangThai == trangThai);
+        public JsonResult GetThongKeBuoiHocTheoLop(Guid lopHocId)
+        {
+            var buoiHocs = db.BuoiHocs
+                .Where(b => b.LopHocId == lopHocId)
+                .OrderBy(b => b.NgayHoc)
+                .ThenBy(b => b.GioBatDau)
+                .ToList();
 
-            var lopHocs = query.ToList();  // Lấy ra danh sách, truy vấn xuống DB
+            int tongDangKy = db.DangKyHocs.Count(d => d.LopHocId == lopHocId && d.IsConfirmed);
 
-            var model = lopHocs.Select(l =>
+            var result = buoiHocs.Select(b =>
             {
-                var tongDiemDanh = db.DiemDanhs_HVs.Count(d => d.BuoiHoc.LopHocId == l.LopHocId);
-                var diemDanhCoMat = db.DiemDanhs_HVs.Count(d => d.BuoiHoc.LopHocId == l.LopHocId && d.TrangThai == DiemDanh_HV.TrangThaiDiemDanhHV.CoMat);
+                int soCoMat = db.DiemDanhs_HVs.Count(dd => dd.BuoiHocId == b.BuoiHocId && dd.TrangThai == DiemDanh_HV.TrangThaiDiemDanhHV.CoMat);
+                int tongGv = db.GiangVien_BuoiHoc.Count(gv => gv.BuoiHocId == b.BuoiHocId);
+                int soGvCoMat = db.DiemDanhs_GVs.Count(ddgv => ddgv.BuoiHocId == b.BuoiHocId && ddgv.TrangThai == DiemDanh_GV.TrangThaiDiemDanhGV.CoMat);
 
-                double tiLeDiemDanh = (double)diemDanhCoMat / Math.Max(1, tongDiemDanh) * 100;
+                // Giới hạn không vượt tổng
+                soCoMat = Math.Min(soCoMat, tongDangKy);
+                soGvCoMat = Math.Min(soGvCoMat, tongGv);
 
-                // Lấy thông tin điểm danh giảng viên cho lớp này
-                var tongDiemDanhGV = db.DiemDanhs_GVs.Count(d => d.BuoiHoc.LopHocId == l.LopHocId);
-                var diemDanhGVCoMat = db.DiemDanhs_GVs.Count(d => d.BuoiHoc.LopHocId == l.LopHocId && d.TrangThai == DiemDanh_GV.TrangThaiDiemDanhGV.CoMat);
-                double tiLeDiemDanhGV = (double)diemDanhGVCoMat / Math.Max(1, tongDiemDanhGV) * 100;
+                double tiLeHV = tongDangKy > 0 ? (double)soCoMat / tongDangKy : 0;
+                double tiLeGV = tongGv > 0 ? (double)soGvCoMat / tongGv : 0;
 
-                return new LopHocThongKeViewModel
+                return new
                 {
-                    TenLopHoc = l.TenLopHoc,
-                    SoHocVien = l.DangKyHocs.Where(dk => dk.IsConfirmed).Select(dk => dk.HocVienId).Distinct().Count(),
-                    SoBuoiHoc = l.BuoiHocs.Count(),
-                    TiLeDiemDanh = tiLeDiemDanh,
-                    TrangThai = l.TrangThai.ToString(),
-                    NgayBatDau = l.NgayBatDau,
-                    NgayKetThuc = l.NgayKetThuc,
-                    GiangVienPhuTrach = db.GiangVien_BuoiHoc
-                                        .Where(gb => gb.BuoiHoc.LopHocId == l.LopHocId)
-                                        .Select(gb => gb.GiangVien.HoVaTen)
-                                        .FirstOrDefault(),
-
-                    SoLanDiemDanhGiangVienCoMat = diemDanhGVCoMat,
-                    TongSoLanDiemDanhGiangVien = tongDiemDanhGV,
-                    TiLeDiemDanhGiangVien = tiLeDiemDanhGV
+                    BuoiHocId = b.BuoiHocId,
+                    NgayHoc = b.NgayHoc.ToString("dd/MM/yyyy"),
+                    GioBatDau = b.GioBatDau.ToString(@"hh\:mm"),
+                    GioKetThuc = b.GioKetThuc.ToString(@"hh\:mm"),
+                    TongDangKy = tongDangKy,
+                    SoCoMat = soCoMat,
+                    TiLe = Math.Round(tiLeHV * 100, 2),   // phần trăm HV
+                    TiLeGV = Math.Round(tiLeGV * 100, 2)  // phần trăm GV
                 };
             }).ToList();
 
-
-            return View(model);
-
+            return Json(result, JsonRequestBehavior.AllowGet);
         }
 
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                db.Dispose();
+            base.Dispose(disposing);
+        }
     }
 }

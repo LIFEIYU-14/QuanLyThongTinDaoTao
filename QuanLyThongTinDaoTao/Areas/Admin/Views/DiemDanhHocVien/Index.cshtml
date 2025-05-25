@@ -8,30 +8,27 @@
     <div class="text-center wow fadeInUp mb-5" data-wow-delay="0.1s">
         <h3 class="mb-5">   <i class="fas fa-user-tag me-2"></i>ĐIỂM DANH HỌC VIÊN</h3>
     </div>
-    <div class="card-header text-white text-center d-flex flex-wrap align-items-center justify-content-center gap-2 mb-3 mt-4">
-        <!-- Dropdown chọn Khóa học -->
-        <select class="form-select w-100 mb-3" id="KhoaHocId">
-            <option value="">-- Chọn Khóa Học --</option>
-            @foreach (var khoaHoc in ViewBag.KhoaHocList)
-            {
-                <option value="@khoaHoc.KhoaHocId">Khóa: @khoaHoc.TenKhoaHoc</option>
-            }
-        </select>
+    <div class="bg-light rounded shadow-sm px-4 py-3">
+        <div class="row g-3 justify-content-center mb-4">
+            <div class="col-md-6 col-lg-5">
+                <label>Khóa học:</label>
+                @Html.DropDownList("KhoaHocId", (SelectList)ViewBag.KhoaHocList, "-- Chọn Khóa học --", new { @class = "form-control", id = "khoaHocSelect" })
+            </div>
+            <div class="col-md-6 col-lg-5">
+                <label>Lớp học:</label>
+                <select id="lopHocSelect" class="form-control">
+                    <option value="">-- Chọn lớp học --</option>
+                </select>
+            </div>
+        </div>
 
-        <div id="lopHocListContainer" class="d-flex flex-nowrap gap-2 justify-content-start overflow-auto mt-2 mb-3"></div>
-
-
+        <div class="p-4">
+            <div id="buoiHocContainer" class="mb-3"></div>
+            <div id="hocVienContainer"></div>
+        </div>
     </div>
-    <div class="p-4">
 
-        <!-- Danh sách buổi học của lớp được chọn -->
-        <div id="buoiHocContainer" class="mb-3"></div>
-
-        <!-- (Có thể dùng cho các chức năng khác nếu cần) -->
-        <div id="hocVienContainer"></div>
-    </div>
 </div>
-
 <script>
     var currentWeekStart = new Date();
 
@@ -39,7 +36,15 @@
         return date.toISOString().split("T")[0];
     }
 
-    function changeWeek(days, lopHocId = null) {
+    function getWeekStart(date) {
+        var d = new Date(date);
+        var day = d.getDay();
+        day = (day === 0) ? 7 : day;
+        d.setDate(d.getDate() - day + 1);
+        return d;
+    }
+
+    function changeWeek(days) {
         if (days === 0) {
             currentWeekStart = new Date();
         } else {
@@ -47,13 +52,13 @@
         }
 
         var startDate = getFormattedDate(getWeekStart(currentWeekStart));
-        var selectedLopHocId = lopHocId || $('.lop-hoc-btn.active').data('id');
-        if (!selectedLopHocId) return;
+        var lopHocId = $('#lopHocSelect').val();
+        if (!lopHocId) return;
 
         $.ajax({
             url: '@Url.Action("FilterByLopHoc")',
             type: 'GET',
-            data: { lopHocId: selectedLopHocId, startDate: startDate },
+            data: { lopHocId: lopHocId, startDate: startDate },
             success: function (res) {
                 $('#buoiHocContainer').html(res);
                 $('#hocVienContainer').html('');
@@ -64,62 +69,34 @@
         });
     }
 
+    $('#khoaHocSelect').change(function () {
+        const khoaHocId = $(this).val();
+        $('#lopHocSelect').empty().append('<option value="">-- Chọn lớp học --</option>');
+        $('#buoiHocContainer').empty();
+        $('#hocVienContainer').empty();
 
-    function getWeekStart(date) {
-        var d = new Date(date);
-        var day = d.getDay();
-        day = (day === 0) ? 7 : day;
-        d.setDate(d.getDate() - day + 1);
-        return d;
-    }
-
-    $('#KhoaHocId').change(function () {
-    var khoaHocId = $(this).val();
-
-    $('#buoiHocContainer').empty();
-    $('#hocVienContainer').empty();
-    $('#lopHocListContainer').empty();
-
-    if (!khoaHocId) return;
-
-        $.ajax({
-            url: '@Url.Action("GetLopHocTheoKhoaHoc")',
-            type: 'GET',
-            data: { khoaHocId: khoaHocId },
-            success: function (res) {
-                var html = '';
-                $.each(res, function (i, lopHoc) {
-                    html += `<button class="btn btn-outline-primary btn-sm me-2 lop-hoc-btn" data-id="${lopHoc.LopHocId}">
-                                ${lopHoc.TenLopHoc}
-                             </button>`;
+        if (khoaHocId) {
+            $.getJSON('@Url.Action("GetLopHocTheoKhoaHoc")', { khoaHocId: khoaHocId }, function (data) {
+                data.forEach(lop => {
+                    $('#lopHocSelect').append(`<option value="${lop.LopHocId}">${lop.TenLopHoc}</option>`);
                 });
-                $('#lopHocListContainer').html(html);
-            },
-            error: function () {
-                alert("Không thể tải danh sách lớp học.");
-            }
-        });
-    });
-    $(document).on('click', '.lop-hoc-btn', function () {
-        $('.lop-hoc-btn').removeClass('active'); // Xóa class active khỏi tất cả nút
-        $(this).addClass('active');              // Thêm class active cho nút đang được click
-        var lopHocId = $(this).data('id');
-        currentWeekStart = new Date();
-        changeWeek(0, lopHocId);
+            });
+        }
     });
 
-
-    $('#LopHocId').change(function () {
+    $('#lopHocSelect').change(function () {
         currentWeekStart = new Date();
         changeWeek(0);
     });
 </script>
+
 <style>
     .lop-hoc-btn.active {
         background-color: #ff0000;
         color: white;
         border-color: #ff0000;
     }
+
     #lopHocListContainer {
         max-width: 100%;
         padding: 5px 0;
@@ -165,5 +142,4 @@
             border-color: #ff0000 !important;
             box-shadow: 0 4px 12px rgba(255,0,0,0.6);
         }
-
 </style>

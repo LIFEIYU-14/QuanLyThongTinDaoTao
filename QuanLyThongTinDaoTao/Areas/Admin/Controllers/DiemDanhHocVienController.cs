@@ -43,7 +43,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                    .Include(dk => dk.HocVien)
                    .Include(dk => dk.LopHoc.BuoiHocs.Select(bh => bh.GiangVien_BuoiHocs.Select(gvbh => gvbh.GiangVien)))
                    .ToList();
-
+            ViewBag.KhoaHocList = new SelectList(db.KhoaHocs.ToList(), "KhoaHocId", "TenKhoaHoc");
             return View(danhSachHocVien);
         }
         // Lấy danh sách lớp theo khóa học
@@ -71,9 +71,10 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             }
 
             var buoiHocs = db.BuoiHocs
-                .Where(b => b.LopHoc.LopHocId == lopHocId.Value)
-                .OrderBy(b => b.NgayHoc)
-                .ToList();
+                    .Include(b => b.LopHoc.KhoaHoc)
+                    .Where(b => b.LopHoc.LopHocId == lopHocId.Value)
+                    .OrderBy(b => b.NgayHoc)
+                    .ToList();
 
             ViewBag.LopHocId = lopHocId.Value;
             return PartialView("_BuoiHocListPartial", buoiHocs);

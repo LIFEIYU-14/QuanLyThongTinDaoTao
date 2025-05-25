@@ -2,6 +2,7 @@
 @{
     ViewBag.Title = "Chi Tiết Học Viên";
     Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
+    var thongKe = ViewBag.ThongKeBuoiHoc as Dictionary<Guid, Tuple<int, int>>;
 }
 
 <div class="container mt-5">
@@ -17,41 +18,52 @@
             <p><strong>Cơ Quan Làm Việc:</strong> @Model.CoQuanLamViec</p>
 
             <h5 class="mt-4">Danh Sách Lớp Học Đã Đăng Ký</h5>
+
             @if (Model.DangKyHocs.Any())
             {
                 <table class="table table-bordered mt-3">
                     <thead>
                         <tr>
-                            <th>Ngày Đăng Ký</th>
                             <th>Tên Lớp Học</th>
+                            <th>Tên Khóa Học</th> <!-- Thêm dòng này -->
+                            <th>Ngày Đăng Ký</th>
                             <th>Số Tín Chỉ</th>
                             <th>Ngày Bắt Đầu</th>
                             <th>Ngày Kết Thúc</th>
-                            <th>Trạng Thái</th>
+                            <th>Số Buổi Học</th>
+                            <th>Có Mặt</th>
+                            <th>Vắng</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         @foreach (var dangKy in Model.DangKyHocs)
                         {
+                            var lop = dangKy.LopHoc;
+                            var lopId = lop.LopHocId;
+                            int soBuoi = 0, coMat = 0;
+
+                            if (thongKe != null && thongKe.ContainsKey(lopId))
+                            {
+                                var data = thongKe[lopId];
+                                soBuoi = data.Item1;
+                                coMat = data.Item2;
+                            }
+
                             <tr>
+                                <td>@lop.TenLopHoc</td>
+                                <td>@(lop.KhoaHoc != null ? lop.KhoaHoc.TenKhoaHoc : "N/A")</td> <!-- Tên khóa học -->
                                 <td>@dangKy.NgayDangKy.ToString("dd/MM/yyyy")</td>
-                                <td>@dangKy.LopHoc.TenLopHoc</td>
-                                <td>@dangKy.LopHoc.SoTinChi</td>
-                                <td>@dangKy.LopHoc.NgayBatDau.ToString("dd/MM/yyyy")</td>
-                                <td>@dangKy.LopHoc.NgayKetThuc.ToString("dd/MM/yyyy")</td>
-                                <td>
-                                    @if (dangKy.IsConfirmed)
-                                    {
-                                        <span class="badge badge-success">Đã Xác Nhận</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge badge-warning">Chưa Xác Nhận</span>
-                                    }
-                                </td>
+                                <td>@lop.SoTinChi</td>
+                                <td>@lop.NgayBatDau.ToString("dd/MM/yyyy")</td>
+                                <td>@lop.NgayKetThuc.ToString("dd/MM/yyyy")</td>
+                                <td>@soBuoi</td>
+                                <td>@coMat</td>
+                                <td>@(soBuoi - coMat)</td>
                             </tr>
                         }
                     </tbody>
+
                 </table>
             }
             else
