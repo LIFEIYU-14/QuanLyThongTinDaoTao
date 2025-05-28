@@ -1,194 +1,183 @@
-﻿
-@{
-    ViewBag.Title = "Index";
+﻿@{
+    ViewBag.Title = "Trang tổng quan";
     Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
 }
 
-<!-- Sale & Revenue Start -->
-<div class="container-fluid pt-4 px-4">
-    <div class="row g-4">
-        <div class="col-sm-6 col-xl-3">
-            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                <i class="fa fa-chart-line fa-3x text-primary"></i>
-                <div class="ms-3">
-                    <p class="mb-2">Today Sale</p>
-                    <h6 class="mb-0">$1234</h6>
+<div class="container-xxl py-5">
+    <div class="bg-light rounded p-4 shadow-sm">
+        <div class="text-center mb-5">
+            <h3 class="mb-0"><i class="fas fa-chart-line"></i> TRANG TỔNG QUAN HỆ THỐNG</h3>
+        </div>
+
+        <!-- Dropdown lọc -->
+        <div class="card-header d-flex flex-wrap align-items-center justify-content-center gap-2 mb-4">
+            @Html.DropDownList("khoaHocId", ViewBag.KhoaHocList as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>()), "-- Chọn Khóa học --", new { @class = "form-select w-25", id = "khoaHocSelect" })
+
+            @Html.DropDownList("lopHocId", ViewBag.LopHocList as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>()), "-- Chọn Lớp học --", new { @class = "form-select w-25", id = "lopHocSelect" })
+
+            <!-- Ngày bắt đầu -->
+            <input type="date" id="startDate" class="form-control w-auto" />
+
+            <!-- Ngày kết thúc -->
+            <input type="date" id="endDate" class="form-control w-auto" />
+
+            <!-- Nút lọc -->
+            <button class="btn btn-primary" id="filterButton">Lọc</button>
+        </div>
+
+        <!-- Thống kê tổng quan -->
+        <div class="row text-center mb-4">
+            <div class="col-md-2 col-6 mb-3">
+                <div class="card shadow p-3">
+                    <h6>Khóa học</h6>
+                    <h4 class="text-info">@ViewBag.TotalCourses</h4>
+                </div>
+            </div>
+            <div class="col-md-2 col-6 mb-3">
+                <div class="card shadow p-3">
+                    <h6>Lớp học</h6>
+                    <h4 class="text-warning">@ViewBag.TotalClasses</h4>
+                </div>
+            </div>
+            <div class="col-md-2 col-6 mb-3">
+                <div class="card shadow p-3">
+                    <h6>Học viên</h6>
+                    <h4 class="text-success">@ViewBag.TotalStudents</h4>
+                </div>
+            </div>
+            <div class="col-md-2 col-6 mb-3">
+                <div class="card shadow p-3">
+                    <h6>Giảng viên</h6>
+                    <h4 class="text-danger">@ViewBag.TotalTeachers</h4>
+                </div>
+            </div>
+            <div class="col-md-2 col-6 mb-3">
+                <div class="card shadow p-3">
+                    <h6>Hôm nay</h6>
+                    <h4 class="text-primary">@ViewBag.RegistrationsToday</h4>
+                </div>
+            </div>
+            <div class="col-md-2 col-6 mb-3">
+                <div class="card shadow p-3">
+                    <h6>Trong tháng</h6>
+                    <h4 class="text-secondary">@ViewBag.RegistrationsThisMonth</h4>
                 </div>
             </div>
         </div>
-        <div class="col-sm-6 col-xl-3">
-            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                <i class="fa fa-chart-bar fa-3x text-primary"></i>
-                <div class="ms-3">
-                    <p class="mb-2">Total Sale</p>
-                    <h6 class="mb-0">$1234</h6>
+
+        <!-- Biểu đồ -->
+        <div class="row">
+            <div class="col-md-8 mb-4">
+                <div class="card shadow p-3">
+                    <h5 class="text-center">Thống kê đăng ký theo tháng</h5>
+                    <canvas id="barChart"></canvas>
                 </div>
             </div>
-        </div>
-        <div class="col-sm-6 col-xl-3">
-            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                <i class="fa fa-chart-area fa-3x text-primary"></i>
-                <div class="ms-3">
-                    <p class="mb-2">Today Revenue</p>
-                    <h6 class="mb-0">$1234</h6>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-xl-3">
-            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                <i class="fa fa-chart-pie fa-3x text-primary"></i>
-                <div class="ms-3">
-                    <p class="mb-2">Total Revenue</p>
-                    <h6 class="mb-0">$1234</h6>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Sale & Revenue End -->
-<!-- Sales Chart Start -->
-<div class="container-fluid pt-4 px-4">
-    <div class="row g-4">
-        <div class="col-sm-12 col-xl-6">
-            <div class="bg-light text-center rounded p-4">
-                <div class="d-flex align-items-center justify-content-between mb-4">
-                    <h6 class="mb-0">Worldwide Sales</h6>
-                    <a href="">Show All</a>
-                </div>
-                <canvas id="worldwide-sales"></canvas>
-            </div>
-        </div>
-        <div class="col-sm-12 col-xl-6">
-            <div class="bg-light text-center rounded p-4">
-                <div class="d-flex align-items-center justify-content-between mb-4">
-                    <h6 class="mb-0">Salse & Revenue</h6>
-                    <a href="">Show All</a>
-                </div>
-                <canvas id="salse-revenue"></canvas>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Sales Chart End -->
-<!-- Recent Sales Start -->
-<!-- Recent Sales End -->
-<!-- Widgets Start -->
-<div class="container-fluid pt-4 px-4">
-    <div class="row g-4">
-        <div class="col-sm-12 col-md-6 col-xl-4">
-            <div class="h-100 bg-light rounded p-4">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <h6 class="mb-0">Messages</h6>
-                    <a href="">Show All</a>
-                </div>
-                <div class="d-flex align-items-center border-bottom py-3">
-                    <img class="rounded-circle flex-shrink-0" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                    <div class="w-100 ms-3">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-0">Jhon Doe</h6>
-                            <small>15 minutes ago</small>
-                        </div>
-                        <span>Short message goes here...</span>
-                    </div>
-                </div>
-                <div class="d-flex align-items-center border-bottom py-3">
-                    <img class="rounded-circle flex-shrink-0" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                    <div class="w-100 ms-3">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-0">Jhon Doe</h6>
-                            <small>15 minutes ago</small>
-                        </div>
-                        <span>Short message goes here...</span>
-                    </div>
-                </div>
-                <div class="d-flex align-items-center border-bottom py-3">
-                    <img class="rounded-circle flex-shrink-0" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                    <div class="w-100 ms-3">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-0">Jhon Doe</h6>
-                            <small>15 minutes ago</small>
-                        </div>
-                        <span>Short message goes here...</span>
-                    </div>
-                </div>
-                <div class="d-flex align-items-center pt-3">
-                    <img class="rounded-circle flex-shrink-0" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                    <div class="w-100 ms-3">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-0">Jhon Doe</h6>
-                            <small>15 minutes ago</small>
-                        </div>
-                        <span>Short message goes here...</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-12 col-md-6 col-xl-4">
-            <div class="h-100 bg-light rounded p-4">
-                <div class="d-flex align-items-center justify-content-between mb-4">
-                    <h6 class="mb-0">Calender</h6>
-                    <a href="">Show All</a>
-                </div>
-                <div id="calender"></div>
-            </div>
-        </div>
-        <div class="col-sm-12 col-md-6 col-xl-4">
-            <div class="h-100 bg-light rounded p-4">
-                <div class="d-flex align-items-center justify-content-between mb-4">
-                    <h6 class="mb-0">To Do List</h6>
-                    <a href="">Show All</a>
-                </div>
-                <div class="d-flex mb-2">
-                    <input class="form-control bg-transparent" type="text" placeholder="Enter task">
-                    <button type="button" class="btn btn-primary ms-2">Add</button>
-                </div>
-                <div class="d-flex align-items-center border-bottom py-2">
-                    <input class="form-check-input m-0" type="checkbox">
-                    <div class="w-100 ms-3">
-                        <div class="d-flex w-100 align-items-center justify-content-between">
-                            <span>Short task goes here...</span>
-                            <button class="btn btn-sm"><i class="fa fa-times"></i></button>
-                        </div>
-                    </div>
-                </div>
-                <div class="d-flex align-items-center border-bottom py-2">
-                    <input class="form-check-input m-0" type="checkbox">
-                    <div class="w-100 ms-3">
-                        <div class="d-flex w-100 align-items-center justify-content-between">
-                            <span>Short task goes here...</span>
-                            <button class="btn btn-sm"><i class="fa fa-times"></i></button>
-                        </div>
-                    </div>
-                </div>
-                <div class="d-flex align-items-center border-bottom py-2">
-                    <input class="form-check-input m-0" type="checkbox" checked>
-                    <div class="w-100 ms-3">
-                        <div class="d-flex w-100 align-items-center justify-content-between">
-                            <span><del>Short task goes here...</del></span>
-                            <button class="btn btn-sm text-primary"><i class="fa fa-times"></i></button>
-                        </div>
-                    </div>
-                </div>
-                <div class="d-flex align-items-center border-bottom py-2">
-                    <input class="form-check-input m-0" type="checkbox">
-                    <div class="w-100 ms-3">
-                        <div class="d-flex w-100 align-items-center justify-content-between">
-                            <span>Short task goes here...</span>
-                            <button class="btn btn-sm"><i class="fa fa-times"></i></button>
-                        </div>
-                    </div>
-                </div>
-                <div class="d-flex align-items-center pt-2">
-                    <input class="form-check-input m-0" type="checkbox">
-                    <div class="w-100 ms-3">
-                        <div class="d-flex w-100 align-items-center justify-content-between">
-                            <span>Short task goes here...</span>
-                            <button class="btn btn-sm"><i class="fa fa-times"></i></button>
-                        </div>
-                    </div>
+            <div class="col-md-4 mb-4">
+                <div class="card shadow p-3">
+                    <h5 class="text-center">Thống kê lớp học theo trạng thái</h5>
+                    <canvas id="pieChart"></canvas>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<!-- Widgets End -->
+
+<!-- Chart.js + Script xử lý -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    const barCtx = document.getElementById('barChart').getContext('2d');
+    const pieCtx = document.getElementById('pieChart').getContext('2d');
+
+    const barChart = new Chart(barCtx, {
+        type: 'bar',
+        data: {
+            labels: @Html.Raw(ViewBag.MonthLabels),
+            datasets: [{
+                label: 'Lượt đăng ký',
+                data: @Html.Raw(ViewBag.MonthData),
+                backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    const pieChart = new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+            labels: @Html.Raw(ViewBag.StatusLabels),
+            datasets: [{
+                data: @Html.Raw(ViewBag.StatusData),
+                backgroundColor: ['#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+
+    function updateBarChart(labels, data) {
+        barChart.data.labels = labels;
+        barChart.data.datasets[0].data = data;
+        barChart.update();
+    }
+
+    $('#khoaHocSelect').change(function () {
+        const khoaHocId = $(this).val();
+        $('#lopHocSelect').empty().append('<option value="">-- Đang tải --</option>');
+
+        $.getJSON('@Url.Action("GetLopHocByKhoaHoc", "HomeAdmin", new { area = "Admin" })', { khoaHocId }, function (data) {
+            $('#lopHocSelect').empty().append('<option value="">-- Chọn Lớp học --</option>');
+            $.each(data, function (i, item) {
+                $('#lopHocSelect').append($('<option>', {
+                    value: item.LopHocId,
+                    text: item.TenLopHoc
+                }));
+            });
+        });
+
+        // Tự động gọi lại thống kê khi đổi khóa học (reset lớp học)
+        $.getJSON('@Url.Action("GetRegistrationStats", "HomeAdmin", new { area = "Admin" })', { khoaHocId, lopHocId: null }, function (res) {
+            updateBarChart(res.labels, res.data);
+        });
+    });
+
+    $('#lopHocSelect').change(function () {
+        const khoaHocId = $('#khoaHocSelect').val();
+        const lopHocId = $(this).val();
+
+        $.getJSON('@Url.Action("GetRegistrationStats", "HomeAdmin", new { area = "Admin" })', { khoaHocId, lopHocId }, function (res) {
+            updateBarChart(res.labels, res.data);
+        });
+    });
+
+    $('#filterButton').click(function () {
+        const khoaHocId = $('#khoaHocSelect').val();
+        const lopHocId = $('#lopHocSelect').val();
+        const startDate = $('#startDate').val();
+        const endDate = $('#endDate').val();
+
+        console.log('Filter params:', { khoaHocId, lopHocId, startDate, endDate });
+
+        $.getJSON('@Url.Action("GetRegistrationStats", "HomeAdmin", new { area = "Admin" })', {
+            khoaHocId,
+            lopHocId,
+            startDate,
+            endDate
+        }, function (res) {
+            updateBarChart(res.labels, res.data);
+        });
+
+    });
+</script>

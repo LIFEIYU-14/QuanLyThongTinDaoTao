@@ -1,0 +1,169 @@
+﻿@using QuanLyThongTinDaoTao.ModelsHelper
+@model List<HocVienHocTapViewModel>
+
+@{
+    ViewBag.Title = "Quản Lý Học Tập Theo Khóa Học";
+    Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
+}
+
+<div class="container-xxl py-5">
+    <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+        <h3 class="mb-5"><i class="fas fa-graduation-cap me-2"></i>QUẢN LÝ HỌC TẬP THEO KHÓA HỌC</h3>
+    </div>
+
+    <div class="bg-light rounded shadow-sm">
+        <div class="card-header text-white text-center d-flex flex-wrap align-items-center justify-content-center gap-3 mb-4 mt-4">
+            <label for="khoaHocSelect" class="fw-bold">Chọn khóa học:</label>
+            @Html.DropDownList("khoaHocId", (SelectList)ViewBag.KhoaHocList, "Chọn khóa học", new { @id = "khoaHocSelect", @class = "form-select w-auto" })
+
+            <input type="text" class="form-control w-50" id="searchInput" placeholder="Tìm kiếm học viên..." />
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle text-center" id="hocVienTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>STT</th>
+                        <th>Họ và Tên</th>
+                        <th>Ngày Sinh</th>
+                        <th>Email</th>
+                        <th>Tổng Buổi Học</th>
+                        <th>Số Buổi Có Mặt</th>
+                        <th>Số Buổi Vắng</th>
+                        <th>Chứng Chỉ</th>
+                        <th>Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{ int stt = 1; }
+                    @foreach (var item in Model)
+                    {
+                        <tr data-hocvienid="@item.HocVienId">
+                            <td>@stt</td>
+                            <td>@item.TenHocVien</td>
+                            <td>@item.NgaySinh.ToShortDateString()</td>
+                            <td>@item.Email</td>
+                            <td>@item.TongBuoiHoc</td>
+                            <td>@item.SoBuoiCoMat</td>
+                            <td>@item.SoBuoiVang</td>
+                            <td>
+                                @if (item.DaCapChungChi)
+                                {
+                                    <span class="text-success">Đã cấp</span>
+                                }
+                                else
+                                {
+                                    <span class="text-danger">Chưa cấp</span>
+                                }
+                            </td>
+                            <td>
+                                @if (!item.DaCapChungChi)
+                                {
+                                    <label class="fw-bold">Ngày hết hạn</label>
+                                    <input type="date" class="form-control ngayHetHan mb-2" style="width:150px;" />
+                                    <button class="btn btn-primary btnCapChungChi btn-sm">Cấp chứng chỉ</button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-danger btnHuyChungChi btn-sm">Hủy cấp</button>
+                                }
+                            </td>
+                        </tr>
+                        stt++;
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <nav>
+            <ul class="pagination justify-content-center"></ul>
+        </nav>
+    </div>
+</div>
+
+<script>
+    $('#khoaHocSelect').change(function () {
+        var khoaHocId = $(this).val();
+        if (khoaHocId) {
+            window.location.href = '@Url.Action("QuanLyHocTapTheoKhoaHoc", "QuanLyHocTap", new { area = "Admin" })' + '?khoaHocId=' + khoaHocId;
+        }
+    });
+
+    // Search filter on table
+    $('#searchInput').on('input', function () {
+        var keyword = $(this).val().toLowerCase();
+        $('#hocVienTable tbody tr').filter(function () {
+            $(this).toggle($(this).find('td:nth-child(2)').text().toLowerCase().indexOf(keyword) > -1)
+        });
+    });
+
+   $('.btnCapChungChi').click(function () {
+    var row = $(this).closest('tr');
+    var hocVienId = row.data('hocvienid');
+    var khoaHocId = $('#khoaHocSelect').val();
+    var ngayHetHan = row.find('.ngayHetHan').val();
+
+    if (!khoaHocId) {
+        alert('Vui lòng chọn khóa học.');
+        return;
+    }
+
+    if (!ngayHetHan) {
+        alert('Vui lòng chọn ngày hết hạn chứng chỉ.');
+        return;
+    }
+
+    $.ajax({
+        url: '@Url.Action("CapChungChi", "QuanLyHocTap", new { area = "Admin" })',
+        type: 'POST',
+        data: {
+            hocVienId: hocVienId,
+            khoaHocId: khoaHocId,
+            ngayHetHan: ngayHetHan
+        },
+        success: function (response) {
+            if (response.success) {
+                alert(response.message);
+                location.reload();
+            } else {
+                alert('Lỗi: ' + response.message);
+            }
+        },
+        error: function (xhr, status, error) {
+            alert('Có lỗi xảy ra khi cấp chứng chỉ: ' + xhr.responseText);
+            console.error(xhr.responseText);
+        }
+    });
+});
+
+
+    // Hủy cấp chứng chỉ
+    $('.btnHuyChungChi').click(function () {
+        var row = $(this).closest('tr');
+        var hocVienId = row.data('hocvienid');
+        var khoaHocId = $('#khoaHocSelect').val();
+
+        if (!confirm("Bạn có chắc muốn hủy cấp chứng chỉ?")) return;
+
+        $.ajax({
+            url: '@Url.Action("HuyCapChungChi", "QuanLyHocTap", new { area = "Admin" })',
+            type: 'POST',
+            data: {
+                hocVienId: hocVienId,
+                khoaHocId: khoaHocId
+            },
+            success: function (response) {
+                if (response.success) {
+                    alert(response.message);
+                    location.reload();
+                } else {
+                    alert('Lỗi: ' + response.message);
+                }
+            },
+            error: function (xhr, status, error) {
+                alert('Có lỗi xảy ra khi hủy cấp chứng chỉ: ' + xhr.responseText);
+                console.error(xhr.responseText);
+            }
+        });
+    });
+</script>

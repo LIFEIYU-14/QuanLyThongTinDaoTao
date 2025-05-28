@@ -109,8 +109,7 @@ namespace QuanLyThongTinDaoTao.Controllers
         {
             if (selectedLopHocIds == null || !selectedLopHocIds.Any())
             {
-                TempData["Error"] = "Vui lòng chọn ít nhất một lớp học để đăng ký.";
-                return RedirectToAction("Index");
+                return new HttpStatusCodeResult(400, "Vui lòng chọn ít nhất một lớp học.");
             }
 
             // Lấy danh sách lớp học đã chọn và kèm thông tin khóa học

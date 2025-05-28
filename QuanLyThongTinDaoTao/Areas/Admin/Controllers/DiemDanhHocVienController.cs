@@ -24,6 +24,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 var buoiHoc = db.GiangVien_BuoiHoc
                                 .Where(gb => gb.GiangVien.AppUserId == userId)
                                 .Select(gb => gb.BuoiHoc)
+                                .Include(bh => bh.LopHoc.KhoaHoc)
                                 .ToList();
 
                 return View("DanhSachBuoiDayGV", buoiHoc);

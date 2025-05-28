@@ -244,6 +244,7 @@
     <Compile Include="Areas\Admin\Controllers\LopHocController.cs" />
     <Compile Include="Areas\Admin\Controllers\HocVienController.cs" />
     <Compile Include="Areas\Admin\Controllers\LoginController.cs" />
+    <Compile Include="Areas\Admin\Controllers\QuanLyHocTapController.cs" />
     <Compile Include="Areas\Admin\Controllers\ThongKeController.cs" />
     <Compile Include="Controllers\CoursesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -279,8 +280,13 @@
     <Compile Include="Migrations\202505031548384_Fix-indentity2.Designer.cs">
       <DependentUpon>202505031548384_Fix-indentity2.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202505281515483_ChungChiHocVien.cs" />
+    <Compile Include="Migrations\202505281515483_ChungChiHocVien.Designer.cs">
+      <DependentUpon>202505281515483_ChungChiHocVien.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ModelsHelper\DangKyHocRequest.cs" />
+    <Compile Include="ModelsHelper\HocVienHocTapViewModel.cs" />
     <Compile Include="ModelsHelper\LopHocDetailsViewModel.cs" />
     <Compile Include="ModelsHelper\LopHocThongKeViewModel.cs" />
     <Compile Include="ModelsHelper\VerifyOtpRequest.cs" />
@@ -288,6 +294,7 @@
     <Compile Include="Models\Attachment.cs" />
     <Compile Include="Models\BuoiHoc.cs" />
     <Compile Include="Models\BuoiHocAttachment.cs" />
+    <Compile Include="Models\ChungChiHocTap.cs" />
     <Compile Include="Models\DangKyHoc.cs" />
     <Compile Include="Models\DbContextThongTinDaoTao.cs" />
     <Compile Include="Models\DiemDanh_HV.cs" />
@@ -494,6 +501,8 @@
     <Content Include="Areas\Admin\Views\KhoaHoc\Index.cshtml" />
     <Content Include="Areas\Admin\Views\LopHoc\DanhSachHocVien.cshtml" />
     <Content Include="Areas\Admin\Views\ThongKe\BaoCaoLopHoc.cshtml" />
+    <Content Include="Areas\Admin\Views\GiangVien\Details.cshtml" />
+    <Content Include="Areas\Admin\Views\QuanLyHocTap\QuanLyHocTapTheoKhoaHoc.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -576,6 +585,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202505031548384_Fix-indentity2.resx">
       <DependentUpon>202505031548384_Fix-indentity2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202505281515483_ChungChiHocVien.resx">
+      <DependentUpon>202505281515483_ChungChiHocVien.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

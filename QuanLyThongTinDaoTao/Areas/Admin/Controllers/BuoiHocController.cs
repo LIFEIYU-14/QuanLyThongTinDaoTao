@@ -24,9 +24,29 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             // Cập nhật trạng thái của tất cả các buổi học theo thời gian thực
             UpdateTrangThaiBuoiHocs();
             var buoiHocs = db.BuoiHocs.Include(b => b.LopHoc).ToList();
+
             ViewBag.LopHocList = db.LopHocs.ToList();
+            ViewBag.KhoaHocList = db.KhoaHocs.ToList();
             return View(buoiHocs);
         }
+        public ActionResult GetLopHocByKhoaHoc(Guid? khoaHocId)
+        {
+            if (!khoaHocId.HasValue)
+            {
+                return Content("<option value=''>-- Không có lớp học --</option>");
+            }
+
+            var lopHocs = db.LopHocs.Where(l => l.KhoaHocId == khoaHocId).ToList();
+
+            var options = "<option value=''>-- Chọn lớp học --</option>";
+            foreach (var lop in lopHocs)
+            {
+                options += $"<option value='{lop.LopHocId}'>{lop.TenLopHoc}</option>";
+            }
+
+            return Content(options, "text/html");
+        }
+
         public ActionResult FilterByLopHoc(Guid? lopHocId)
         {
             if (lopHocId.HasValue)

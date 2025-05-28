@@ -99,50 +99,54 @@
         </div>
     </div>
 
-    <!-- Danh sách giảng viên -->
-    <div class="bg-white rounded shadow-sm p-4">
-        <h5 class="mb-3 text-primary"><i class="fas fa-chalkboard-teacher"></i> Giảng viên phụ trách</h5>
+    @if (User.IsInRole("Admin"))
+    {
+        <!-- Danh sách giảng viên -->
+        <div class="bg-white rounded shadow-sm p-4">
+            <h5 class="mb-3 text-primary"><i class="fas fa-chalkboard-teacher"></i> Giảng viên phụ trách</h5>
 
-        @foreach (var gv in tatCaGiangVien)
-        {
-            var diemDanhGV = diemDanhsGV?.FirstOrDefault(d => d.GiangVienId == gv.GiangVienId && d.BuoiHocId == buoiHoc.BuoiHocId);
-            bool daDiemDanhGV = danhSachIdDaDiemDanh.Contains(gv.GiangVienId);
-            <div class="border rounded p-3 mb-3 bg-light">
-                <p><strong>Họ tên:</strong> @gv.HoVaTen</p>
-                <p>
-                    <strong>Trạng thái:</strong>
-                    @if (daDiemDanhGV)
-                    {
-                        <span class="text-success">
-                            <i class="fas fa-check-circle"></i> Đã điểm danh
+            @foreach (var gv in tatCaGiangVien)
+            {
+                var diemDanhGV = diemDanhsGV?.FirstOrDefault(d => d.GiangVienId == gv.GiangVienId && d.BuoiHocId == buoiHoc.BuoiHocId);
+                bool daDiemDanhGV = danhSachIdDaDiemDanh.Contains(gv.GiangVienId);
+
+                <div class="border rounded p-3 mb-3 bg-light">
+                    <p><strong>Họ tên:</strong> @gv.HoVaTen</p>
+                    <p>
+                        <strong>Trạng thái:</strong>
+                        @if (daDiemDanhGV)
+                        {
+                            <span class="text-success">
+                                <i class="fas fa-check-circle"></i> Đã điểm danh
+                            </span>
                             <br />
-                        </span>
-                    <p> <strong>Ngày Điểm Danh :</strong>  @diemDanhGV.NgayDiemDanh.ToString("HH:mm - dd/MM/yyyy")</p>
-
+                        <p><strong>Ngày Điểm Danh:</strong> @diemDanhGV.NgayDiemDanh.ToString("HH:mm - dd/MM/yyyy")</p>
                     }
                     else
                     {
                         <span class="text-danger">Chưa điểm danh</span>
                     }
+                        </p>
 
-
-                    <div>
-                        @if (!daDiemDanhGV)
-                        {
-                            <button class="btn btn-sm btn-primary btn-diemdanh-gv" data-giangvien-id="@gv.GiangVienId">
-                                <i class="fas fa-check"></i> Điểm danh
-                            </button>
-                        }
-                        else
-                        {
-                            <button class="btn btn-sm btn-warning btn-huydiemdanh-gv" data-giangvien-id="@gv.GiangVienId">
-                                <i class="fas fa-undo"></i> Hủy
-                            </button>
-                        }
+                        <div>
+                            @if (!daDiemDanhGV)
+                            {
+                                <button class="btn btn-sm btn-primary btn-diemdanh-gv" data-giangvien-id="@gv.GiangVienId">
+                                    <i class="fas fa-check"></i> Điểm danh
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-sm btn-warning btn-huydiemdanh-gv" data-giangvien-id="@gv.GiangVienId">
+                                    <i class="fas fa-undo"></i> Hủy
+                                </button>
+                            }
+                        </div>
                     </div>
-                </div>
-        }
-    </div>
+                }
+        </div>
+    }
+
 </div>
 
     <script>

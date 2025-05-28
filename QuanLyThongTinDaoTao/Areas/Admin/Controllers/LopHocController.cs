@@ -503,7 +503,6 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             if (hocVienIds == null || !hocVienIds.Any())
                 return Json(new { success = false, message = "Không có học viên nào được chọn." });
 
-            // Dùng trực tiếp hocVienIds (kiểu string)
             var dangKyList = db.DangKyHocs
                 .Where(dk => hocVienIds.Contains(dk.HocVienId) && dk.LopHocId == lopHocId)
                 .Include(dk => dk.HocVien)

@@ -4,6 +4,7 @@ using QuanLyThongTinDaoTao.Identity;
 using QuanLyThongTinDaoTao.Models;
 using QuanLyThongTinDaoTao.Services;
 using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
@@ -30,6 +31,50 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             var list = db.GiangViens.Include(g => g.AppUser).ToList();
             return View(list);
         }
+        // GET: Admin/GiangVien/Details/5
+        public ActionResult Details(string id)
+        {
+            if (id == null)
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+
+            var giangVien = db.GiangViens
+                     .Include(g => g.AppUser)
+                     .FirstOrDefault(g => g.GiangVienId == id);
+
+            if (giangVien == null)
+                return HttpNotFound();
+
+            // Lấy danh sách buổi học mà giảng viên đã dạy
+            var buoiHocDaDay = db.GiangVien_BuoiHoc
+                                 .Where(gb => gb.GiangVienId == id)
+                                 .Select(gb => gb.BuoiHoc)
+                                 .ToList();
+            // Lấy thông tin điểm danh giảng viên cho các buổi này
+            var diemDanhGVs = db.DiemDanhs_GVs
+                .Where(d => d.GiangVienId == id)
+                .ToList();
+
+            // Thống kê giảng dạy theo BuoiHoc
+            var thongKe = buoiHocDaDay
+                .Select(b => new
+                {
+                    BuoiHoc = b,
+                    CoMat = diemDanhGVs.Any(d => d.BuoiHocId == b.BuoiHocId &&
+                                                  d.TrangThai == DiemDanh_GV.TrangThaiDiemDanhGV.CoMat)
+                })
+                .GroupBy(x => x.BuoiHoc.BuoiHocId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => Tuple.Create(g.Count(), g.Count(x => x.CoMat))
+                );
+
+            ViewBag.ThongKeGiangDay = thongKe;
+            ViewBag.BuoiHocDaDay = buoiHocDaDay;
+            ViewBag.DiemDanhGVs = diemDanhGVs;
+            return View(giangVien);
+        }
+
+
 
         public ActionResult Create()
         {

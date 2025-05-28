@@ -1,0 +1,178 @@
+﻿@model QuanLyThongTinDaoTao.Models.GiangVien
+@{
+    ViewBag.Title = "Chi Tiết Giảng Viên";
+    Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
+    var buoiHocDaDay = ViewBag.BuoiHocDaDay as List<QuanLyThongTinDaoTao.Models.BuoiHoc>;
+    var diemDanhGVs = ViewBag.DiemDanhGVs as List<QuanLyThongTinDaoTao.Models.DiemDanh_GV>;
+    var total = buoiHocDaDay?.Count ?? 0;
+    var daDiemDanh = diemDanhGVs?.Count ?? 0;
+    var chuaDiemDanh = total - daDiemDanh;
+}
+
+<div class="container mt-5">
+    <div class="card border-0 shadow-lg rounded-4">
+        <div class="card-header text-white text-center py-4" style="background: linear-gradient(135deg, #1d3557, #457b9d);">
+            <h3><i class="fas fa-chalkboard-teacher me-2"></i>Thông Tin Giảng Viên</h3>
+        </div>
+        <div class="card-body p-4">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h4 class="fw-bold">@Model.HoVaTen</h4>
+                    <p><i class="fas fa-envelope me-2 text-primary"></i><strong>Email:</strong> @Model.AppUser.Email</p>
+                    <p><i class="fas fa-phone me-2 text-primary"></i><strong>Điện thoại:</strong> @Model.SoDienThoai</p>
+                </div>
+                <div class="col-md-6">
+                    <p><i class="fas fa-graduation-cap me-2 text-primary"></i><strong>Chuyên môn:</strong> @Model.ChuyenMon</p>
+                    <p><i class="fas fa-building me-2 text-primary"></i><strong>Đơn vị:</strong> @Model.HocHam</p>
+                </div>
+            </div>
+
+            <div class="row text-center mb-4">
+                <div class="col-md-4">
+                    <div class="bg-light p-3 rounded shadow-sm">
+                        <h6 class="text-muted">Tổng buổi dạy</h6>
+                        <h4 class="fw-bold text-primary">@total</h4>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="bg-light p-3 rounded shadow-sm">
+                        <h6 class="text-muted">Đã điểm danh</h6>
+                        <h4 class="fw-bold text-success">@daDiemDanh</h4>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="bg-light p-3 rounded shadow-sm">
+                        <h6 class="text-muted">Số Buổi Vắng</h6>
+                        <h4 class="fw-bold text-danger">@chuaDiemDanh</h4>
+                    </div>
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-semibold mb-0">
+                    <i class="fas fa-calendar-alt me-2 text-success"></i>Danh Sách Buổi Giảng Dạy
+                </h5>
+                <input type="text" id="searchInput" class="form-control w-50" placeholder="Tìm theo ngày dạy, giờ...">
+            </div>
+
+            @if (buoiHocDaDay != null && buoiHocDaDay.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover text-center" id="buoiHocTable">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>Ngày Dạy</th>
+                                <th>Giờ Bắt Đầu</th>
+                                <th>Giờ Kết Thúc</th>
+                                <th>Trạng Thái</th>
+                                <th>Ngày Điểm Danh</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var buoi in buoiHocDaDay.OrderByDescending(b => b.NgayHoc))
+                            {
+                                var diemDanh = diemDanhGVs.FirstOrDefault(d => d.BuoiHocId == buoi.BuoiHocId);
+                                bool buoiDaDiemDanh = diemDanh != null;
+                                <tr>
+                                    <td>@buoi.NgayHoc.ToString("dd/MM/yyyy")</td>
+                                    <td>@buoi.GioBatDau.ToString(@"hh\:mm")</td>
+                                    <td>@buoi.GioKetThuc.ToString(@"hh\:mm")</td>
+                                    <td>
+                                        @if (buoiDaDiemDanh)
+                                        {
+                                            <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> Đã điểm danh</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary"><i class="fas fa-times-circle me-1"></i> Chưa điểm danh</span>
+                                        }
+                                    </td>
+                                    <td>@(diemDanh?.NgayDiemDanh.ToString("dd/MM/yyyy") ?? "-")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <nav>
+                    <ul class="pagination justify-content-center"></ul>
+                </nav>
+            }
+            else
+            {
+                <div class="alert alert-info"><i class="fas fa-info-circle me-2"></i>Chưa có buổi học nào được ghi nhận.</div>
+            }
+
+            <div class="text-center mt-4">
+                <a href="@Url.Action("Index", "GiangVien")" class="btn btn-outline-secondary btn-lg rounded-pill px-4">
+                    <i class="fas fa-arrow-left me-2"></i> Quay lại danh sách
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/jquery.simplePagination.min.js"></script>
+<script>
+    const rowsPerPage = 4; // Số dòng mỗi trang
+    let currentPage = 1;
+
+    function renderPagination() {
+        const rows = $('#buoiHocTable tbody tr:visible'); // chỉ các dòng đang hiển thị
+        const totalRows = rows.length;
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+        rows.hide();
+
+        const startIndex = (currentPage - 1) * rowsPerPage;
+        const endIndex = startIndex + rowsPerPage;
+        rows.slice(startIndex, endIndex).show();
+
+        let paginationHtml = '';
+
+        paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+       <a class="page-link" href="#" onclick="changePage(1)">Trang đầu</a></li>`;
+
+        paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+       <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Trước</a></li>`;
+
+        for (let i = 1; i <= totalPages; i++) {
+            paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+           <a class="page-link" href="#" onclick="changePage(${i})">${i}</a></li>`;
+        }
+
+        paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+       <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Sau</a></li>`;
+
+        paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+       <a class="page-link" href="#" onclick="changePage(${totalPages})">Trang cuối</a></li>`;
+
+        $('.pagination').html(paginationHtml);
+    }
+
+    function changePage(page) {
+        currentPage = page;
+        renderPagination();
+    }
+
+    $(function () {
+        renderPagination(); // gọi lần đầu khi trang load
+    });
+
+    $('#searchInput').on('keyup', function () {
+        const value = $(this).val().toLowerCase();
+        const rows = $('#buoiHocTable tbody tr');
+
+        rows.each(function () {
+            const rowText = $(this).text().toLowerCase();
+            $(this).toggle(rowText.indexOf(value) > -1);
+        });
+
+        currentPage = 1; // reset về trang đầu sau khi tìm
+        renderPagination();
+    });
+
+</script>

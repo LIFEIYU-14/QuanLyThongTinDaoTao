@@ -10,7 +10,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 {
     public class ThongKeController : Controller
     {
-        private DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
+        public DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
 
         public ActionResult BaoCaoLopHoc()
         {

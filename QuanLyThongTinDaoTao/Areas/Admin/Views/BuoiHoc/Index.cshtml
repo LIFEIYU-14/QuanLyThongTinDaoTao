@@ -1,48 +1,77 @@
 ﻿@model List<QuanLyThongTinDaoTao.Models.BuoiHoc>
-@using QuanLyThongTinDaoTao.Models;
+@using QuanLyThongTinDaoTao.Models
 
 @{
     ViewBag.Title = "Danh Sách Buổi Học";
     Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
 }
 
-<div class="container-fluid pt-4 px-4">
-    <a href="@Url.Action("Create", "BuoiHoc", new { id = ViewBag.LopHocId })" class="btn btn-success mt-3 btn-lg">
-        <i class="fas fa-plus-circle"></i> Thêm Buổi Học
-    </a>
+<div class="container-xxl py-5">
+    <div class="text-center wow fadeInUp mb-4" data-wow-delay="0.1s">
+        <h3 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>DANH SÁCH BUỔI HỌC</h3>
+    </div>
 
-    <div class="bg-light text-center rounded p-4">
-        <h6 class="mb-4 fs-3"><i class="fas fa-calendar-alt"></i> Danh Sách Buổi Học</h6>
+    <div class="bg-light rounded shadow-sm">
+        <!-- Action Bar -->
+        <div class="card-header d-flex flex-wrap align-items-center justify-content-center gap-3 py-3">
+            <a href="@Url.Action("Create", "BuoiHoc", new { id = ViewBag.LopHocId })" class="btn btn-success">
+                <i class="fas fa-plus-circle"></i> Thêm Buổi Học
+            </a>
 
-        <!-- Dropdown chọn Lớp học -->
-        <select class="form-control mb-3" id="LopHocId" name="LopHocId">
-            <option value="" class="text-center">-- Tất cả Lớp Học --</option>
-            @foreach (var lopHoc in ViewBag.LopHocList)
-            {
-                <option value="@lopHoc.LopHocId" class="text-center">@lopHoc.TenLopHoc</option>
-            }
-        </select>
-        <!-- Khu vực hiển thị danh sách buổi học -->
-        <div id="buoiHocContainer">
+
+            <select class="form-select w-auto" id="KhoaHocId">
+                <option value="">-- Tất cả Khóa Học --</option>
+                @foreach (var khoaHoc in ViewBag.KhoaHocList)
+                {
+                    <option value="@khoaHoc.KhoaHocId">@khoaHoc.TenKhoaHoc</option>
+                }
+            </select>
+
+            <select class="form-select w-auto" id="LopHocId">
+                <option value="">-- Vui lòng chọn Khóa Học --</option>
+            </select>
+        </div>
+        <div class="d-flex justify-content-center mb-3">
+            <input type="text" class="form-control w-50" id="searchBuoiHoc" placeholder="Tìm kiếm theo tên lớp, khóa học, trạng thái..." />
+        </div>
+
+        <!-- Nội dung danh sách buổi học -->
+        <div id="buoiHocContainer" class="p-3">
             @Html.Partial("_BuoiHocPartial", Model)
         </div>
     </div>
 </div>
 
 <script>
-        $(document).ready(function () {
+        $(function () {
+            $('#KhoaHocId').change(function () {
+                var khoaHocId = $(this).val();
+                $('#LopHocId').html('<option>Đang tải...</option>');
+                $('#buoiHocContainer').html('');
+
+                $.get('@Url.Action("GetLopHocByKhoaHoc", "BuoiHoc")', { khoaHocId: khoaHocId }, function (result) {
+                    $('#LopHocId').html(result);
+                }).fail(function () {
+                    alert('Không thể tải danh sách lớp học.');
+                });
+            });
+
             $('#LopHocId').change(function () {
-                var selectedLopId = $(this).val();
-                $.ajax({
-                    url: '@Url.Action("FilterByLopHoc", "BuoiHoc")',
-                    type: 'GET',
-                    data: { lopHocId: selectedLopId },
-                    success: function (result) {
-                        $('#buoiHocContainer').html(result);
-                    },
-                    error: function () {
-                        alert('Đã xảy ra lỗi khi lọc buổi học.');
-                    }
+                var lopHocId = $(this).val();
+                $.get('@Url.Action("FilterByLopHoc", "BuoiHoc")', { lopHocId: lopHocId }, function (result) {
+                    $('#buoiHocContainer').html(result);
+                }).fail(function () {
+                    alert('Không thể tải danh sách buổi học.');
+                });
+            });
+            
+            // Tìm kiếm trong bảng buổi học
+            $("#searchBuoiHoc").on("input", function () {
+                var keyword = $(this).val().toLowerCase();
+
+                $("#tableBuoiHoc tbody tr.buoiHocItem").filter(function () {
+                    var text = $(this).text().toLowerCase();
+                    $(this).toggle(text.indexOf(keyword) > -1);
                 });
             });
         });
