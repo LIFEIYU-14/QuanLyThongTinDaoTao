@@ -89,21 +89,87 @@
 
                     @if (Model.LopHocAttachments != null && Model.LopHocAttachments.Any())
                     {
-                        <h4 class="mt-4 text-primary">Tệp Đính Kèm</h4>
-                        <ul class="list-group">
-                            @foreach (var attachment in Model.LopHocAttachments)
-                            {
+                        var fileGroups = Model.LopHocAttachments
+                            .GroupBy(a => a.Attachment.FileType?.ToLower())
+                            .ToList();
 
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <a href="@Url.Content(attachment.Attachment.FilePath)" target="_blank">@attachment.Attachment.FileName</a>
-                                    <button type="button" class="btn btn-danger btn-sm" onclick="deleteAttachment('@attachment.Attachment.AttachmentId')">
-                                        <i class="fas fa-trash-alt"></i> Xóa
-                                    </button>
-                                </li>
+                        <div class="accordion" id="accordionFiles">
+                            @{
+                                int index = 0;
+                                foreach (var group in fileGroups)
+                                {
+                                    var fileType = group.Key.ToUpper();
+                                    var collapseId = $"collapse{index}";
+                                    var headingId = $"heading{index}";
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="@headingId">
+                                            <button class="accordion-button collapsed" type="button"
+                                                    data-bs-toggle="collapse" data-bs-target="#@collapseId"
+                                                    aria-expanded="false" aria-controls="@collapseId">
+                                                📁 @fileType
+                                            </button>
+                                        </h2>
+                                        <div id="@collapseId" class="accordion-collapse collapse"
+                                             aria-labelledby="@headingId" data-bs-parent="#accordionFiles">
+                                            <div class="accordion-body">
+                                                <div class="row">
+                                                    @foreach (var attachment in group)
+                                                    {
+                                                        var filePath = Url.Content(attachment.Attachment.FilePath);
+                                                        var fileName = attachment.Attachment.FileName;
+                                                        var ext = group.Key;
+
+                                                        if (ext == "jpg" || ext == "png" || ext == "jpeg")
+                                                        {
+                                                            <div class="col-md-3 mb-3">
+                                                                <div class="card h-100">
+                                                                    <img src="@filePath" class="card-img-top img-fluid" alt="@fileName" />
+                                                                    <div class="card-body p-2 text-center">
+                                                                        <a href="@filePath" target="_blank" class="btn btn-sm btn-outline-primary">Xem ảnh</a>
+                                                                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteAttachment('@attachment.Attachment.AttachmentId')">
+                                                                            <i class="fas fa-trash-alt"></i> Xóa
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="col-md-12 mb-2">
+                                                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                                                    <div class="text-truncate" style="max-width: 70%;">
+                                                                        <i class="fas fa-file me-2"></i>
+                                                                        <a href="@filePath" target="_blank" title="@fileName">@fileName</a>
+                                                                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteAttachment('@attachment.Attachment.AttachmentId')">
+                                                                            <i class="fas fa-trash-alt"></i> Xóa
+                                                                        </button>
+                                                                    </div>
+                                                                    <span class="badge bg-secondary">@ext.ToUpper()</span>
+                                                                </div>
+                                                            </div>
+                                                        }
+
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    index++;
+                                }
                             }
-                        </ul>
-
+                        </div>
+                        <a href="@Url.Action("DeleteAllAttachments", new { lopHocId = Model.LopHocId })"
+                           class="btn btn-danger m-2"
+                           onclick="return confirm('Bạn có chắc chắn muốn xóa tất cả tài liệu?');">
+                            <i class="fa fa-trash"></i> Xóa tất cả tài liệu
+                        </a>
                     }
+                    else
+                    {
+                        <div class="alert alert-info">Không có tài liệu</div>
+                    }
+
                 </div>
 
                 <div class="text-center">

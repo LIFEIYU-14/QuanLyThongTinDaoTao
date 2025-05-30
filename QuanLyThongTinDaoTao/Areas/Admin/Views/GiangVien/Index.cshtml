@@ -16,8 +16,9 @@
             </a>
             <input type="text" class="form-control w-50" id="searchInput" placeholder="Tìm kiếm theo mã, tên, email..." />
 
-            <button class="btn btn-danger d-none" id="btnXoaNhieu" onclick="xoaNhieu()">
-                <i class="bi bi-trash3"></i> Xóa đã chọn
+            <!-- Nút gửi mail -->
+            <button class="btn btn-danger d-none" id="btnSendNotification">
+                <i class="bi bi-envelope"></i> Gửi mail thông báo
             </button>
         </div>
 
@@ -37,38 +38,34 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @{
-                        int stt = 1;
-                        foreach (var gv in Model)
-                        {
-                            <tr>
-                                <td><input type="checkbox" class="check-item" value="@gv.GiangVienId" /></td>
-                                <td>@gv.MaGiangVien</td>
-                                <td class="text-start">@gv.HoVaTen</td>
-                                <td>@gv.NgaySinh.ToString("dd/MM/yyyy")</td>
-                                <td class="text-start">@gv.Email</td>
-                                <td>@gv.ChuyenMon</td>
-                                <td>@gv.HocHam</td>
-
-                                <td>
-                                    <a href="@Url.Action("Details", new { id = gv.GiangVienId})" class="btn btn-sm btn-info">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a href="@Url.Action("Edit", new { id = gv.GiangVienId })" class="btn btn-sm btn-warning">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <a href="@Url.Action("Delete", new { id = gv.GiangVienId })" class="btn btn-sm btn-danger"
-                                       onclick="return confirm('Bạn có chắc chắn muốn xóa giảng viên này?');">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            stt++;
-                        }
+                    @foreach (var gv in Model)
+                    {
+                        <tr>
+                            <td><input type="checkbox" class="check-item" value="@gv.GiangVienId" /></td>
+                            <td>@gv.MaGiangVien</td>
+                            <td class="text-start">@gv.HoVaTen</td>
+                            <td>@gv.NgaySinh.ToString("dd/MM/yyyy")</td>
+                            <td class="text-start">@gv.Email</td>
+                            <td>@gv.ChuyenMon</td>
+                            <td>@gv.HocHam</td>
+                            <td>
+                                <a href="@Url.Action("Details", new { id = gv.GiangVienId })" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="@Url.Action("Edit", new { id = gv.GiangVienId })" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="@Url.Action("Delete", new { id = gv.GiangVienId })" class="btn btn-sm btn-danger"
+                                   onclick="return confirm('Bạn có chắc chắn muốn xóa giảng viên này?');">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </td>
+                        </tr>
                     }
                 </tbody>
             </table>
         </div>
+
         <!-- Pagination -->
         <nav>
             <ul class="pagination justify-content-center"></ul>
@@ -77,104 +74,118 @@
 </div>
 
 <script>
-    // Check all
-    $("#checkAll").click(function () {
-        $(".check-item").prop('checked', $(this).prop('checked'));
-        toggleDeleteButton();
-    });
+    // Hàm gửi mail thông báo (scope toàn cục)
+    function sendMailNotification() {
+        const selectedIds = $(".check-item:checked").map(function () {
+            return $(this).val();
+        }).get();
 
-    // Toggle delete button
-    $(".check-item").on('change', function () {
-        toggleDeleteButton();
-    });
+        if (selectedIds.length === 0) {
+            alert("Vui lòng chọn ít nhất một giảng viên.");
+            return;
+        }
 
-    function toggleDeleteButton() {
-        let anyChecked = $(".check-item:checked").length > 0;
-        $("#btnXoaNhieu").toggleClass("d-none", !anyChecked);
+        if (!confirm(`Bạn có chắc chắn muốn gửi mail thông báo cho ${selectedIds.length} giảng viên?`)) {
+            return;
+        }
+
+        $.ajax({
+            url: '@Url.Action("SendMailNotification", "GiangVien")',
+            type: 'POST',
+            data: JSON.stringify(selectedIds),
+            contentType: 'application/json',
+            success: function (response) {
+                alert(response.message);
+            },
+            error: function () {
+                alert("Gửi mail thất bại, vui lòng thử lại.");
+            }
+        });
     }
+
     $(document).ready(function () {
+        // Tìm kiếm theo text
         $("#searchInput").on("input", function () {
             var keyword = $(this).val().toLowerCase();
             $("#giangVienTable tbody tr").filter(function () {
                 $(this).toggle($(this).text().toLowerCase().indexOf(keyword) > -1);
             });
+            currentPage = 1; // reset trang khi tìm kiếm
+            renderPagination();
         });
 
-        // Check all
+        // Check all checkbox
         $("#checkAll").click(function () {
             $(".check-item").prop('checked', $(this).prop('checked'));
-            toggleDeleteButton();
+            toggleSendButton();
         });
 
-        // Toggle delete button
-        $(".check-item").on('change', function () {
-            toggleDeleteButton();
+        // Toggle nút gửi mail khi checkbox thay đổi
+        $(document).on('change', ".check-item", function () {
+            toggleSendButton();
         });
 
-        function toggleDeleteButton() {
+        function toggleSendButton() {
             let anyChecked = $(".check-item:checked").length > 0;
-            $("#btnXoaNhieu").toggleClass("d-none", !anyChecked);
-        }
-    });
-    function xoaNhieu() {
-        let ids = $(".check-item:checked").map(function () {
-            return $(this).val();
-        }).get();
-
-        if (ids.length === 0) return;
-
-        if (confirm("Bạn có chắc chắn muốn xóa các giảng viên đã chọn?")) {
-            // TODO: Gọi API hoặc gửi form xử lý xóa nhiều
-            console.log("IDs to delete:", ids);
-        }
-    }
-    // phân trang
-
-    const rowsPerPage = 4; // Số dòng mỗi trang
-    let currentPage = 1;
-
-    function renderPagination() {
-        const rows = $('#lopHocTable tbody tr');
-        const totalRows = rows.length;
-        const totalPages = Math.ceil(totalRows / rowsPerPage);
-
-        rows.hide();
-
-        const startIndex = (currentPage - 1) * rowsPerPage;
-        const endIndex = startIndex + rowsPerPage;
-        rows.slice(startIndex, endIndex).show();
-
-        // Render pagination
-        let paginationHtml = '';
-
-        paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-       <a class="page-link" href="#" onclick="changePage(1)">Trang đầu</a></li>`;
-
-        paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-       <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Trước</a></li>`;
-
-        for (let i = 1; i <= totalPages; i++) {
-            paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
-           <a class="page-link" href="#" onclick="changePage(${i})">${i}</a></li>`;
+            $("#btnSendNotification").toggleClass("d-none", !anyChecked);
         }
 
-        paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-       <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Sau</a></li>`;
+        // Bind sự kiện click nút gửi mail
+        $("#btnSendNotification").click(function () {
+            sendMailNotification();
+        });
 
-        paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-       <a class="page-link" href="#" onclick="changePage(${totalPages})">Trang cuối</a></li>`;
+        // Phân trang
+        const rowsPerPage = 4;
+        let currentPage = 1;
 
-        $('.pagination').html(paginationHtml);
-    }
+        function renderPagination() {
+            const rows = $('#giangVienTable tbody tr:visible'); // Chỉ lấy những dòng đang hiển thị (đã lọc)
+            const totalRows = rows.length;
+            const totalPages = Math.ceil(totalRows / rowsPerPage);
 
-    function changePage(page) {
-        currentPage = page;
+            rows.hide();
+
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            rows.slice(startIndex, endIndex).show();
+
+            // Tạo HTML phân trang
+            let paginationHtml = '';
+
+            paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="changePage(1); return false;">Trang đầu</a></li>`;
+
+            paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">Trước</a></li>`;
+
+            for (let i = 1; i <= totalPages; i++) {
+                paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a></li>`;
+            }
+
+            paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;">Sau</a></li>`;
+
+            paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="changePage(${totalPages}); return false;">Trang cuối</a></li>`;
+
+            $('.pagination').html(paginationHtml);
+        }
+
+        window.changePage = function (page) {
+            const rows = $('#giangVienTable tbody tr:visible');
+            const totalRows = rows.length;
+            const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+            if (page < 1) page = 1;
+            if (page > totalPages) page = totalPages;
+
+            currentPage = page;
+            renderPagination();
+        }
+
+        // Khởi tạo phân trang khi load trang
         renderPagination();
-    }
-
-    $(function () {
-        renderPagination(); // Gọi lần đầu khi trang load
     });
 </script>
-
-

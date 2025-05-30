@@ -96,7 +96,7 @@
                         @if (role == "Admin")
                         {
                             <a href="@Url.Action("Index", "HomeAdmin")" class="nav-item nav-link">
-                                <i class="fa fa-tachometer-alt me-2"></i>Trang chủ
+                                <i class="fas fa-chart-line me-2"></i>Trang chủ
                             </a>
 
                             <!-- KHÓA HỌC -->
@@ -118,6 +118,11 @@
                                 <ul class="dropdown-menu bg-light border-0" aria-labelledby="dropdownLopHoc">
                                     <li><a class="dropdown-item" href="@Url.Action("Index", "LopHoc")"> <i class="fas fa-school me-2"></i>Danh sách Lớp Học</a></li>
                                     <li><a class="dropdown-item" href="@Url.Action("Create", "LopHoc")"> <i class="fas fa-school me-2"></i>Thêm Lớp Học</a></li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("BaoCaoLopHoc", "ThongKe")" class="nav-item nav-link">
+                                            <i class="fas fa-check-circle me-2"></i>Thống kê lớp học
+                                        </a>
+                                    </li>
                                 </ul>
                             </div>
 
@@ -161,9 +166,7 @@
                             <a href="@Url.Action("Index", "DiemDanhGiangVien")" class="nav-item nav-link">
                                 <i class="fas fa-check-circle me-2"></i>Điểm danh Giảng Viên
                             </a>
-                            <a href="@Url.Action("BaoCaoLopHoc", "ThongKe")" class="nav-item nav-link">
-                                <i class="fas fa-check-circle me-2"></i>Thống kê lớp học
-                            </a>
+                        
                             <a href="@Url.Action("QuanLyHocTapTheoKhoaHoc", "QuanLyHocTap")" class="nav-item nav-link">
                                 <i class="fas fa-check-circle me-2"></i>Quản lý học tập
                             </a>

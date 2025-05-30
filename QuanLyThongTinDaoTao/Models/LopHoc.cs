@@ -30,10 +30,11 @@ namespace QuanLyThongTinDaoTao.Models
         public DateTime NgayKetThuc { get; set; }
         public enum TrangThaiLopHoc
         {
-            SapMo,    // Giá trị số nguyên
-            DaBatDau,
-            DaKetThuc
+            SapMo = 0,       // Sắp mở
+            DaBatDau = 1,    // Đã bắt đầu
+            DaKetThuc = 2    // Đã kết thúc
         }
+
         [Required]
         public TrangThaiLopHoc TrangThai { get; set; }
        

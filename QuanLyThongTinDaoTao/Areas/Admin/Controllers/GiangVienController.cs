@@ -18,7 +18,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
     public class GiangVienController : Controller
     {
         private readonly DbContextThongTinDaoTao db = new DbContextThongTinDaoTao();
-
+        private readonly EmailService emailService = new EmailService();
         private AppUserManager _userManager;
         public AppUserManager UserManager
         {
@@ -288,7 +288,58 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpPost]
+        public async Task<JsonResult> SendMailNotification(List<string> selectedGiangVienIds)
+        {
+            if (selectedGiangVienIds == null || !selectedGiangVienIds.Any())
+            {
+                return Json(new { success = false, message = "Không có giảng viên được chọn." });
+            }
+            try
+            {
+                // Lấy danh sách giảng viên kèm lịch dạy từ bảng GiangVien_BuoiHoc
+                var giangViens = await db.GiangViens
+                    .Where(gv => selectedGiangVienIds.Contains(gv.GiangVienId))
+                    .ToListAsync();
 
+                foreach (var gv in giangViens)
+                {
+                    // Lấy lịch dạy của giảng viên (BuoiHoc)
+                    var buoiHocs = await db.GiangVien_BuoiHoc
+                        .Include(gbh => gbh.BuoiHoc)
+                        .Where(gbh => gbh.GiangVienId == gv.GiangVienId)
+                        .Select(gbh => gbh.BuoiHoc)
+                        .ToListAsync();
+
+                    // Tạo nội dung mail thông báo lịch dạy
+                    string mailBody = $"<p>Chào {gv.HoVaTen},</p>";
+                    mailBody += "<p>Dưới đây là lịch dạy của bạn:</p><ul>";
+
+                    if (buoiHocs.Any())
+                    {
+                        foreach (var buoi in buoiHocs)
+                        {
+                            mailBody += $"<li>Ngày: {buoi.NgayHoc.ToString("dd/MM/yyyy")}, Thời gian: {buoi.GioBatDau.ToString(@"hh\:mm")} - {buoi.GioKetThuc.ToString(@"hh\:mm")}</li>";
+                        }
+                    }
+                    else
+                    {
+                        mailBody += "<li>Chưa có lịch dạy được lên kế hoạch.</li>";
+                    }
+                    mailBody += "</ul><p>Chúc bạn có những buổi dạy hiệu quả!</p>";
+
+                    // Gửi mail
+                    await emailService.SendEmail(gv.Email, "Thông báo lịch dạy", mailBody);
+                }
+
+                return Json(new { success = true, message = "Gửi mail thông báo thành công." });
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi nếu cần
+                return Json(new { success = false, message = "Lỗi khi gửi mail: " + ex.Message });
+            }
+        }
         protected override void Dispose(bool disposing)
         {
             if (disposing) db.Dispose();

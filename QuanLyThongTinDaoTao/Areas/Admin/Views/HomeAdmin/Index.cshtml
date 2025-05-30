@@ -9,67 +9,26 @@
             <h3 class="mb-0"><i class="fas fa-chart-line"></i> TRANG TỔNG QUAN HỆ THỐNG</h3>
         </div>
 
-        <!-- Dropdown lọc -->
         <div class="card-header d-flex flex-wrap align-items-center justify-content-center gap-2 mb-4">
             @Html.DropDownList("khoaHocId", ViewBag.KhoaHocList as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>()), "-- Chọn Khóa học --", new { @class = "form-select w-25", id = "khoaHocSelect" })
-
             @Html.DropDownList("lopHocId", ViewBag.LopHocList as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>()), "-- Chọn Lớp học --", new { @class = "form-select w-25", id = "lopHocSelect" })
-
-            <!-- Ngày bắt đầu -->
-            <input type="date" id="startDate" class="form-control w-auto" />
-
-            <!-- Ngày kết thúc -->
-            <input type="date" id="endDate" class="form-control w-auto" />
-
-            <!-- Nút lọc -->
-            <button class="btn btn-primary" id="filterButton">Lọc</button>
         </div>
 
         <!-- Thống kê tổng quan -->
         <div class="row text-center mb-4">
-            <div class="col-md-2 col-6 mb-3">
-                <div class="card shadow p-3">
-                    <h6>Khóa học</h6>
-                    <h4 class="text-info">@ViewBag.TotalCourses</h4>
-                </div>
-            </div>
-            <div class="col-md-2 col-6 mb-3">
-                <div class="card shadow p-3">
-                    <h6>Lớp học</h6>
-                    <h4 class="text-warning">@ViewBag.TotalClasses</h4>
-                </div>
-            </div>
-            <div class="col-md-2 col-6 mb-3">
-                <div class="card shadow p-3">
-                    <h6>Học viên</h6>
-                    <h4 class="text-success">@ViewBag.TotalStudents</h4>
-                </div>
-            </div>
-            <div class="col-md-2 col-6 mb-3">
-                <div class="card shadow p-3">
-                    <h6>Giảng viên</h6>
-                    <h4 class="text-danger">@ViewBag.TotalTeachers</h4>
-                </div>
-            </div>
-            <div class="col-md-2 col-6 mb-3">
-                <div class="card shadow p-3">
-                    <h6>Hôm nay</h6>
-                    <h4 class="text-primary">@ViewBag.RegistrationsToday</h4>
-                </div>
-            </div>
-            <div class="col-md-2 col-6 mb-3">
-                <div class="card shadow p-3">
-                    <h6>Trong tháng</h6>
-                    <h4 class="text-secondary">@ViewBag.RegistrationsThisMonth</h4>
-                </div>
-            </div>
+            <div class="col-md-2 col-6 mb-3"><div class="card shadow p-3"><h6>Khóa học</h6><h4 class="text-info">@ViewBag.TotalCourses</h4></div></div>
+            <div class="col-md-2 col-6 mb-3"><div class="card shadow p-3"><h6>Lớp học</h6><h4 class="text-warning">@ViewBag.TotalClasses</h4></div></div>
+            <div class="col-md-2 col-6 mb-3"><div class="card shadow p-3"><h6>Học viên</h6><h4 class="text-success">@ViewBag.TotalStudents</h4></div></div>
+            <div class="col-md-2 col-6 mb-3"><div class="card shadow p-3"><h6>Giảng viên</h6><h4 class="text-danger">@ViewBag.TotalTeachers</h4></div></div>
+            <div class="col-md-2 col-6 mb-3"><div class="card shadow p-3"><h6>Hôm nay</h6><h4 class="text-primary">@ViewBag.RegistrationsToday</h4></div></div>
+            <div class="col-md-2 col-6 mb-3"><div class="card shadow p-3"><h6>Trong tháng</h6><h4 class="text-secondary">@ViewBag.RegistrationsThisMonth</h4></div></div>
         </div>
 
         <!-- Biểu đồ -->
         <div class="row">
             <div class="col-md-8 mb-4">
                 <div class="card shadow p-3">
-                    <h5 class="text-center">Thống kê đăng ký theo tháng</h5>
+                    <h5 class="text-center">Thống kê đăng ký theo tháng & Tỷ lệ điểm danh</h5>
                     <canvas id="barChart"></canvas>
                 </div>
             </div>
@@ -83,34 +42,57 @@
     </div>
 </div>
 
-<!-- Chart.js + Script xử lý -->
+<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     const barCtx = document.getElementById('barChart').getContext('2d');
     const pieCtx = document.getElementById('pieChart').getContext('2d');
 
-    const barChart = new Chart(barCtx, {
+    let barChart = new Chart(barCtx, {
         type: 'bar',
         data: {
             labels: @Html.Raw(ViewBag.MonthLabels),
-            datasets: [{
-                label: 'Lượt đăng ký',
-                data: @Html.Raw(ViewBag.MonthData),
-                backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }]
+            datasets: [
+                {
+                    label: 'Lượt đăng ký',
+                    data: @Html.Raw(ViewBag.MonthData),
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    yAxisID: 'y'
+                }
+            ]
         },
         options: {
             responsive: true,
             scales: {
-                y: { beginAtZero: true }
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Số lượt đăng ký'
+                    }
+                },
+                y1: {
+                    beginAtZero: true,
+                    position: 'right',
+                    ticks: {
+                        callback: function (value) {
+                            return value + '%';
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Tỉ lệ điểm danh (%)'
+                    },
+                    grid: {
+                        drawOnChartArea: false
+                    }
+                }
             }
         }
     });
 
-    const pieChart = new Chart(pieCtx, {
+    let pieChart = new Chart(pieCtx, {
         type: 'pie',
         data: {
             labels: @Html.Raw(ViewBag.StatusLabels),
@@ -122,62 +104,67 @@
         options: {
             responsive: true,
             plugins: {
-                legend: { position: 'bottom' }
+                legend: {
+                    position: 'bottom'
+                }
             }
         }
     });
 
-    function updateBarChart(labels, data) {
-        barChart.data.labels = labels;
-        barChart.data.datasets[0].data = data;
+    function updateBarChart(months, registrationData, hvPercent, gvPercent) {
+        barChart.data.labels = months;
+        barChart.data.datasets = [
+            {
+                label: 'Lượt đăng ký',
+                data: registrationData,
+                backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                yAxisID: 'y'
+            },
+            {
+                label: 'Tỉ lệ điểm danh HV (%)',
+                data: hvPercent,
+                backgroundColor: 'rgba(40, 167, 69, 0.7)',
+                yAxisID: 'y1'
+            },
+            {
+                label: 'Tỉ lệ điểm danh GV (%)',
+                data: gvPercent,
+                backgroundColor: 'rgba(220, 53, 69, 0.7)',
+                yAxisID: 'y1'
+            }
+        ];
         barChart.update();
+    }
+
+    function loadStats(khoaHocId, lopHocId) {
+        $.when(
+            $.post('@Url.Action("GetRegistrationStats", "HomeAdmin", new { area = "Admin" })', { khoaHocId, lopHocId }),
+            $.post('@Url.Action("GetAttendanceStats", "HomeAdmin", new { area = "Admin" })', { khoaHocId, lopHocId })
+        ).done(function (res1, res2) {
+            const registration = res1[0];
+            const attendance = res2[0];
+            updateBarChart(registration.labels, registration.data, attendance.tiLeDiemDanhHV, attendance.tiLeDiemDanhGV);
+        });
     }
 
     $('#khoaHocSelect').change(function () {
         const khoaHocId = $(this).val();
-        $('#lopHocSelect').empty().append('<option value="">-- Đang tải --</option>');
+        $('#lopHocSelect').html('<option value="">-- Đang tải --</option>');
 
         $.getJSON('@Url.Action("GetLopHocByKhoaHoc", "HomeAdmin", new { area = "Admin" })', { khoaHocId }, function (data) {
-            $('#lopHocSelect').empty().append('<option value="">-- Chọn Lớp học --</option>');
+            let options = '<option value="">-- Chọn Lớp học --</option>';
             $.each(data, function (i, item) {
-                $('#lopHocSelect').append($('<option>', {
-                    value: item.LopHocId,
-                    text: item.TenLopHoc
-                }));
+                options += `<option value="${item.LopHocId}">${item.TenLopHoc}</option>`;
             });
+            $('#lopHocSelect').html(options);
         });
 
-        // Tự động gọi lại thống kê khi đổi khóa học (reset lớp học)
-        $.getJSON('@Url.Action("GetRegistrationStats", "HomeAdmin", new { area = "Admin" })', { khoaHocId, lopHocId: null }, function (res) {
-            updateBarChart(res.labels, res.data);
-        });
+        loadStats(khoaHocId, null);
     });
 
     $('#lopHocSelect').change(function () {
         const khoaHocId = $('#khoaHocSelect').val();
         const lopHocId = $(this).val();
-
-        $.getJSON('@Url.Action("GetRegistrationStats", "HomeAdmin", new { area = "Admin" })', { khoaHocId, lopHocId }, function (res) {
-            updateBarChart(res.labels, res.data);
-        });
-    });
-
-    $('#filterButton').click(function () {
-        const khoaHocId = $('#khoaHocSelect').val();
-        const lopHocId = $('#lopHocSelect').val();
-        const startDate = $('#startDate').val();
-        const endDate = $('#endDate').val();
-
-        console.log('Filter params:', { khoaHocId, lopHocId, startDate, endDate });
-
-        $.getJSON('@Url.Action("GetRegistrationStats", "HomeAdmin", new { area = "Admin" })', {
-            khoaHocId,
-            lopHocId,
-            startDate,
-            endDate
-        }, function (res) {
-            updateBarChart(res.labels, res.data);
-        });
-
+        loadStats(khoaHocId, lopHocId);
     });
 </script>
