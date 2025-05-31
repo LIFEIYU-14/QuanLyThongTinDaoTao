@@ -7,113 +7,114 @@
     var buoiHocs = ViewBag.BuoiHocs as List<BuoiHoc>;
 }
 
+<div class="container py-4">
+    <h3 class="fw-bold mb-3"><i class="fa-solid fa-circle-info"></i> Chi Tiết Lớp Học</h3>
 
-<div class="container mt-5">
-    <div class="card shadow-lg">
-        <div class="card-header bg-primary text-white text-center">
-            <h3><i class="fa-solid fa-circle-info"></i> Chi Tiết Lớp Học: @Model.TenLopHoc</h3>
-        </div>
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb bg-info bg-opacity-25 px-3 py-2 rounded">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Dashboard")">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "LopHoc")">Lớp học</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Chi tiết</li>
+        </ol>
+    </nav>
 
-        <!-- Tabs -->
-    <ul class="nav nav-tabs nav-fill" id="myTab" role="tablist">
-        <li class="nav-item">
-            <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">
-                <i class="fa-solid fa-info-circle me-1"></i>Thông tin
-            </button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link" id="lessons-tab" data-bs-toggle="tab" data-bs-target="#lessons" type="button" role="tab">
-                <i class="fa-solid fa-calendar-days me-1"></i>Buổi học
-            </button>
-        </li>
-    </ul>
+    <a href="@Url.Action("Index")" class="btn btn-primary mb-3">
+        <i class="fa-solid fa-arrow-left"></i> Về danh sách
+    </a>
 
-<div class="card-body tab-content fs-5">
-    <!-- Tab: Thông tin -->
-    <div class="tab-pane fade show active" id="info" role="tabpanel">
-        <div class="row">
-            <div class="col-md-6">
-                <p><strong><i class="fa-solid fa-id-card me-1"></i> Mã Lớp Học:</strong> @Model.MaLopHoc</p>
-                <p><strong><i class="fa-solid fa-book me-1"></i> Tên Lớp Học:</strong> @Model.TenLopHoc</p>
-                <p><strong><i class="fa-solid fa-credit-card me-1"></i> Số Tín Chỉ:</strong> @Model.SoTinChi</p>
-                <p><strong><i class="fa-solid fa-graduation-cap me-1"></i> Khóa Học:</strong> @(Model.KhoaHoc?.TenKhoaHoc ?? "Chưa có")</p>
-            </div>
-            <div class="col-md-6">
-                <p><strong><i class="fa-solid fa-calendar-day me-1"></i> Ngày Bắt Đầu:</strong> @Model.NgayBatDau.ToString("dd/MM/yyyy")</p>
-                <p><strong><i class="fa-solid fa-calendar-check me-1"></i> Ngày Kết Thúc:</strong> @Model.NgayKetThuc.ToString("dd/MM/yyyy")</p>
-                <p><strong><i class="fa-solid fa-users me-1"></i> Số Lượng Tối Đa:</strong> @Model.SoLuongToiDa</p>
+    <!-- Thông tin lớp học -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Thông tin lớp học</h5>
+            <div>
+                <a href="@Url.Action("Edit", new { id = Model.LopHocId })" class="btn btn-warning me-2"><i class="fa-solid fa-pen"></i> Sửa</a>
+                <a href="@Url.Action("Delete", new { id = Model.LopHocId })" class="btn btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa lớp học này?');">
+                    <i class="fa-solid fa-trash"></i> Xóa
+                </a>
             </div>
         </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <p><strong><i class="fa-solid fa-id-card me-1"></i> Mã Lớp Học:</strong> @Model.MaLopHoc</p>
+                    <p><strong><i class="fa-solid fa-book me-1"></i> Tên Lớp Học:</strong> @Model.TenLopHoc</p>
+                    <p><strong><i class="fa-solid fa-credit-card me-1"></i> Số Tín Chỉ:</strong> @Model.SoTinChi</p>
+                    <p><strong><i class="fa-solid fa-graduation-cap me-1"></i> Khóa Học:</strong> @(Model.KhoaHoc?.TenKhoaHoc ?? "Chưa có")</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong><i class="fa-solid fa-calendar-day me-1"></i> Ngày Bắt Đầu:</strong> @Model.NgayBatDau.ToString("dd/MM/yyyy")</p>
+                    <p><strong><i class="fa-solid fa-calendar-check me-1"></i> Ngày Kết Thúc:</strong> @Model.NgayKetThuc.ToString("dd/MM/yyyy")</p>
+                    <p><strong><i class="fa-solid fa-users me-1"></i> Số Lượng Tối Đa:</strong> @Model.SoLuongToiDa</p>
+                </div>
+            </div>
 
-        <div class="mb-4">
-            <p><strong><i class="fa-solid fa-file-lines me-1"></i> Mô Tả:</strong></p>
-            <div class="border rounded p-3 bg-light">@Html.Raw(Model.MoTa)</div>
+            <div>
+                <label class="form-label fw-bold"><i class="fa-solid fa-file-lines me-1"></i> Mô tả:</label>
+                <div class="border rounded p-3 bg-light">@Html.Raw(Model.MoTa)</div>
+            </div>
         </div>
+    </div>
 
-        <div class="mt-4">
-            <h5 class="text-primary"><i class="fa-solid fa-paperclip"></i> Tệp Đính Kèm</h5>
+    <!-- Tệp đính kèm -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white py-3">
+            <h5 class="card-title mb-0"><i class="fa-solid fa-paperclip"></i> Tệp đính kèm</h5>
+        </div>
+        <div class="card-body">
             @if (Model.LopHocAttachments != null && Model.LopHocAttachments.Any())
             {
-                var fileGroups = Model.LopHocAttachments
-                    .GroupBy(a => a.Attachment.FileType?.ToLower())
-                    .ToList();
-
+                var fileGroups = Model.LopHocAttachments.GroupBy(a => a.Attachment.FileType?.ToLower()).ToList();
                 <div class="accordion" id="accordionFiles">
-                    @{
-                        int index = 0;
-                        foreach (var group in fileGroups)
-                        {
-                            var fileType = group.Key.ToUpper();
-                            var collapseId = $"collapse{index}";
-                            var headingId = $"heading{index}";
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="@headingId">
-                                    <button class="accordion-button collapsed" type="button"
-                                            data-bs-toggle="collapse" data-bs-target="#@collapseId"
-                                            aria-expanded="false" aria-controls="@collapseId">
-                                        📁 @fileType
-                                    </button>
-                                </h2>
-                                <div id="@collapseId" class="accordion-collapse collapse"
-                                     aria-labelledby="@headingId" data-bs-parent="#accordionFiles">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            @foreach (var attachment in group)
-                                            {
-                                                var filePath = Url.Content(attachment.Attachment.FilePath);
-                                                var fileName = attachment.Attachment.FileName;
-                                                var ext = group.Key;
+                    @{ int index = 0; }
+                    @foreach (var group in fileGroups)
+                    {
+                        var fileType = group.Key.ToUpper();
+                        var collapseId = $"collapse{index}";
+                        var headingId = $"heading{index}";
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="@headingId">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId">
+                                    📁 @fileType
+                                </button>
+                            </h2>
+                            <div id="@collapseId" class="accordion-collapse collapse" aria-labelledby="@headingId" data-bs-parent="#accordionFiles">
+                                <div class="accordion-body">
+                                    <div class="row">
+                                        @foreach (var attachment in group)
+                                        {
+                                            var filePath = Url.Content(attachment.Attachment.FilePath);
+                                            var fileName = attachment.Attachment.FileName;
+                                            var ext = group.Key;
 
-                                                if (ext == "jpg" || ext == "png" || ext == "jpeg")
-                                                {
-                                                    <div class="col-md-3 mb-3">
-                                                        <div class="card h-100">
-                                                            <img src="@filePath" class="card-img-top img-fluid" alt="@fileName" />
-                                                            <div class="card-body p-2 text-center">
-                                                                <a href="@filePath" target="_blank" class="btn btn-sm btn-outline-primary">Xem ảnh</a>
-                                                            </div>
+                                            if (ext == "jpg" || ext == "png" || ext == "jpeg")
+                                            {
+                                                <div class="col-md-3 mb-3">
+                                                    <div class="card h-100">
+                                                        <img src="@filePath" class="card-img-top img-fluid" alt="@fileName" />
+                                                        <div class="card-body p-2 text-center">
+                                                            <a href="@filePath" target="_blank" class="btn btn-sm btn-outline-primary">Xem ảnh</a>
                                                         </div>
                                                     </div>
-                                                }
-                                                else
-                                                {
-                                                    <div class="col-md-12 mb-2">
-                                                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                                                            <div class="text-truncate" style="max-width: 70%;">
-                                                                <i class="fas fa-file me-2"></i>
-                                                                <a href="@filePath" target="_blank" title="@fileName">@fileName</a>
-                                                            </div>
-                                                            <span class="badge bg-secondary">@ext.ToUpper()</span>
-                                                        </div>
-                                                    </div>
-                                                }
+                                                </div>
                                             }
-                                        </div>
+                                            else
+                                            {
+                                                <div class="col-md-12 mb-2">
+                                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                                        <div class="text-truncate" style="max-width: 70%;">
+                                                            <i class="fas fa-file me-2"></i>
+                                                            <a href="@filePath" target="_blank" title="@fileName">@fileName</a>
+                                                        </div>
+                                                        <span class="badge bg-secondary">@ext.ToUpper()</span>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
                                     </div>
                                 </div>
                             </div>
-                            index++;
-                        }
+                        </div>
+                        index++;
                     }
                 </div>
             }
@@ -121,82 +122,78 @@
             {
                 <div class="alert alert-info">Không có tài liệu</div>
             }
-
         </div>
     </div>
 
-    <!-- Tab: Buổi học -->
-    <div class="tab-pane fade" id="lessons" role="tabpanel">
-        @if (buoiHocs != null && buoiHocs.Any())
-        {
-            <div class="row">
-                @foreach (var buoiHoc in buoiHocs)
-                {
-                    var trangThaiText = buoiHoc.TrangThai == TrangThaiBuoiHoc.SapDienRa ? "Sắp Diễn Ra"
-                        : buoiHoc.TrangThai == TrangThaiBuoiHoc.DangDienRa ? "Đang Diễn Ra"
-                        : "Đã Kết Thúc";
-                    var badgeClass = buoiHoc.TrangThai == TrangThaiBuoiHoc.SapDienRa ? "bg-primary"
-                        : buoiHoc.TrangThai == TrangThaiBuoiHoc.DangDienRa ? "bg-success"
-                        : "bg-secondary";
+    <!-- Buổi học -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0"><i class="fa-solid fa-calendar-days"></i> Danh sách buổi học</h5>
+            <a href="@Url.Action("Create", "BuoiHoc", new { lopHocId = Model.LopHocId })" class="btn btn-success btn-sm">+ Thêm buổi học</a>
+        </div>
+        <div class="card-body">
+            @if (buoiHocs != null && buoiHocs.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle text-center">
+                        <thead class="table-light">
+                            <tr>
+                                <th>STT</th>
+                                <th>Ngày Học</th>
+                                <th>Giờ Học</th>
+                                <th>Trạng Thái</th>
+                                <th>Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int stt = 1;
+                                foreach (var buoiHoc in buoiHocs)
+                                {
+                                    var trangThaiText = buoiHoc.TrangThai == TrangThaiBuoiHoc.SapDienRa ? "Sắp Diễn Ra"
+                                        : buoiHoc.TrangThai == TrangThaiBuoiHoc.DangDienRa ? "Đang Diễn Ra"
+                                        : "Đã Kết Thúc";
+                                    var badgeClass = buoiHoc.TrangThai == TrangThaiBuoiHoc.SapDienRa ? "bg-primary"
+                                        : buoiHoc.TrangThai == TrangThaiBuoiHoc.DangDienRa ? "bg-success"
+                                        : "bg-secondary";
 
-                    <div class="col-md-4 mb-4">
-                        <div class="card shadow h-100">
-                            <div class="card-header text-white text-center bg-info">
-                                <h5 class="mb-0">@buoiHoc.NgayHoc.ToString("dd/MM/yyyy")</h5>
-                            </div>
-                            <div class="card-body text-center">
-                                <p><strong>⏰ Giờ học:</strong> @buoiHoc.GioBatDau - @buoiHoc.GioKetThuc</p>
-                                <p><strong>📌 Trạng thái:</strong> <span class="badge @badgeClass">@trangThaiText</span></p>
-                                <div class="d-flex justify-content-center gap-2">
-                                    <a href="@Url.Action("DanhSachHocVien", "BuoiHoc", new { id = buoiHoc.BuoiHocId })" class="btn btn-info btn-sm">
-                                        <i class="fas fa-users"></i> Học viên
-                                    </a>
-                                    <a href="@Url.Action("Edit", "BuoiHoc", new { id = buoiHoc.BuoiHocId })" class="btn btn-warning btn-sm">
-                                        <i class="fa-solid fa-edit"></i> Sửa
-                                    </a>
-                                    <form method="post" action="@Url.Action("Delete", "BuoiHoc", new { id = buoiHoc.BuoiHocId })"
-                                          onsubmit="return confirm('Bạn có chắc chắn muốn xóa buổi học này?');">
-                                        @Html.AntiForgeryToken()
-                                        <button type="submit" class="btn btn-danger btn-sm">
-                                            <i class="fas fa-trash-alt"></i> Xóa
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-        }
-        else
-        {
-            <div class="alert alert-info text-center">
-                <i class="fa-solid fa-circle-info"></i> Lớp học chưa có buổi học nào
-            </div>
-        }
-
-        <div class="text-center mt-4">
-            <a href="@Url.Action("Create", "BuoiHoc", new { lopHocId = Model.LopHocId })" class="btn btn-success">
-                <i class="fa-solid fa-plus"></i> Thêm buổi học mới
-            </a>
+                                    <tr>
+                                        <td>@stt</td>
+                                        <td>@buoiHoc.NgayHoc.ToString("dd/MM/yyyy")</td>
+                                        <td>@buoiHoc.GioBatDau - @buoiHoc.GioKetThuc</td>
+                                        <td><span class="badge @badgeClass">@trangThaiText</span></td>
+                                        <td>
+                                            <a href="@Url.Action("DanhSachHocVien", "BuoiHoc", new { id = buoiHoc.BuoiHocId })" class="btn btn-sm btn-info" title="Danh sách học viên">
+                                                <i class="fas fa-users"></i>
+                                            </a>
+                                            <a href="@Url.Action("Edit", "BuoiHoc", new { id = buoiHoc.BuoiHocId })" class="btn btn-sm btn-warning" title="Chỉnh sửa">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form action="@Url.Action("Delete", "BuoiHoc", new { id = buoiHoc.BuoiHocId })" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn xóa buổi học này?');">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-danger" title="Xóa buổi học">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    stt++;
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center">
+                    <i class="fa-solid fa-circle-info"></i> Lớp học chưa có buổi học nào.
+                </div>
+            }
         </div>
     </div>
 </div>
 
-<div class="card-footer text-center">
-    <a href="@Url.Action("Index")" class="btn btn-secondary btn-lg me-2">
-        <i class="fa-solid fa-arrow-left me-2"></i>Quay Lại
-    </a>
-    <a href="@Url.Action("Edit", new { id = Model.LopHocId })" class="btn btn-warning btn-lg me-2">
-        <i class="fa-solid fa-pen-to-square me-2"></i>Chỉnh Sửa
-    </a>
-    <a href="@Url.Action("Delete", new { id = Model.LopHocId })" class="btn btn-danger btn-lg"
-       onclick="return confirm('Bạn có chắc chắn muốn xóa lớp học này?');">
-        <i class="fa-solid fa-trash-can me-2"></i>Xóa
-    </a>
-</div>
-    </div>
-</div>
 
 <!-- JavaScript giữ tab khi reload -->
 <script>

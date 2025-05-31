@@ -75,77 +75,108 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
             return Json(lops, JsonRequestBehavior.AllowGet);
         }
-
         [HttpPost]
         public JsonResult GetRegistrationStats(Guid? khoaHocId, Guid? lopHocId)
         {
             var year = DateTime.Today.Year;
-            var dangKyQuery = db.DangKyHocs.AsQueryable();
+
+            var dangKyQuery = db.DangKyHocs
+                .Where(dk => dk.NgayDangKy.Year == year)
+                .AsQueryable();
 
             if (lopHocId.HasValue)
-                dangKyQuery = dangKyQuery.Where(d => d.LopHocId == lopHocId);
+            {
+                dangKyQuery = dangKyQuery.Where(dk => dk.LopHocId == lopHocId);
+            }
             else if (khoaHocId.HasValue)
-                dangKyQuery = dangKyQuery.Where(d => db.LopHocs.Any(l => l.KhoaHocId == khoaHocId && l.LopHocId == d.LopHocId));
-
-            var registrationsByMonth = dangKyQuery
-                .Where(d => d.NgayDangKy.Year == year)
-                .GroupBy(d => d.NgayDangKy.Month)
-                .Select(g => new { Month = g.Key, Count = g.Count() })
-                .ToList();
+            {
+                var lopIds = db.LopHocs
+                    .Where(l => l.KhoaHocId == khoaHocId)
+                    .Select(l => l.LopHocId)
+                    .ToList();
+                dangKyQuery = dangKyQuery.Where(dk => lopIds.Contains(dk.LopHocId));
+            }
 
             var months = Enumerable.Range(1, 12).ToList();
-            var counts = months.Select(m => registrationsByMonth.FirstOrDefault(x => x.Month == m)?.Count ?? 0).ToList();
+            var labels = months.Select(m => "Tháng " + m).ToList();
+            var data = months.Select(m => dangKyQuery.Count(dk => dk.NgayDangKy.Month == m)).ToList();
 
             return Json(new
             {
-                labels = months.Select(m => "Tháng " + m),
-                data = counts
+                labels = labels,
+                data = data,
+                soLuongDangKyTheoThang = data // Giữ lại nếu cần dùng cho mục đích khác
             }, JsonRequestBehavior.AllowGet);
         }
+
+
 
         [HttpPost]
         public JsonResult GetAttendanceStats(Guid? khoaHocId, Guid? lopHocId)
         {
             var year = DateTime.Today.Year;
 
-            var buoiHocQuery = db.BuoiHocs.AsQueryable();
+            var buoiHocQuery = db.BuoiHocs
+                .Where(b => b.NgayHoc.Year == year)
+                .AsQueryable();
+
             if (lopHocId.HasValue)
+            {
                 buoiHocQuery = buoiHocQuery.Where(b => b.LopHocId == lopHocId);
+            }
             else if (khoaHocId.HasValue)
-                buoiHocQuery = buoiHocQuery.Where(b => db.LopHocs.Any(l => l.KhoaHocId == khoaHocId && l.LopHocId == b.LopHocId));
+            {
+                var lopIds = db.LopHocs
+                    .Where(l => l.KhoaHocId == khoaHocId)
+                    .Select(l => l.LopHocId)
+                    .ToList();
+                buoiHocQuery = buoiHocQuery.Where(b => lopIds.Contains(b.LopHocId));
+            }
 
             var buoiHocTheoThang = buoiHocQuery
-                .Where(b => b.NgayHoc.Year == year)
                 .GroupBy(b => b.NgayHoc.Month)
                 .ToList();
 
-            var hvDangKyQuery = db.DangKyHocs.AsQueryable();
+            // Lấy danh sách học viên có liên quan
+            var dangKyQuery = db.DangKyHocs.AsQueryable();
             if (lopHocId.HasValue)
-                hvDangKyQuery = hvDangKyQuery.Where(d => d.LopHocId == lopHocId);
+            {
+                dangKyQuery = dangKyQuery.Where(d => d.LopHocId == lopHocId);
+            }
             else if (khoaHocId.HasValue)
-                hvDangKyQuery = hvDangKyQuery.Where(d => db.LopHocs.Any(l => l.KhoaHocId == khoaHocId && l.LopHocId == d.LopHocId));
+            {
+                var lopIds = db.LopHocs
+                    .Where(l => l.KhoaHocId == khoaHocId)
+                    .Select(l => l.LopHocId)
+                    .ToList();
+                dangKyQuery = dangKyQuery.Where(d => lopIds.Contains(d.LopHocId));
+            }
 
-            var hocVienIds = hvDangKyQuery.Select(d => d.HocVienId).Distinct().ToList();
+            // Nếu không có filter thì lấy tất cả học viên đăng ký
+            var hocVienIds = dangKyQuery.Any()
+                ? dangKyQuery.Select(d => d.HocVienId).Distinct().ToList()
+                : db.DangKyHocs.Select(d => d.HocVienId).Distinct().ToList();
 
             var tileHV = new List<double>();
             var tileGV = new List<double>();
 
             foreach (int thang in Enumerable.Range(1, 12))
             {
-                var buoiIds = buoiHocTheoThang
-                    .FirstOrDefault(g => g.Key == thang)?
+                var buoiIds = buoiHocTheoThang.FirstOrDefault(g => g.Key == thang)?
                     .Select(b => b.BuoiHocId)
                     .ToList() ?? new List<Guid>();
 
+                // === HV ===
                 int totalHV = hocVienIds.Count * buoiIds.Count;
-                int diemDanhHV = db.DiemDanhs_HVs.Count(dd => buoiIds.Contains(dd.BuoiHocId) && dd.TrangThai == DiemDanh_HV.TrangThaiDiemDanhHV.CoMat);
-
+                int diemDanhHV = db.DiemDanhs_HVs
+                    .Count(dd => buoiIds.Contains(dd.BuoiHocId) && dd.TrangThai == DiemDanh_HV.TrangThaiDiemDanhHV.CoMat);
                 double tile1 = totalHV > 0 ? (double)diemDanhHV / totalHV * 100 : 0;
                 tileHV.Add(Math.Round(tile1, 2));
 
+                // === GV ===
                 int totalGV = db.GiangVien_BuoiHoc.Count(gb => buoiIds.Contains(gb.BuoiHocId));
-                int diemDanhGV = db.DiemDanhs_GVs.Count(dd => buoiIds.Contains(dd.BuoiHocId) && dd.TrangThai == DiemDanh_GV.TrangThaiDiemDanhGV.CoMat);
-
+                int diemDanhGV = db.DiemDanhs_GVs
+                    .Count(dd => buoiIds.Contains(dd.BuoiHocId) && dd.TrangThai == DiemDanh_GV.TrangThaiDiemDanhGV.CoMat);
                 double tile2 = totalGV > 0 ? (double)diemDanhGV / totalGV * 100 : 0;
                 tileGV.Add(Math.Round(tile2, 2));
             }
@@ -156,5 +187,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 tiLeDiemDanhGV = tileGV
             }, JsonRequestBehavior.AllowGet);
         }
+
+
     }
 }

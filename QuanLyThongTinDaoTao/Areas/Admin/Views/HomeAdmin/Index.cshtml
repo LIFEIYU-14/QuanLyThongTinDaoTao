@@ -10,11 +10,10 @@
         </div>
 
         <div class="card-header d-flex flex-wrap align-items-center justify-content-center gap-2 mb-4">
-            @Html.DropDownList("khoaHocId", ViewBag.KhoaHocList as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>()), "-- Chọn Khóa học --", new { @class = "form-select w-25", id = "khoaHocSelect" })
-            @Html.DropDownList("lopHocId", ViewBag.LopHocList as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>()), "-- Chọn Lớp học --", new { @class = "form-select w-25", id = "lopHocSelect" })
+            @Html.DropDownList("khoaHocId", ViewBag.KhoaHocList as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>()), "-- Tất cả Khóa học --", new { @class = "form-select w-25", id = "khoaHocSelect" })
+            @Html.DropDownList("lopHocId", ViewBag.LopHocList as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>()), "-- Tất cả Lớp học --", new { @class = "form-select w-25", id = "lopHocSelect" })
         </div>
 
-        <!-- Thống kê tổng quan -->
         <div class="row text-center mb-4">
             <div class="col-md-2 col-6 mb-3"><div class="card shadow p-3"><h6>Khóa học</h6><h4 class="text-info">@ViewBag.TotalCourses</h4></div></div>
             <div class="col-md-2 col-6 mb-3"><div class="card shadow p-3"><h6>Lớp học</h6><h4 class="text-warning">@ViewBag.TotalClasses</h4></div></div>
@@ -24,7 +23,6 @@
             <div class="col-md-2 col-6 mb-3"><div class="card shadow p-3"><h6>Trong tháng</h6><h4 class="text-secondary">@ViewBag.RegistrationsThisMonth</h4></div></div>
         </div>
 
-        <!-- Biểu đồ -->
         <div class="row">
             <div class="col-md-8 mb-4">
                 <div class="card shadow p-3">
@@ -42,7 +40,6 @@
     </div>
 </div>
 
-<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
@@ -137,9 +134,13 @@
     }
 
     function loadStats(khoaHocId, lopHocId) {
+        // Convert empty string to null to indicate "Tất cả"
+        const khId = khoaHocId || null;
+        const lhId = lopHocId || null;
+
         $.when(
-            $.post('@Url.Action("GetRegistrationStats", "HomeAdmin", new { area = "Admin" })', { khoaHocId, lopHocId }),
-            $.post('@Url.Action("GetAttendanceStats", "HomeAdmin", new { area = "Admin" })', { khoaHocId, lopHocId })
+            $.post('@Url.Action("GetRegistrationStats", "HomeAdmin", new { area = "Admin" })', { khoaHocId: khId, lopHocId: lhId }),
+            $.post('@Url.Action("GetAttendanceStats", "HomeAdmin", new { area = "Admin" })', { khoaHocId: khId, lopHocId: lhId })
         ).done(function (res1, res2) {
             const registration = res1[0];
             const attendance = res2[0];
@@ -151,13 +152,17 @@
         const khoaHocId = $(this).val();
         $('#lopHocSelect').html('<option value="">-- Đang tải --</option>');
 
-        $.getJSON('@Url.Action("GetLopHocByKhoaHoc", "HomeAdmin", new { area = "Admin" })', { khoaHocId }, function (data) {
-            let options = '<option value="">-- Chọn Lớp học --</option>';
-            $.each(data, function (i, item) {
-                options += `<option value="${item.LopHocId}">${item.TenLopHoc}</option>`;
+        if (khoaHocId) {
+            $.getJSON('@Url.Action("GetLopHocByKhoaHoc", "HomeAdmin", new { area = "Admin" })', { khoaHocId }, function (data) {
+                let options = '<option value="">-- Tất cả Lớp học --</option>';
+                $.each(data, function (i, item) {
+                    options += `<option value="${item.LopHocId}">${item.TenLopHoc}</option>`;
+                });
+                $('#lopHocSelect').html(options);
             });
-            $('#lopHocSelect').html(options);
-        });
+        } else {
+            $('#lopHocSelect').html('<option value="">-- Tất cả Lớp học --</option>');
+        }
 
         loadStats(khoaHocId, null);
     });
@@ -167,4 +172,8 @@
         const lopHocId = $(this).val();
         loadStats(khoaHocId, lopHocId);
     });
+    $(document).ready(function () {
+        loadStats(null, null);
+    });
+
 </script>

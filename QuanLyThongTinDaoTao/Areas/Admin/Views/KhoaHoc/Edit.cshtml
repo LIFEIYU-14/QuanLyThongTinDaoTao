@@ -11,197 +11,169 @@
         ? Url.Content(Model.HinhDaiDienKhoaHoc)
         : (avatar?.Attachment?.FilePath ?? Url.Content("~/Upload/KhoaHoc/HinhDaiDien/default.png"));
 }
+<div class="container py-4">
+    <h3 class="fw-bold mb-3">Chỉnh Sửa Khóa Học</h3>
 
-<div class="container mt-5">
-    <div class="card shadow-lg">
-        <div class="card-header bg-warning text-white text-center">
-            <h3><i class="fa-solid fa-pen-to-square"></i> Chỉnh Sửa Khóa Học</h3>
-        </div>
-        <div class="card-body">
-            @using (Html.BeginForm("Edit", "KhoaHoc", FormMethod.Post, new { enctype = "multipart/form-data" }))
-            {
-                @Html.AntiForgeryToken()
-                @Html.HiddenFor(model => model.KhoaHocId)
-                <div class="col-md-12 mb-3">
-                    <label class="form-label fw-semibold">Hình Ảnh Khóa Học</label>
-                    <div class="text-center">
-                        <img id="previewImage" src="@imagePath" alt="Hình khóa học" class="rounded border mb-2" style="max-width: 200px; height: auto;" />
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb bg-warning bg-opacity-25 px-3 py-2 rounded">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Dashboard")">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "KhoaHoc")">Khóa học</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa</li>
+        </ol>
+    </nav>
+
+    @using (Html.BeginForm("Edit", "KhoaHoc", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.KhoaHocId)
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0"><i class="fa-solid fa-pen-to-square"></i> Thông Tin Khóa Học</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4 text-center">
+                        <label class="form-label fw-semibold">Ảnh Đại Diện</label>
+                        <img id="previewImage" src="@imagePath" alt="Ảnh khóa học" class="img-thumbnail mb-2" style="max-width: 100%; height: auto;" />
+                        <input type="file" name="hinhDaiDien" id="imageFile" class="form-control mt-2" accept="image/*" onchange="previewFile()" />
                     </div>
-                    <input type="file" name="hinhDaiDien" id="imageFile" class="form-control" accept="image/*" onchange="previewFile()" />
-                </div>
-                <div class="col-md-12 mb-3">
-                    @Html.LabelFor(model => model.MaKhoaHoc, "Mã Khóa Học", new { @class = "form-label" })
-                    @Html.TextBoxFor(model => model.MaKhoaHoc, new { @class = "form-control", @readonly = "readonly" })
-
-
-                </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <i class="fa-solid fa-book-open"></i> @Html.LabelFor(model => model.TenKhoaHoc, "Tên Khóa Học", new { @class = "form-label" })
-                        <span class="text-danger">*</span>
-                        @Html.TextBoxFor(model => model.TenKhoaHoc, new { @class = "form-control", required = "required" })
-                        @Html.ValidationMessageFor(model => model.TenKhoaHoc, "", new { @class = "text-danger" })
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <i class="fa-solid fa-clock"></i>
-                        @Html.LabelFor(model => model.ThoiLuong, "Thời Lượng (tiết)", new { @class = "form-label" })
-                        <span class="text-danger">*</span>
-                        @Html.TextBoxFor(model => model.ThoiLuong, new { @class = "form-control", type = "number", min = "0" })
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.MaKhoaHoc, "Mã Khóa Học", new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.MaKhoaHoc, new { @class = "form-control", @readonly = "readonly" })
+                        </div>
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.TenKhoaHoc, "Tên Khóa Học", new { @class = "form-label" })
+                            <span class="text-danger">*</span>
+                            @Html.TextBoxFor(model => model.TenKhoaHoc, new { @class = "form-control", required = "required" })
+                            @Html.ValidationMessageFor(model => model.TenKhoaHoc, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.ThoiLuong, "Thời Lượng (tiết)", new { @class = "form-label" })
+                            <span class="text-danger">*</span>
+                            @Html.TextBoxFor(model => model.ThoiLuong, new { @class = "form-control", type = "number", min = "0" })
+                        </div>
                     </div>
                 </div>
 
-                <div class="col-md-12 mb-3">
-                    <i class="fa-solid fa-file-lines"></i>
-                    @Html.LabelFor(model => model.MoTa, "Mô Tả", new { @class = "form-label" })
+                <div class="mb-3">
+                    @Html.LabelFor(model => model.MoTa, "Mô Tả", new { @class = "form-label fw-bold" })
                     @Html.TextAreaFor(model => model.MoTa, new { @class = "form-control", rows = 5, id = "MoTa" })
                     @Html.ValidationMessageFor(model => model.MoTa, "", new { @class = "text-danger" })
                 </div>
+            </div>
+        </div>
 
-
-
-                <div class="col-md-12 mb-3">
-                    <label class="form-label fw-semibold">Tệp Đính Kèm (jpg, png, pdf, docx, xlsx, txt)</label>
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0"><i class="bi bi-paperclip"></i> Tệp Đính Kèm</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Chọn file (jpg, png, pdf, docx, xlsx, txt)</label>
                     <input type="file" name="attachments" multiple class="form-control" accept=".jpg,.jpeg,.png,.pdf,.docx,.xlsx,.txt,.pptx" />
+                </div>
 
-                    @if (Model.KhoaHocAttachments != null && Model.KhoaHocAttachments.Any())
-                    {
-                        var fileGroups = Model.KhoaHocAttachments
-                            .GroupBy(a => a.Attachment.FileType?.ToLower())
-                            .ToList();
-
-                        <div class="accordion" id="accordionFiles">
-                            @{
-                                int index = 0;
-                                foreach (var group in fileGroups)
-                                {
-                                    var fileType = group.Key.ToUpper();
-                                    var collapseId = $"collapse{index}";
-                                    var headingId = $"heading{index}";
-                                    <div class="accordion-item">
-                                        <h2 class="accordion-header" id="@headingId">
-                                            <button class="accordion-button collapsed" type="button"
-                                                    data-bs-toggle="collapse" data-bs-target="#@collapseId"
-                                                    aria-expanded="false" aria-controls="@collapseId">
-                                                📁 @fileType
-                                            </button>
-                                        </h2>
-                                        <div id="@collapseId" class="accordion-collapse collapse"
-                                             aria-labelledby="@headingId" data-bs-parent="#accordionFiles">
-                                            <div class="accordion-body">
-                                                <div class="row">
-                                                    @foreach (var attachment in group)
+                @* Hiển thị danh sách tệp *@
+                @if (Model.KhoaHocAttachments != null && Model.KhoaHocAttachments.Any())
+                {
+                    var fileGroups = Model.KhoaHocAttachments.GroupBy(a => a.Attachment.FileType?.ToLower()).ToList();
+                    <div class="accordion" id="accordionFiles">
+                        @{
+                            int index = 0;
+                            foreach (var group in fileGroups)
+                            {
+                                var fileType = group.Key.ToUpper();
+                                var collapseId = $"collapse{index}";
+                                var headingId = $"heading{index}";
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="@headingId">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId">
+                                            📁 @fileType
+                                        </button>
+                                    </h2>
+                                    <div id="@collapseId" class="accordion-collapse collapse" aria-labelledby="@headingId" data-bs-parent="#accordionFiles">
+                                        <div class="accordion-body">
+                                            <div class="row">
+                                                @foreach (var attachment in group)
+                                                {
+                                                    var filePath = Url.Content(attachment.Attachment.FilePath);
+                                                    var fileName = attachment.Attachment.FileName;
+                                                    var ext = group.Key;
+                                                    if (ext == "jpg" || ext == "png" || ext == "jpeg")
                                                     {
-                                                        var filePath = Url.Content(attachment.Attachment.FilePath);
-                                                        var fileName = attachment.Attachment.FileName;
-                                                        var ext = group.Key;
-
-                                                        if (ext == "jpg" || ext == "png" || ext == "jpeg")
-                                                        {
-                                                            <div class="col-md-3 mb-3">
-                                                                <div class="card h-100">
-                                                                    <img src="@filePath" class="card-img-top img-fluid" alt="@fileName" />
-                                                                    <div class="card-body p-2 text-center">
-                                                                        <a href="@filePath" target="_blank" class="btn btn-sm btn-outline-primary">Xem ảnh</a>
-                                                                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteAttachment('@attachment.Attachment.AttachmentId')">
-                                                                            <i class="fas fa-trash-alt"></i> Xóa
-                                                                        </button>
-                                                                    </div>
+                                                        <div class="col-md-3 mb-3">
+                                                            <div class="card h-100">
+                                                                <img src="@filePath" class="card-img-top img-fluid" alt="@fileName" />
+                                                                <div class="card-body p-2 text-center">
+                                                                    <a href="@filePath" target="_blank" class="btn btn-sm btn-outline-primary">Xem ảnh</a>
+                                                                    <button type="button" class="btn btn-danger btn-sm" onclick="deleteAttachment('@attachment.Attachment.AttachmentId')">
+                                                                        <i class="fas fa-trash-alt"></i> Xóa
+                                                                    </button>
                                                                 </div>
                                                             </div>
-
-                                                        }
-                                                        else
-                                                        {
-                                                            <div class="col-md-12 mb-2">
-                                                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                                                    <div class="text-truncate" style="max-width: 70%;">
-                                                                        <i class="fas fa-file me-2"></i>
-                                                                        <a href="@filePath" target="_blank" title="@fileName">@fileName</a>
-                                                                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteAttachment('@attachment.Attachment.AttachmentId')">
-                                                                            <i class="fas fa-trash-alt"></i> Xóa
-                                                                        </button>
-                                                                    </div>
-                                                                    <span class="badge bg-secondary">@ext.ToUpper()</span>
-                                                                </div>
-                                                            </div>
-                                                        }
-                                                       
+                                                        </div>
                                                     }
-                                                </div>
+                                                    else
+                                                    {
+                                                        <div class="col-md-12 mb-2">
+                                                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                                                <div class="text-truncate" style="max-width: 70%;">
+                                                                    <i class="bi bi-file-earmark"></i>
+                                                                    <a href="@filePath" target="_blank" title="@fileName">@fileName</a>
+                                                                </div>
+                                                                <button type="button" class="btn btn-danger btn-sm" onclick="deleteAttachment('@attachment.Attachment.AttachmentId')">
+                                                                    <i class="fas fa-trash-alt"></i> Xóa
+                                                                </button>
+                                                                <span class="badge bg-secondary">@ext.ToUpper()</span>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                }
                                             </div>
                                         </div>
                                     </div>
-                                    index++;
-                                }
+                                </div>
+                                index++;
                             }
-                        </div>
-                        <a href="@Url.Action("DeleteAllAttachments", new { khoaHocId = Model.KhoaHocId })"
-                           class="btn btn-danger m-2"
-                           onclick="return confirm('Bạn có chắc chắn muốn xóa tất cả tài liệu?');">
-                            <i class="fa fa-trash"></i> Xóa tất cả tài liệu
-                        </a>
-                    }
-                    else
-                    {
-                        <div class="alert alert-info">Không có tài liệu</div>
-                    }
+                        }
+                    </div>
 
-                </div>
-
-                <div class="text-center mt-4">
-                    <button type="submit" class="btn btn-primary me-2 btn-lg">
-                        <i class="fa-solid fa-save"></i> Lưu Thay Đổi
-                    </button>
-                    <a href="@Url.Action("Index")" class="btn btn-secondary btn-lg">
-                        <i class="fas fa-arrow-left me-1"></i> Quay lại
+                    <a href="@Url.Action("DeleteAllAttachments", new { khoaHocId = Model.KhoaHocId })"
+                       class="btn btn-danger mt-3"
+                       onclick="return confirm('Bạn có chắc chắn muốn xóa tất cả tài liệu?');">
+                        <i class="fa fa-trash"></i> Xóa tất cả tài liệu
                     </a>
-                </div>
-            }
+                }
+                else
+                {
+                    <div class="alert alert-info">Không có tài liệu</div>
+                }
+            </div>
         </div>
-    </div>
-</div>
 
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary btn-lg me-2">
+                <i class="fa-solid fa-save"></i> Lưu Thay Đổi
+            </button>
+            <a href="@Url.Action("Index")" class="btn btn-secondary btn-lg">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+        </div>
+    }
+</div>
 <style>
     .ck-editor__editable {
         min-height: 150px;
         max-height: 600px;
-        resize: vertical;
+        resize: vertical; /* Cho phép kéo theo chiều dọc */
         overflow-y: auto;
     }
 
-    .form-label {
-        font-weight: bold;
-    }
-
-    .form-control {
-        padding: 0.75rem;
-        font-size: 1rem;
-    }
-
-    .btn-lg {
-        padding: 0.5rem 1.5rem;
-        font-size: 1.125rem;
-    }
-
-    .card-header {
-        font-size: 1.5rem;
-    }
-
-    .text-danger {
-        font-size: 0.875rem;
-    }
-
-    .row {
-        margin-bottom: 1.5rem;
-    }
-
-    .container {
-        max-width: 800px;
-        margin: 0 auto;
-    }
+    
+    
 </style>
-
 <script>
     function previewFile() {
         var preview = document.getElementById("previewImage");

@@ -215,7 +215,9 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             // Xử lý upload các tệp đính kèm (nếu có)
             UploadAttachments(khoaHoc.KhoaHocId, attachments);
 
-            return RedirectToAction("Index");
+            TempData["Success"] = "Cập nhật khóa học thành công!";
+            return RedirectToAction("Edit", new { id = khoaHoc.KhoaHocId });
+
         }
 
 

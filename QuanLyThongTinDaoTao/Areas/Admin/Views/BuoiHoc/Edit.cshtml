@@ -5,10 +5,21 @@
     Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
 }
 
-<div class="container mt-5">
-    <div class="card shadow-lg">
-        <div class="card-header bg-warning text-white text-center">
-            <h3><i class="fa-solid fa-edit"></i> Chỉnh Sửa Buổi Học</h3>
+
+<div class="container py-4">
+    <h3 class="fw-bold mb-3"><i class="fa-solid fa-calendar-day"></i> Chỉnh Sửa Buổi Học</h3>
+
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb bg-warning bg-opacity-25 px-3 py-2 rounded">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Dashboard")">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "BuoiHoc")">Buổi học</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa</li>
+        </ol>
+    </nav>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-warning text-white">
+            <h5 class="mb-0"><i class="fa-solid fa-pen-to-square"></i> Thông Tin Buổi Học</h5>
         </div>
         <div class="card-body">
             @using (Html.BeginForm("Edit", "BuoiHoc", FormMethod.Post, new { enctype = "multipart/form-data" }))
@@ -17,69 +28,59 @@
                 @Html.HiddenFor(model => model.BuoiHocId)
 
                 <div class="mb-3">
-                    @Html.Label("LopHocId", "Lớp Học", new { @class = "form-label" })
+                    @Html.Label("LopHocId", "Lớp Học", new { @class = "form-label fw-semibold" })
                     <select class="form-control" name="LopHocId" required>
                         <option value="">-- Chọn Lớp Học --</option>
                         @foreach (var lopHoc in ViewBag.LopHocList)
                         {
-                            var ngayBatDau = lopHoc.NgayBatDau != null ? ((DateTime)lopHoc.NgayBatDau).ToString("dd/MM/yyyy") : "??";
-                            var ngayKetThuc = lopHoc.NgayKetThuc != null ? ((DateTime)lopHoc.NgayKetThuc).ToString("dd/MM/yyyy") : "??";
-
+                            var start = lopHoc.NgayBatDau?.ToString("dd/MM/yyyy") ?? "??";
+                            var end = lopHoc.NgayKetThuc?.ToString("dd/MM/yyyy") ?? "??";
                             <option value="@lopHoc.LopHocId" @(lopHoc.LopHocId == Model.LopHocId ? "selected" : "")>
-                                @lopHoc.TenLopHoc - (@ngayBatDau - @ngayKetThuc)
+                                @lopHoc.TenLopHoc (@start - @end)
                             </option>
                         }
-
                     </select>
                 </div>
 
-                <div class="mb-3">
-                    @Html.LabelFor(model => model.NgayHoc, "Ngày Học", new { @class = "form-label" })
-
-                    @Html.TextBoxFor(model => model.NgayHoc, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
-                    <small class="text-danger" id="NgayHocError"></small>
-                    @Html.ValidationMessageFor(model => model.NgayHoc, "", new { @class = "text-danger" })
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        @Html.LabelFor(model => model.GioBatDau, "Giờ Bắt Đầu", new { @class = "form-label" })
-                        @Html.TextBoxFor(model => model.GioBatDau, new { @class = "form-control", type = "time", id = "GioBatDau" })
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        @Html.LabelFor(model => model.NgayHoc, "Ngày Học", new { @class = "form-label fw-semibold" })
+                        @Html.TextBoxFor(model => model.NgayHoc, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", required = "required" })
+                        @Html.ValidationMessageFor(model => model.NgayHoc, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="col-md-3">
+                        @Html.LabelFor(model => model.GioBatDau, "Giờ Bắt Đầu", new { @class = "form-label fw-semibold" })
+                        @Html.TextBoxFor(model => model.GioBatDau, new { @class = "form-control", type = "time", required = "required" })
                         @Html.ValidationMessageFor(model => model.GioBatDau, "", new { @class = "text-danger" })
                     </div>
-                    <div class="col-md-6 mb-3">
-                        @Html.LabelFor(model => model.GioKetThuc, "Giờ Kết Thúc", new { @class = "form-label" })
-                        @Html.TextBoxFor(model => model.GioKetThuc, new { @class = "form-control", type = "time", id = "GioKetThuc" })
+                    <div class="col-md-3">
+                        @Html.LabelFor(model => model.GioKetThuc, "Giờ Kết Thúc", new { @class = "form-label fw-semibold" })
+                        @Html.TextBoxFor(model => model.GioKetThuc, new { @class = "form-control", type = "time", required = "required" })
                         @Html.ValidationMessageFor(model => model.GioKetThuc, "", new { @class = "text-danger" })
                     </div>
                 </div>
-                <div class="col-md-12 mb-3">
-                    <label class="form-label">Chọn Giảng Viên</label>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Chọn Giảng Viên</label>
                     <input type="text" class="form-control mb-2" placeholder="Tìm giảng viên..." id="searchGiangVien" />
                     <div id="giangVienContainer" class="border rounded p-2" style="max-height: 300px; overflow-y: auto;">
-
+                        <!-- Chèn danh sách giảng viên động ở đây -->
                     </div>
-
                 </div>
 
-
-
-                <div class="col-md-12 mb-3">
+                <div class="mb-4">
                     <label class="form-label fw-semibold">Tệp Đính Kèm (jpg, png, pdf, docx, xlsx, txt)</label>
                     <input type="file" name="attachments" multiple class="form-control" accept=".jpg,.jpeg,.png,.pdf,.docx,.xlsx,.txt,.pptx" />
 
                     @if (Model.BuoiHocAttachments != null && Model.BuoiHocAttachments.Any())
                     {
-                        var fileGroups = Model.BuoiHocAttachments
-                            .GroupBy(a => a.Attachment.FileType?.ToLower())
-                            .ToList();
-
-                        <div class="accordion" id="accordionFiles">
+                        var fileGroups = Model.BuoiHocAttachments.GroupBy(a => a.Attachment.FileType?.ToLower()).ToList();
+                        <div class="accordion mt-3" id="accordionFiles">
                             @{
                                 int index = 0;
                                 foreach (var group in fileGroups)
                                 {
-                                    var fileType = group.Key.ToUpper();
+                                    var ext = group.Key.ToUpper();
                                     var collapseId = $"collapse{index}";
                                     var headingId = $"heading{index}";
                                     <div class="accordion-item">
@@ -87,7 +88,7 @@
                                             <button class="accordion-button collapsed" type="button"
                                                     data-bs-toggle="collapse" data-bs-target="#@collapseId"
                                                     aria-expanded="false" aria-controls="@collapseId">
-                                                📁 @fileType
+                                                📁 @ext
                                             </button>
                                         </h2>
                                         <div id="@collapseId" class="accordion-collapse collapse"
@@ -98,22 +99,20 @@
                                                     {
                                                         var filePath = Url.Content(attachment.Attachment.FilePath);
                                                         var fileName = attachment.Attachment.FileName;
-                                                        var ext = group.Key;
 
-                                                        if (ext == "jpg" || ext == "png" || ext == "jpeg")
+                                                        if (ext == "JPG" || ext == "PNG" || ext == "JPEG")
                                                         {
                                                             <div class="col-md-3 mb-3">
                                                                 <div class="card h-100">
                                                                     <img src="@filePath" class="card-img-top img-fluid" alt="@fileName" />
-                                                                    <div class="card-body p-2 text-center">
+                                                                    <div class="card-body text-center p-2">
                                                                         <a href="@filePath" target="_blank" class="btn btn-sm btn-outline-primary">Xem ảnh</a>
-                                                                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteAttachment('@attachment.Attachment.AttachmentId')">
+                                                                        <button type="button" class="btn btn-sm btn-danger" onclick="deleteAttachment('@attachment.Attachment.AttachmentId')">
                                                                             <i class="fas fa-trash-alt"></i> Xóa
                                                                         </button>
                                                                     </div>
                                                                 </div>
                                                             </div>
-
                                                         }
                                                         else
                                                         {
@@ -121,16 +120,14 @@
                                                                 <div class="list-group-item d-flex justify-content-between align-items-center">
                                                                     <div class="text-truncate" style="max-width: 70%;">
                                                                         <i class="fas fa-file me-2"></i>
-                                                                        <a href="@filePath" target="_blank" title="@fileName">@fileName</a>
-                                                                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteAttachment('@attachment.Attachment.AttachmentId')">
-                                                                            <i class="fas fa-trash-alt"></i> Xóa
-                                                                        </button>
+                                                                        <a href="@filePath" target="_blank">@fileName</a>
                                                                     </div>
-                                                                    <span class="badge bg-secondary">@ext.ToUpper()</span>
+                                                                    <button type="button" class="btn btn-sm btn-danger" onclick="deleteAttachment('@attachment.Attachment.AttachmentId')">
+                                                                        <i class="fas fa-trash-alt"></i> Xóa
+                                                                    </button>
                                                                 </div>
                                                             </div>
                                                         }
-
                                                     }
                                                 </div>
                                             </div>
@@ -141,29 +138,27 @@
                             }
                         </div>
                         <a href="@Url.Action("DeleteAllAttachments", new { buoiHocId = Model.BuoiHocId })"
-                           class="btn btn-danger m-2"
+                           class="btn btn-danger mt-3"
                            onclick="return confirm('Bạn có chắc chắn muốn xóa tất cả tài liệu?');">
                             <i class="fa fa-trash"></i> Xóa tất cả tài liệu
                         </a>
                     }
                     else
                     {
-                        <div class="alert alert-info">Không có tài liệu</div>
+                        <div class="alert alert-info mt-3">Không có tài liệu đính kèm</div>
                     }
-
                 </div>
-                <small class="text-danger" id="GioHocError"></small>
 
                 <div class="mb-3">
-                    @Html.LabelFor(model => model.GhiChu, "Ghi Chú", new { @class = "form-label" })
+                    @Html.LabelFor(model => model.GhiChu, "Ghi Chú", new { @class = "form-label fw-semibold" })
                     @Html.TextAreaFor(model => model.GhiChu, new { @class = "form-control", rows = 5, id = "GhiChu" })
                 </div>
 
-                <div class="text-center">
+                <div class="text-end mt-4">
                     <button type="submit" class="btn btn-warning btn-lg">
                         <i class="fa-solid fa-save"></i> Lưu Thay Đổi
                     </button>
-                    <a href="@Url.Action("Index")" class="btn btn-secondary btn-lg">
+                    <a href="@Url.Action("Index")" class="btn btn-secondary btn-lg ms-2">
                         <i class="fas fa-arrow-left"></i> Quay lại
                     </a>
                 </div>
@@ -181,36 +176,6 @@
         overflow-y: auto;
     }
 
-    .form-label {
-        font-weight: bold;
-    }
-
-    .form-control {
-        padding: 0.75rem;
-        font-size: 1rem;
-    }
-
-    .btn-lg {
-        padding: 0.5rem 1.5rem;
-        font-size: 1.125rem;
-    }
-
-    .card-header {
-        font-size: 1.5rem;
-    }
-
-    .text-danger {
-        font-size: 0.875rem;
-    }
-
-    .row {
-        margin-bottom: 1.5rem;
-    }
-
-    .container {
-        max-width: 800px;
-        margin: 0 auto;
-    }
 </style>
 
 <!-- Tích hợp CKEditor 5 -->

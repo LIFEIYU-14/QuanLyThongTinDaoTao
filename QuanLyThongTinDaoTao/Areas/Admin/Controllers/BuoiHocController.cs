@@ -391,7 +391,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             }
 
             TempData["Success"] = "Cập nhật buổi học thành công!";
-            return RedirectToAction("Index");
+            return RedirectToAction("Edit", new { id = buoiHoc.BuoiHocId });
         }
 
 
