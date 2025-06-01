@@ -1,5 +1,5 @@
 ﻿@model List<QuanLyThongTinDaoTao.Models.DangKyHoc>
-@using QuanLyThongTinDaoTao.Models;
+@using QuanLyThongTinDaoTao.Models
 
 @{
     ViewBag.Title = "Điểm Danh Buổi Học";
@@ -102,7 +102,7 @@
     @if (User.IsInRole("Admin"))
     {
         <!-- Danh sách giảng viên -->
-        <div class="bg-white rounded shadow-sm p-4">
+        <div class="bg-white rounded shadow-sm p-4 mb-4">
             <h5 class="mb-3 text-primary"><i class="fas fa-chalkboard-teacher"></i> Giảng viên phụ trách</h5>
 
             @foreach (var gv in tatCaGiangVien)
@@ -116,40 +116,48 @@
                         <strong>Trạng thái:</strong>
                         @if (daDiemDanhGV)
                         {
-                            <span class="text-success">
-                                <i class="fas fa-check-circle"></i> Đã điểm danh
-                            </span>
+                            <span class="text-success"><i class="fas fa-check-circle"></i> Đã điểm danh</span>
                             <br />
-                        <p><strong>Ngày Điểm Danh:</strong> @diemDanhGV.NgayDiemDanh.ToString("HH:mm - dd/MM/yyyy")</p>
-                    }
-                    else
-                    {
-                        <span class="text-danger">Chưa điểm danh</span>
-                    }
-                        </p>
-
-                        <div>
-                            @if (!daDiemDanhGV)
-                            {
-                                <button class="btn btn-sm btn-primary btn-diemdanh-gv" data-giangvien-id="@gv.GiangVienId">
-                                    <i class="fas fa-check"></i> Điểm danh
-                                </button>
-                            }
-                            else
-                            {
-                                <button class="btn btn-sm btn-warning btn-huydiemdanh-gv" data-giangvien-id="@gv.GiangVienId">
-                                    <i class="fas fa-undo"></i> Hủy
-                                </button>
-                            }
-                        </div>
+                            <strong>Ngày Điểm Danh:</strong> @diemDanhGV.NgayDiemDanh.ToString("HH:mm - dd/MM/yyyy")
+                        }
+                        else
+                        {
+                            <span class="text-danger">Chưa điểm danh</span>
+                        }
+                    </p>
+                    <div>
+                        @if (!daDiemDanhGV)
+                        {
+                            <button class="btn btn-sm btn-primary btn-diemdanh-gv" data-giangvien-id="@gv.GiangVienId">
+                                <i class="fas fa-check"></i> Điểm danh
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-sm btn-warning btn-huydiemdanh-gv" data-giangvien-id="@gv.GiangVienId">
+                                <i class="fas fa-undo"></i> Hủy
+                            </button>
+                        }
                     </div>
-                }
+                </div>
+            }
         </div>
     }
 
+    <!-- Quét QR -->
+    <div class="bg-light rounded p-4 mb-4">
+        <h5><i class="fas fa-qrcode me-2"></i> Quét QR để điểm danh</h5>
+        <div id="reader" style="width: 100%; max-width: 400px;"></div>
+        <div class="mt-2">
+            <span id="qrResultMessage" class="fw-bold text-primary"></span>
+        </div>
+    </div>
 </div>
 
-    <script>
+<!-- Scripts -->
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<script>
     $(function () {
         // Học viên
         $(document).on('click', '.btn-diemdanh', function () {
@@ -186,42 +194,77 @@
         });
     });
 
+    // Phân trang
     document.addEventListener("DOMContentLoaded", function () {
-        const rows = document.querySelectorAll(".hocvien-row");
-        const rowsPerPage = 5;
+        const rowsPerPage = 10;
+        const tableRows = document.querySelectorAll(".hocvien-row");
+        const totalRows = tableRows.length;
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
         const pagination = document.getElementById("pagination");
-        const totalPages = Math.ceil(rows.length / rowsPerPage);
 
         function showPage(page) {
-            rows.forEach((row, index) => {
+            tableRows.forEach((row, index) => {
                 row.style.display = (index >= (page - 1) * rowsPerPage && index < page * rowsPerPage) ? "" : "none";
             });
 
-            document.querySelectorAll("#pagination .page-item").forEach((li, idx) => {
-                li.classList.toggle("active", idx === page - 1);
-            });
-        }
-
-        function createPagination() {
             pagination.innerHTML = "";
             for (let i = 1; i <= totalPages; i++) {
                 const li = document.createElement("li");
-                li.className = "page-item";
-                const a = document.createElement("a");
-                a.className = "page-link";
-                a.href = "#";
-                a.innerText = i;
-                a.addEventListener("click", (e) => {
+                li.className = "page-item" + (i === page ? " active" : "");
+                li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                li.addEventListener("click", function (e) {
                     e.preventDefault();
                     showPage(i);
                 });
-
-                li.appendChild(a);
                 pagination.appendChild(li);
             }
         }
 
-        createPagination();
         showPage(1);
     });
-    </script>
+
+    // Quét QR điểm danh
+    document.addEventListener("DOMContentLoaded", function () {
+        const resultEl = document.getElementById("qrResultMessage");
+
+        function onScanSuccess(decodedText) {
+            try {
+                const parsed = JSON.parse(decodedText);
+                let payload = {
+                    buoiHocId: '@buoiHoc.BuoiHocId'
+                };
+
+                if (parsed.HocVienId)
+                    payload.HocVienId = parsed.HocVienId;
+                else if (parsed.GiangVienId)
+                    payload.GiangVienId = parsed.GiangVienId;
+                else {
+                    resultEl.className = "text-danger";
+                    resultEl.innerText = "❌ QR không hợp lệ!";
+                    return;
+                }
+
+                $.post('@Url.Action("DiemDanhBangQr", "DiemDanhHocVien", new { area = "Admin" })',
+                    { qrData: JSON.stringify(payload) },
+                    function (res) {
+                        if (res.success) {
+                            resultEl.className = "text-success";
+                            resultEl.innerText = "✅ " + res.message;
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            resultEl.className = "text-danger";
+                            resultEl.innerText = "⚠️ " + res.message;
+                        }
+                    });
+
+                html5QrcodeScanner.clear(); // Dừng quét sau 1 lần thành công
+            } catch {
+                resultEl.className = "text-danger";
+                resultEl.innerText = "❌ QR không hợp lệ!";
+            }
+        }
+
+        const html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+        html5QrcodeScanner.render(onScanSuccess);
+    });
+</script>

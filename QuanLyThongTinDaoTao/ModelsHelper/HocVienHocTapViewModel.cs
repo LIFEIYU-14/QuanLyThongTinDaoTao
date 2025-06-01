@@ -16,6 +16,7 @@ namespace QuanLyThongTinDaoTao.ModelsHelper
         public int SoBuoiCoMat { get; set; }
         public int SoBuoiVang { get; set; }
         public bool DaCapChungChi { get; set; }
+        public List<ChungChiViewModel> ChungChis { get; set; } = new List<ChungChiViewModel>();
     }
 
 }

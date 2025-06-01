@@ -65,7 +65,6 @@
                 </tbody>
             </table>
         </div>
-
         <!-- Pagination -->
         <nav>
             <ul class="pagination justify-content-center"></ul>
@@ -107,12 +106,14 @@
         // Tìm kiếm theo text
         $("#searchInput").on("input", function () {
             var keyword = $(this).val().toLowerCase();
-            $("#giangVienTable tbody tr").filter(function () {
-                $(this).toggle($(this).text().toLowerCase().indexOf(keyword) > -1);
+            $("#giangVienTable tbody tr").each(function () {
+                const text = $(this).text().toLowerCase();
+                $(this).toggle(text.indexOf(keyword) > -1);
             });
-            currentPage = 1; // reset trang khi tìm kiếm
+            currentPage = 1;
             renderPagination();
         });
+
 
         // Check all checkbox
         $("#checkAll").click(function () {
@@ -134,58 +135,52 @@
         $("#btnSendNotification").click(function () {
             sendMailNotification();
         });
+    });
+    // phân trang
 
-        // Phân trang
-        const rowsPerPage = 4;
-        let currentPage = 1;
+    const rowsPerPage = 4; // Số dòng mỗi trang
+    let currentPage = 1;
 
-        function renderPagination() {
-            const rows = $('#giangVienTable tbody tr:visible'); // Chỉ lấy những dòng đang hiển thị (đã lọc)
-            const totalRows = rows.length;
-            const totalPages = Math.ceil(totalRows / rowsPerPage);
+    function renderPagination() {
+        const rows = $('#giangVienTable tbody tr');
+        const totalRows = rows.length;
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
 
-            rows.hide();
+        rows.hide();
 
-            const startIndex = (currentPage - 1) * rowsPerPage;
-            const endIndex = startIndex + rowsPerPage;
-            rows.slice(startIndex, endIndex).show();
+        const startIndex = (currentPage - 1) * rowsPerPage;
+        const endIndex = startIndex + rowsPerPage;
+        rows.slice(startIndex, endIndex).show();
 
-            // Tạo HTML phân trang
-            let paginationHtml = '';
+        // Render pagination
+        let paginationHtml = '';
 
-            paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="changePage(1); return false;">Trang đầu</a></li>`;
+        paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+        <a class="page-link" href="#" onclick="changePage(1)">Trang đầu</a></li>`;
 
-            paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">Trước</a></li>`;
+        paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+        <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Trước</a></li>`;
 
-            for (let i = 1; i <= totalPages; i++) {
-                paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
-                    <a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a></li>`;
-            }
-
-            paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;">Sau</a></li>`;
-
-            paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="changePage(${totalPages}); return false;">Trang cuối</a></li>`;
-
-            $('.pagination').html(paginationHtml);
+        for (let i = 1; i <= totalPages; i++) {
+            paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+            <a class="page-link" href="#" onclick="changePage(${i})">${i}</a></li>`;
         }
 
-        window.changePage = function (page) {
-            const rows = $('#giangVienTable tbody tr:visible');
-            const totalRows = rows.length;
-            const totalPages = Math.ceil(totalRows / rowsPerPage);
+        paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+        <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Sau</a></li>`;
 
-            if (page < 1) page = 1;
-            if (page > totalPages) page = totalPages;
+        paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+        <a class="page-link" href="#" onclick="changePage(${totalPages})">Trang cuối</a></li>`;
 
-            currentPage = page;
-            renderPagination();
-        }
+        $('.pagination').html(paginationHtml);
+    }
 
-        // Khởi tạo phân trang khi load trang
+    function changePage(page) {
+        currentPage = page;
         renderPagination();
+    }
+
+    $(function () {
+        renderPagination(); // Gọi lần đầu khi trang load
     });
 </script>

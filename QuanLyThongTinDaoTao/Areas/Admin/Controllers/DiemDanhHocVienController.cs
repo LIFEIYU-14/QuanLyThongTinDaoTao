@@ -239,38 +239,60 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
             try
             {
                 var parsed = JsonConvert.DeserializeObject<dynamic>(qrData);
-                string hocVienId = parsed.HocVienId;
-                Guid buoiHocId = Guid.Parse((string)parsed.BuoiHocId);
+                Guid buoiHocId = Guid.Parse((string)parsed.buoiHocId ?? "");
 
-                // Kiểm tra học viên đã điểm danh chưa
-                var daDiemDanh = db.DiemDanhs_HVs.Any(dd =>
-                    dd.HocVienId == hocVienId && dd.BuoiHocId == buoiHocId);
-
-                if (daDiemDanh)
-                    return Json(new { success = false, message = "Học viên đã điểm danh trước đó!" });
-
-                // Tạo bản ghi điểm danh mới
-                var diemDanh = new DiemDanh_HV
+                // Nếu là học viên
+                if (parsed.HocVienId != null)
                 {
-                    DiemDanhId = Guid.NewGuid(),
-                    HocVienId = hocVienId,
-                    BuoiHocId = buoiHocId,
-                    NgayDiemDanh = DateTime.Now,
-                    TrangThai = DiemDanh_HV.TrangThaiDiemDanhHV.CoMat
-                };
+                    string hocVienId = parsed.HocVienId;
+                    bool daDiemDanh = db.DiemDanhs_HVs.Any(dd => dd.HocVienId == hocVienId && dd.BuoiHocId == buoiHocId);
 
-                db.DiemDanhs_HVs.Add(diemDanh);
-                db.SaveChanges();
+                    if (daDiemDanh)
+                        return Json(new { success = false, message = "Học viên đã được điểm danh!" });
 
-                return Json(new { success = true, message = "Điểm danh thành công!" });
+                    var diemDanh = new DiemDanh_HV
+                    {
+                        DiemDanhId = Guid.NewGuid(),
+                        HocVienId = hocVienId,
+                        BuoiHocId = buoiHocId,
+                        NgayDiemDanh = DateTime.Now,
+                        TrangThai = DiemDanh_HV.TrangThaiDiemDanhHV.CoMat
+                    };
+                    db.DiemDanhs_HVs.Add(diemDanh);
+                    db.SaveChanges();
+                    return Json(new { success = true, message = "Điểm danh học viên thành công!" });
+                }
+                // Nếu là giảng viên
+                else if (parsed.GiangVienId != null)
+                {
+                    string giangVienId = parsed.GiangVienId;
+                    bool daDiemDanh = db.DiemDanhs_GVs.Any(dd => dd.GiangVienId == giangVienId && dd.BuoiHocId == buoiHocId);
+
+                    if (daDiemDanh)
+                        return Json(new { success = false, message = "Giảng viên đã được điểm danh!" });
+
+                    var diemDanhGV = new DiemDanh_GV
+                    {
+                        DiemDanhId = Guid.NewGuid(),
+                        GiangVienId = giangVienId,
+                        BuoiHocId = buoiHocId,
+                        NgayDiemDanh = DateTime.Now,
+                        TrangThai = DiemDanh_GV.TrangThaiDiemDanhGV.CoMat
+                    };
+                    db.DiemDanhs_GVs.Add(diemDanhGV);
+                    db.SaveChanges();
+                    return Json(new { success = true, message = "Điểm danh giảng viên thành công!" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "QR không chứa mã hợp lệ!" });
+                }
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "QR code không hợp lệ!", error = ex.Message });
+                return Json(new { success = false, message = "Lỗi xử lý QR!", error = ex.Message });
             }
         }
-
-
 
     }
 }

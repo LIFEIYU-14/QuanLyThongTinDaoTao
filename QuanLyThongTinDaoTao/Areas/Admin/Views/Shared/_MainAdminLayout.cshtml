@@ -118,11 +118,7 @@
                                 <ul class="dropdown-menu bg-light border-0" aria-labelledby="dropdownLopHoc">
                                     <li><a class="dropdown-item" href="@Url.Action("Index", "LopHoc")"> <i class="fas fa-school me-2"></i>Danh sách Lớp Học</a></li>
                                     <li><a class="dropdown-item" href="@Url.Action("Create", "LopHoc")"> <i class="fas fa-school me-2"></i>Thêm Lớp Học</a></li>
-                                    <li>
-                                        <a class="dropdown-item" href="@Url.Action("BaoCaoLopHoc", "ThongKe")" class="nav-item nav-link">
-                                            <i class="fas fa-check-circle me-2"></i>Thống kê lớp học
-                                        </a>
-                                    </li>
+                                    <li><a class="dropdown-item" href="@Url.Action("BaoCaoLopHoc", "ThongKe")"><i class="fas fa-chart-line me-2"></i>Thống Kê Lớp Học</a></li>
                                 </ul>
                             </div>
 
@@ -145,6 +141,7 @@
                                 <ul class="dropdown-menu bg-light border-0" aria-labelledby="dropdownHocVien">
                                     <li><a class="dropdown-item" href="@Url.Action("Index", "HocVien")">Danh sách Học Viên</a></li>
                                     <li><a class="dropdown-item" href="@Url.Action("Create", "HocVien")">Thêm Học Viên</a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("BaoCaoHocVien", "ThongKeHocVien")"><i class="fas fa-chart-line me-2"></i>Thống Kê Học Viên</a></li>
                                 </ul>
                             </div>
 
@@ -156,6 +153,12 @@
                                 <ul class="dropdown-menu bg-light border-0" aria-labelledby="dropdownGiangVien">
                                     <li><a class="dropdown-item" href="@Url.Action("Index", "GiangVien")">Danh sách Giảng Viên</a></li>
                                     <li><a class="dropdown-item" href="@Url.Action("Create", "GiangVien")">Thêm Giảng Viên</a></li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("BaoCaoGiangVien", "ThongKeGV")">
+                                            <i class="fas fa-chart-line me-2"></i>Thống Kê Giảng Viên
+                                        </a>
+                                    </li>
+
                                 </ul>
                             </div>
 

@@ -13,14 +13,27 @@
         <div class="row g-3 justify-content-center mb-4">
             <div class="col-md-6 col-lg-5">
                 <label>Khóa học:</label>
-                @Html.DropDownList("KhoaHocId", (SelectList)ViewBag.KhoaHocList, "-- Chọn Khóa học --", new { @class = "form-control", id = "khoaHocSelect" })
+                @Html.DropDownList("KhoaHocId", (SelectList)ViewBag.KhoaHocList, "-- Tất cả khóa học --", new { @class = "form-control", id = "khoaHocSelect" })
             </div>
             <div class="col-md-6 col-lg-5">
                 <label>Lớp học:</label>
                 <select id="lopHocSelect" class="form-control">
-                    <option value="">-- Chọn lớp học --</option>
+                    <option value="">-- Tất cả lớp học --</option>
                 </select>
             </div>
+            <div class="col-md-4 col-lg-3">
+                <label>Từ ngày:</label>
+                <input type="date" id="tuNgay" class="form-control" />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label>Đến ngày:</label>
+                <input type="date" id="denNgay" class="form-control" />
+            </div>
+            <div class="col-md-4 col-lg-3 d-flex align-items-end">
+                <button class="btn btn-success w-100" id="btnXuatExcel"><i class="fas fa-file-excel me-1"></i> Xuất Excel</button>
+
+            </div>
+
         </div>
 
         <div id="thongKeContainer" class="table-responsive mb-4"></div>
@@ -93,79 +106,206 @@
         });
     }
 
+    // Khi thay đổi khóa học
     $('#khoaHocSelect').change(function () {
         const khoaHocId = $(this).val();
-        $('#lopHocSelect').empty().append('<option value="">-- Chọn lớp học --</option>');
-        $('#thongKeContainer').empty();
+        $('#lopHocSelect').empty().append('<option value="">-- Tất cả lớp học --</option>');
+
         if (chart) chart.destroy();
+        $('#thongKeContainer').empty();
 
         if (khoaHocId) {
+            // Load lớp học tương ứng
             $.getJSON('/Admin/ThongKe/GetLopHocByKhoaHoc', { khoaHocId }, function (data) {
                 data.forEach(lop => {
                     $('#lopHocSelect').append(`<option value="${lop.LopHocId}">${lop.TenLopHoc}</option>`);
                 });
+                // Gọi hiển thị thống kê với filter mới
+                hienThiThongKe();
             });
+        } else {
+            hienThiThongKe();
         }
     });
 
+    // Khi thay đổi lớp học
     $('#lopHocSelect').change(function () {
-        const lopHocId = $(this).val();
-        $('#thongKeContainer').empty();
         if (chart) chart.destroy();
+        $('#thongKeContainer').empty();
+        hienThiThongKe();
+    });
 
-        if (lopHocId) {
-            $.getJSON('/Admin/ThongKe/GetThongKeBuoiHocTheoLop', { lopHocId }, function (data) {
-                if (data.length === 0) {
-                    $('#thongKeContainer').html('<div class="alert alert-warning">Không có dữ liệu điểm danh cho lớp này.</div>');
-                    return;
-                }
+    // Khi thay đổi từ ngày hoặc đến ngày
+    $('#tuNgay, #denNgay').change(function () {
+        if (chart) chart.destroy();
+        $('#thongKeContainer').empty();
+        hienThiThongKe();
+    });
 
-                let html = `
-                    <table class="table table-bordered table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>Ngày học</th>
-                                <th>Giờ bắt đầu</th>
-                                <th>Giờ kết thúc</th>
-                                <th>Tổng đăng ký</th>
-                                <th>Số có mặt (HV)</th>
-                                <th>Tỷ lệ điểm danh (HV)</th>
-                                <th>Tỷ lệ điểm danh (GV)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
+    function loadThongKeTatCa() {
+        $.getJSON('/Admin/ThongKe/GetThongKeTatCaBuoiHoc', function (data) {
+            if (data.length === 0) {
+                $('#thongKeContainer').html('<div class="alert alert-warning">Không có dữ liệu điểm danh.</div>');
+                return;
+            }
 
-                let labels = [];
-                let hocVienData = [];
-                let giangVienData = [];
+            let html = `
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="table-primary text-center">
+                    <tr>
+                        <th>Khóa học</th>
+                        <th>Lớp học</th>
+                        <th>Ngày học</th>
+                        <th>Giờ bắt đầu</th>
+                        <th>Giờ kết thúc</th>
+                        <th>Tổng đăng ký</th>
+                        <th>Số có mặt (HV)</th>
+                        <th>Tỷ lệ điểm danh (HV)</th>
+                        <th>Tỷ lệ điểm danh (GV)</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
 
-                data.forEach(b => {
-                    html += `
-                        <tr>
-                            <td>${b.NgayHoc}</td>
-                            <td>${b.GioBatDau}</td>
-                            <td>${b.GioKetThuc}</td>
-                            <td>${b.TongDangKy}</td>
-                            <td>${b.SoCoMat}</td>
-                            <td>${b.TiLe}%</td>
-                            <td>${b.TiLeGV}%</td>
-                        </tr>
-                    `;
-                    labels.push(`${b.NgayHoc} - ${b.GioBatDau}`);
-                    hocVienData.push(b.TiLe);
-                    giangVienData.push(b.TiLeGV);
-                });
+            let labels = [];
+            let hocVienData = [];
+            let giangVienData = [];
 
-                html += '</tbody></table>';
-                $('#thongKeContainer').html(html);
+            data.forEach(b => {
+                html += `
+                <tr>
+                    <td>${b.TenKhoaHoc}</td>
+                    <td>${b.TenLopHoc}</td>
+                    <td>${b.NgayHoc}</td>
+                    <td>${b.GioBatDau}</td>
+                    <td>${b.GioKetThuc}</td>
+                    <td>${b.TongDangKy}</td>
+                    <td>${b.SoCoMat}</td>
+                    <td>${b.TiLe}%</td>
+                    <td>${b.TiLeGV}%</td>
+                </tr>
+            `;
 
-                renderChart({
-                    labels,
-                    hocVienData,
-                    giangVienData
-                });
+                labels.push(`${b.TenLopHoc} - ${b.NgayHoc} ${b.GioBatDau}`);
+                hocVienData.push(b.TiLe);
+                giangVienData.push(b.TiLeGV);
             });
+
+            html += '</tbody></table>';
+            $('#thongKeContainer').html(html);
+
+            renderChart({
+                labels,
+                hocVienData,
+                giangVienData
+            });
+        });
+    }
+
+    // Gọi khi trang load
+    $(document).ready(function () {
+        loadThongKeTatCa();
+    });
+    function hienThiThongKe() {
+        const filters = layThongTinLoc();
+
+        // Xác định URL gọi API dựa vào filter
+        // Nếu có lớp học chọn thì ưu tiên lấy theo lớp học
+        let url = '/Admin/ThongKe/GetThongKeTatCaBuoiHoc';
+        if (filters.lopHocId) {
+            url = '/Admin/ThongKe/GetThongKeBuoiHocTheoLop';
+        } else if (filters.khoaHocId) {
+            url = '/Admin/ThongKe/GetThongKeBuoiHocTheoKhoaHoc';
         }
+
+        $.getJSON(url, filters, function (data) {
+            $('#thongKeContainer').empty();
+            if (chart) chart.destroy();
+
+            if (data.length === 0) {
+                $('#thongKeContainer').html('<div class="alert alert-warning">Không có dữ liệu điểm danh.</div>');
+                return;
+            }
+
+            let html = `
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="table-primary text-center">
+                    <tr>
+                        <th>Khóa học</th>
+                        <th>Lớp học</th>
+                        <th>Ngày học</th>
+                        <th>Giờ bắt đầu</th>
+                        <th>Giờ kết thúc</th>
+                        <th>Tổng đăng ký</th>
+                        <th>Số có mặt (HV)</th>
+                        <th>Tỷ lệ điểm danh (HV)</th>
+                        <th>Tỷ lệ điểm danh (GV)</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+            let labels = [];
+            let hocVienData = [];
+            let giangVienData = [];
+
+            data.forEach(b => {
+                html += `
+                <tr>
+                    <td>${b.TenKhoaHoc}</td>
+                    <td>${b.TenLopHoc}</td>
+                    <td>${b.NgayHoc}</td>
+                    <td>${b.GioBatDau}</td>
+                    <td>${b.GioKetThuc}</td>
+                    <td>${b.TongDangKy}</td>
+                    <td>${b.SoCoMat}</td>
+                    <td>${b.TiLe}%</td>
+                    <td>${b.TiLeGV}%</td>
+                </tr>
+            `;
+                labels.push(`${b.NgayHoc} - ${b.GioBatDau}`);
+                hocVienData.push(b.TiLe);
+                giangVienData.push(b.TiLeGV);
+            });
+
+            html += '</tbody></table>';
+            $('#thongKeContainer').html(html);
+
+            renderChart({
+                labels,
+                hocVienData,
+                giangVienData
+            });
+        });
+    }
+    $(document).ready(function () {
+        hienThiThongKe('/Admin/ThongKe/GetThongKeTatCaBuoiHoc');
+    });
+    $('#btnXuatExcel').click(function () {
+        const khoaHocId = $('#khoaHocSelect').val();
+        const lopHocId = $('#lopHocSelect').val();
+        const tuNgay = $('#tuNgay').val();
+        const denNgay = $('#denNgay').val();
+
+        let url = '/Admin/ThongKe/XuatExcel?';
+
+        if (khoaHocId) url += `khoaHocId=${khoaHocId}&`;
+        if (lopHocId) url += `lopHocId=${lopHocId}&`;
+        if (tuNgay) url += `tuNgay=${tuNgay}&`;
+        if (denNgay) url += `denNgay=${denNgay}&`;
+
+        window.location.href = url;
+    });
+
+    function layThongTinLoc() {
+        return {
+            khoaHocId: $('#khoaHocSelect').val(),
+            lopHocId: $('#lopHocSelect').val(),
+            tuNgay: $('#tuNgay').val(),
+            denNgay: $('#denNgay').val()
+        };
+    }
+    $(document).ready(function () {
+        hienThiThongKe();
     });
 </script>

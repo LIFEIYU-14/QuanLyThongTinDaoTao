@@ -23,6 +23,17 @@
                 </div>
             }
 
+            <hr />
+            <h5 class="mb-3">Tra cứu bằng mã QR</h5>
+
+            <div class="bg-light rounded p-4 mb-4">
+                <h5><i class="fas fa-qrcode me-2"></i> Quét mã QR</h5>
+                <div id="reader" style="width: 100%; max-width: 400px;"></div>
+                <div class="mt-2">
+                    <span id="qrResultMessage" class="fw-bold text-primary"></span>
+                </div>
+            </div>
+
             @if (ViewBag.Error != null)
             {
                 <div class="alert alert-danger">@ViewBag.Error</div>
@@ -72,3 +83,65 @@
         </div>
     </div>
 </div>
+
+<!-- QR Code Scanner -->
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+    let html5QrCode;
+    let isScanning = false;
+
+    const startQRScanner = () => {
+        if (!isScanning) {
+            html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: 250 },
+                onScanSuccess
+            );
+            isScanning = true;
+        }
+    };
+
+    const stopQRScanner = () => {
+        if (html5QrCode && isScanning) {
+            html5QrCode.stop().then(() => {
+                html5QrCode.clear();
+                isScanning = false;
+            }).catch(err => console.error("Không thể dừng quét QR", err));
+        }
+    };
+
+    function onScanSuccess(decodedText) {
+        submitQRData(decodedText);
+        stopQRScanner();
+    }
+
+    function submitQRData(qrData) {
+        fetch('/TraCuuLichHoc/QuetQR', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ qrData: qrData }) // qrData là JSON string từ mã QR
+        })
+            .then(res => res.json())
+            .then(data => {
+                const resultEl = document.getElementById("qrResultMessage");
+                if (data.success) {
+                    resultEl.className = "text-success";
+                    resultEl.innerText = "✅ " + data.message;
+
+                    if (data.hocVienId) {
+                        window.location.href = '/TraCuuLichHoc/IndexTheoId?id=' + encodeURIComponent(data.hocVienId);
+                    }
+                } else {
+                    resultEl.className = "text-danger";
+                    resultEl.innerText = "❌ " + data.message;
+                }
+            });
+    }
+
+    // Tự động khởi động quét QR khi trang tải
+    document.addEventListener("DOMContentLoaded", function () {
+        startQRScanner();
+    });
+</script>
+

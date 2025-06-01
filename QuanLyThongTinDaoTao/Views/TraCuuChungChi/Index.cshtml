@@ -1,0 +1,133 @@
+﻿@model QuanLyThongTinDaoTao.ModelsHelper.HocVienHocTapViewModel
+@{
+    ViewBag.Title = "Tra cứu chứng chỉ";
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+}
+
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="bg-light text-center rounded p-4">
+            <h3 class="mb-4">Tra cứu chứng chỉ</h3>
+
+            @using (Html.BeginForm("TraCuuBangEmail", "TraCuuChungChi", FormMethod.Post))
+            {
+                <div class="row mb-3 justify-content-center">
+                    <div class="col-md-6">
+                        <label>Email học viên:</label>
+                        <input type="email" name="email" class="form-control" required />
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Tra cứu</button>
+                    </div>
+                </div>
+            }
+
+            <hr />
+            <h5 class="mb-3">Hoặc quét mã QR</h5>
+            <div class="bg-white p-4">
+                <div id="reader" style="width: 100%; max-width: 400px;" class="mx-auto"></div>
+                <div class="mt-2 text-center">
+                    <span id="qrResultMessage" class="fw-bold text-primary"></span>
+                </div>
+            </div>
+
+            <hr />
+
+            @if (Model != null)
+            {
+                <div class="bg-white p-4 mt-4 text-start">
+                    <h5>Thông tin học viên</h5>
+                    <dl class="row">
+                        <dt class="col-sm-4">Mã học viên:</dt>
+                        <dd class="col-sm-8">@Model.HocVienId</dd>
+
+                        <dt class="col-sm-4">Họ và tên:</dt>
+                        <dd class="col-sm-8">@Model.TenHocVien</dd>
+
+                        <dt class="col-sm-4">Email:</dt>
+                        <dd class="col-sm-8">@Model.Email</dd>
+
+                        <dt class="col-sm-4">Ngày sinh:</dt>
+                        <dd class="col-sm-8">@Model.NgaySinh.ToString("dd/MM/yyyy")</dd>
+                    </dl>
+
+                    <h5 class="mt-4">Danh sách chứng chỉ đã cấp</h5>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Khóa học</th>
+                                <th>Ngày cấp</th>
+                                <th>Ngày hết hạn</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var c in Model.ChungChis)
+                            {
+                                <tr>
+                                    <td>@c.TenKhoaHoc</td>
+                                    <td>@c.NgayCap.ToString("dd/MM/yyyy")</td>
+                                    <td>@c.NgayHetHan.ToString("dd/MM/yyyy")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger mt-3">@ViewBag.Error</div>
+            }
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+    let html5QrCode;
+    let isScanning = false;
+
+    function startQRScanner() {
+        if (!isScanning) {
+            html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: 250 },
+                onScanSuccess
+            );
+            isScanning = true;
+        }
+    }
+
+    function stopQRScanner() {
+        if (html5QrCode && isScanning) {
+            html5QrCode.stop().then(() => {
+                html5QrCode.clear();
+                isScanning = false;
+            });
+        }
+    }
+
+    function onScanSuccess(decodedText) {
+        fetch('/TraCuuChungChi/QuetQR', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ qrData: decodedText })
+        })
+            .then(response => response.json())
+            .then(data => {
+                let msg = document.getElementById("qrResultMessage");
+                if (data.success) {
+                    msg.className = "text-success fw-bold";
+                    msg.innerText = data.message;
+                    window.location.href = '/TraCuuChungChi/IndexTheoId?id=' + encodeURIComponent(data.hocVienId);
+                } else {
+                    msg.className = "text-danger fw-bold";
+                    msg.innerText = "❌ " + data.message;
+                }
+            });
+        stopQRScanner();
+    }
+
+    document.addEventListener("DOMContentLoaded", startQRScanner);
+</script>

@@ -84,7 +84,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public JsonResult CapChungChi(string hocVienId, string khoaHocId, string ngayHetHan)
+        public JsonResult CapChungChi(string hocVienId, string khoaHocId, string ngayHetHan, string ngayCap = null)
         {
             try
             {
@@ -104,6 +104,22 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                     return Json(new { success = false, message = "Ngày hết hạn không hợp lệ" });
                 }
 
+                DateTime parsedNgayCap = DateTime.Now;
+                if (!string.IsNullOrEmpty(ngayCap))
+                {
+                    if (!DateTime.TryParseExact(ngayCap, "yyyy-MM-dd",
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        System.Globalization.DateTimeStyles.None, out parsedNgayCap))
+                    {
+                        return Json(new { success = false, message = "Ngày cấp không hợp lệ" });
+                    }
+                }
+
+                if (parsedNgayHetHan <= parsedNgayCap)
+                {
+                    return Json(new { success = false, message = "Ngày hết hạn phải sau ngày cấp." });
+                }
+
                 bool daCap = db.ChungChiHocTaps.Any(cc => cc.HocVienId == hocVienId && cc.KhoaHocId == khoaHocGuid);
                 if (daCap)
                     return Json(new { success = false, message = "Học viên đã được cấp chứng chỉ" });
@@ -113,7 +129,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                     ChungChiId = Guid.NewGuid(),
                     HocVienId = hocVienId,
                     KhoaHocId = khoaHocGuid,
-                    NgayCap = DateTime.Now,
+                    NgayCap = parsedNgayCap,
                     NgayHetHan = parsedNgayHetHan
                 };
 
@@ -127,6 +143,7 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 return Json(new { success = false, message = "Lỗi: " + ex.Message });
             }
         }
+
 
 
         [HttpPost]
@@ -144,8 +161,5 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
             return Json(new { success = true, message = "Đã hủy cấp chứng chỉ." });
         }
-
-
-
     }
 }

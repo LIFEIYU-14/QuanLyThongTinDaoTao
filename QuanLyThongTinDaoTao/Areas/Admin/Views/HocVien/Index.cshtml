@@ -131,11 +131,11 @@
     }
     // phân trang
 
-    const rowsPerPage = 4; // Số dòng mỗi trang
+    const rowsPerPage = 5; // Số dòng mỗi trang
     let currentPage = 1;
 
     function renderPagination() {
-        const rows = $('#lopHocTable tbody tr');
+        const rows = $('#hocVienTable tbody tr');
         const totalRows = rows.length;
         const totalPages = Math.ceil(totalRows / rowsPerPage);
 

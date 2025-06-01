@@ -23,7 +23,11 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
         {
             // Cập nhật trạng thái của tất cả các buổi học theo thời gian thực
             UpdateTrangThaiBuoiHocs();
-            var buoiHocs = db.BuoiHocs.Include(b => b.LopHoc).ToList();
+            var buoiHocs = db.BuoiHocs
+                 .Include(b => b.LopHoc.KhoaHoc)
+                 .Include(b => b.GiangVien_BuoiHocs.Select(gvbh => gvbh.GiangVien))
+                 .ToList();
+
 
             ViewBag.LopHocList = db.LopHocs.ToList();
             ViewBag.KhoaHocList = db.KhoaHocs.ToList();

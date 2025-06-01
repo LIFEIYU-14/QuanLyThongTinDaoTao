@@ -6,7 +6,7 @@ using System.Web.Mvc;
 
 namespace QuanLyThongTinDaoTao.Controllers
 {
-    public class TraCuuController : Controller
+    public class LopHocChieuSinhController : Controller
     {
         // GET: TraCuu
         public ActionResult Index()

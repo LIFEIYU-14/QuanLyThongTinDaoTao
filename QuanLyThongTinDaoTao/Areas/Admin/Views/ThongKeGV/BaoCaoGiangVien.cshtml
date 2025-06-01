@@ -1,0 +1,102 @@
+﻿@model List<QuanLyThongTinDaoTao.ModelsHelper.ThongKeGiangVienViewModel>
+
+@{
+    ViewBag.Title = "THỐNG KÊ GIẢNG VIÊN";
+    Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
+}
+
+<div class="container-xxl py-5">
+    <div class="text-center mb-4">
+        <h3><i class="fas fa-chalkboard-teacher me-2"></i>@ViewBag.Title</h3>
+    </div>
+
+    <div class="bg-light rounded shadow-sm px-4 py-3">
+        <form id="filterForm" method="get" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label>Từ Ngày</label>
+                <input type="date" name="startDate" class="form-control" value="@Request["startDate"]" />
+            </div>
+            <div class="col-md-3">
+                <label>Đến Ngày</label>
+                <input type="date" name="endDate" class="form-control" value="@Request["endDate"]" />
+            </div>
+       
+        </form>
+
+        <div class="d-flex justify-content-end mb-3">
+            <button class="btn btn-success" id="btnXuatExcelGV">
+                <i class="fas fa-file-excel me-1"></i> Xuất Excel
+            </button>
+        </div>
+
+        <div id="thongKeGVContainer" class="table-responsive">
+            <table class="table table-bordered table-hover table-striped ">
+                <thead class="table-primary text-center">
+                    <tr>
+                        <th>Giảng viên</th>
+                        <th>Số buổi dạy</th>
+                        <th>Số buổi vắng</th>
+                        <th>Tỷ lệ chuyên cần (%)</th>
+                        <th>Lớp giảng dạy</th>
+                    </tr>
+                </thead>
+                <tbody class="text-center">
+                    @foreach (var gv in Model)
+                    {
+                        <tr>
+                            <td>@gv.TenGiangVien</td>
+                            <td>@gv.SoBuoiDay</td>
+                            <td>@gv.SoBuoiVang</td>
+                            <td>@gv.TyLeChuyenCan</td>
+                            <td>
+                                <ul>
+                                    @foreach (var lop in gv.LopHocThamGia)
+                                    {
+                                        <li>@lop</li>
+                                    }
+                                </ul>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+    <script>
+        $('#btnXuatExcelGV').click(function () {
+            const start = $('input[name="startDate"]').val();
+            const end = $('input[name="endDate"]').val();
+
+            let url = '/Admin/ThongKeGV/XuatExcel';
+            if (start || end) {
+                url += '?';
+                if (start) url += 'startDate=' + start;
+                if (start && end) url += '&';
+                if (end) url += 'endDate=' + end;
+            }
+
+            window.location.href = url;
+        });
+        $(document).ready(function () {
+            $('input[name="startDate"], input[name="endDate"]').on('change', function () {
+                $('#filterForm').submit();
+            });
+
+            $('#btnXuatExcelGV').click(function () {
+                const start = $('input[name="startDate"]').val();
+                const end = $('input[name="endDate"]').val();
+
+                let url = '/Admin/ThongKeGV/XuatExcel';
+                if (start || end) {
+                    url += '?';
+                    if (start) url += 'startDate=' + start;
+                    if (start && end) url += '&';
+                    if (end) url += 'endDate=' + end;
+                }
+
+                window.location.href = url;
+            });
+        });
+    </script>

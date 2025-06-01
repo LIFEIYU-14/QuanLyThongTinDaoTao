@@ -15,6 +15,7 @@
                   <th>Lớp Học</th>
                   <th>Trạng Thái</th>
                   <th>Thao Tác</th>
+                  <th>Giảng viên </th>
               </tr>
           </thead>
           <tbody>
@@ -50,6 +51,25 @@
                                         </button>
                                     </form>
                                 </td>
+                               
+                                <td>
+                                    @if (buoiHoc.GiangVien_BuoiHocs != null && buoiHoc.GiangVien_BuoiHocs.Any())
+                                    {
+                                        foreach (var gv in buoiHoc.GiangVien_BuoiHocs)
+                                        {
+                                            if (gv.GiangVien != null)
+                                            {
+                                                <div>@Html.Raw(HttpUtility.HtmlEncode(gv.GiangVien.HoVaTen))</div>
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Chưa có</span>
+                                    }
+                                </td>
+
+                
                             </tr>
                       stt++;
                   }
