@@ -1,0 +1,73 @@
+﻿@model QuanLyThongTinDaoTao.ModelsHelper.ThongTinTaiKhoanViewModel
+@{
+    ViewBag.Title = "Thông Tin Tài Khoản";
+    Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
+}
+
+<div class="container-xxl py-5">
+    <div class="text-center wow fadeInUp mb-4" data-wow-delay="0.1s">
+        <h3 class="mb-4"><i class="fas fa-user-circle me-2"></i>THÔNG TIN TÀI KHOẢN - @Model.Role</h3>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="bg-light rounded shadow-sm p-4">
+                <table class="table table-borderless table-hover">
+                    <tbody>
+                        <tr>
+                            <th scope="row" style="width: 200px;"><i class="fas fa-user me-2"></i>Tên đăng nhập</th>
+                            <td>@Model.Username</td>
+                        </tr>
+                        <tr>
+                            <th><i class="fas fa-envelope me-2"></i>Email</th>
+                            <td>@Model.Email</td>
+                        </tr>
+                        <tr>
+                            <th><i class="fas fa-calendar-plus me-2"></i>Ngày tạo</th>
+                            <td>@Model.NgayTao.ToString("dd/MM/yyyy HH:mm")</td>
+                        </tr>
+                        <tr>
+                            <th><i class="fas fa-calendar-check me-2"></i>Ngày cập nhật</th>
+                            <td>@Model.NgayCapNhat.ToString("dd/MM/yyyy HH:mm")</td>
+                        </tr>
+
+                        @if (Model.Role == "GiangVien")
+                        {
+                            <tr>
+                                <th><i class="fas fa-id-card me-2"></i>Mã giảng viên</th>
+                                <td>@Model.MaGiangVien</td>
+                            </tr>
+                            <tr>
+                                <th><i class="fas fa-user-tie me-2"></i>Họ và tên</th>
+                                <td>@Model.HoVaTen</td>
+                            </tr>
+                            <tr>
+                                <th><i class="fas fa-birthday-cake me-2"></i>Ngày sinh</th>
+                                <td>@Model.NgaySinh.ToString("dd/MM/yyyy")</td>
+                            </tr>
+                            <tr>
+                                <th><i class="fas fa-phone me-2"></i>Số điện thoại</th>
+                                <td>@Model.SoDienThoai</td>
+                            </tr>
+                            <tr>
+                                <th><i class="fas fa-chalkboard-teacher me-2"></i>Chuyên môn</th>
+                                <td>@Model.ChuyenMon</td>
+                            </tr>
+                            <tr>
+                                <th><i class="fas fa-graduation-cap me-2"></i>Học hàm</th>
+                                <td>@Model.HocHam</td>
+                            </tr>
+                       
+                        }
+                    </tbody>
+                </table>
+
+                <div class="text-end mt-3">
+                    <a href="@Url.Action("Edit", "ThongTinTaiKhoan")" class="btn btn-primary">
+                        <i class="fas fa-edit me-1"></i>Chỉnh sửa thông tin
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

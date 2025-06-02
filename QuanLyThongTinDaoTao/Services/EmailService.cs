@@ -21,7 +21,7 @@ namespace QuanLyThongTinDaoTao.Services
             {
                 using (var mail = new MailMessage())
                 {
-                    mail.From = new MailAddress(smtpUser);
+                    mail.From = new MailAddress(smtpUser, "Hệ Thống Quản Lý Đào Tạo");
                     mail.To.Add(toEmail);
                     mail.Subject = "Mã xác nhận đăng ký lớp học";
                     mail.Body = $"<p>Mã xác nhận của bạn là: <strong>{otp}</strong></p>";
@@ -53,7 +53,7 @@ namespace QuanLyThongTinDaoTao.Services
             {
                 using (var mail = new MailMessage())
                 {
-                    mail.From = new MailAddress(smtpUser);
+                    mail.From = new MailAddress(smtpUser, "Hệ Thống Quản Lý Đào Tạo");
                     mail.To.Add(toEmail);
                     mail.Subject = "Mã QR Code điểm danh";
                     mail.Body = "<p>Đây là mã QR Code điểm danh của bạn:</p>";
@@ -86,13 +86,13 @@ namespace QuanLyThongTinDaoTao.Services
                 throw;
             }
         }
-        public async Task SendTeacherAccountWithQrEmail(string toEmail, string taiKhoan, string matKhau, string qrCodeBase64)
+        public Task SendTeacherAccountWithQrEmail(string toEmail, string taiKhoan, string matKhau, string qrCodeBase64)
         {
             try
             {
                 using (var mail = new MailMessage())
                 {
-                    mail.From = new MailAddress(smtpUser);
+                    mail.From = new MailAddress(smtpUser, "Hệ Thống Quản Lý Đào Tạo");
                     mail.To.Add(toEmail);
                     mail.Subject = "Thông tin tài khoản và mã QR điểm danh";
 
@@ -144,12 +144,14 @@ namespace QuanLyThongTinDaoTao.Services
                 Console.WriteLine("Email error: " + ex.ToString());
                 throw;
             }
+
+            return Task.CompletedTask;
         }
         public async Task SendEmail(string toEmail, string subject, string body)
         {
             try
             {
-                var fromAddress = new MailAddress(smtpUser, "Quản Lý Đào Tạo");
+                var fromAddress = new MailAddress(smtpUser, "Hệ Thống Quản Lý Đào Tạo");
                 var toAddress = new MailAddress(toEmail);
 
                 using (var smtp = new SmtpClient(smtpHost, smtpPort))
@@ -177,6 +179,7 @@ namespace QuanLyThongTinDaoTao.Services
                 throw;
             }
         }
+     
 
     }
 }

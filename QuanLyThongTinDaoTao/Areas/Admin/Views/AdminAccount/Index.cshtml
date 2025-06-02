@@ -1,0 +1,80 @@
+﻿@model QuanLyThongTinDaoTao.ModelsHelper.AdminAccountViewModel
+@using Microsoft.AspNet.Identity
+
+@{
+    ViewBag.Title = "Quản lý tài khoản Admin";
+    Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
+    var currentUserId = User.Identity.GetUserId();
+}
+
+<div class="container py-5">
+    <h3 class="fw-bold mb-4 text-center"><i class="fas fa-user-shield me-2"></i>DANH SÁCH ADMIN</h3>
+
+    <div class="text-end mb-3">
+        <a href="@Url.Action("Create", "AdminAccount", new { area = "Admin" })" class="btn btn-success">
+            <i class="fas fa-plus-circle"></i> Thêm tài khoản Admin
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success text-center">@TempData["Success"]</div>
+    }
+    else if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger text-center">@TempData["Error"]</div>
+    }
+
+    <div class="table-responsive">
+        <table class="table table-bordered text-center align-middle">
+            <thead class="table-primary">
+                <tr>
+                    <th>STT</th>
+                    <th>Tên đăng nhập</th>
+                    <th>Email</th>
+                    <th>Ngày tạo</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int stt = 1;
+                    var totalAdmins = Model.ExistingAdmins.Count;
+                }
+
+                @foreach (var user in Model.ExistingAdmins)
+                {
+                    <tr>
+                        <td>@stt</td>
+                        <td>@user.UserName</td>
+                        <td>@user.Email</td>
+                        <td>@user.NgayTao.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            @if (user.Id == currentUserId)
+                            {
+                                <span class="text-muted">Không thể tự xóa</span>
+                            }
+                            else if (totalAdmins <= 1)
+                            {
+                                <span class="text-muted">Cần ít nhất 1 Admin</span>
+                            }
+                            else
+                            {
+                                using (Html.BeginForm("Delete", "AdminAccount", FormMethod.Post, new { area = "Admin" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.Hidden("id", user.Id)
+                                    <button type="submit" class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Bạn có chắc muốn xóa tài khoản này?');">
+                                        <i class="fas fa-trash-alt"></i> Xóa
+                                    </button>
+                                }
+                            }
+                        </td>
+                    </tr>
+                    stt++;
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

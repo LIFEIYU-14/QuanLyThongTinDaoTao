@@ -1,0 +1,99 @@
+﻿@model QuanLyThongTinDaoTao.ModelsHelper.ThongTinTaiKhoanViewModel
+
+@{
+    ViewBag.Title = "Chỉnh sửa tài khoản";
+    Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
+}
+
+<div class="container py-4">
+    <h3 class="fw-bold mb-3">Chỉnh sửa thông tin tài khoản</h3>
+
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb bg-info bg-opacity-25 px-3 py-2 rounded">
+            <li class="breadcrumb-item"><a href="@Url.Action("Dashboard", "Home")">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "ThongTinTaiKhoan")">Tài khoản</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa</li>
+        </ol>
+    </nav>
+
+    <a href="@Url.Action("Index", "ThongTinTaiKhoan")" class="btn btn-primary mb-3">
+        <i class="fas fa-arrow-left me-1"></i> Về trang thông tin
+    </a>
+
+    <a href="@Url.Action("ChangePassword", "ThongTinTaiKhoan")" class="btn btn-warning mb-3 ms-2">
+        <i class="fas fa-key me-1"></i> Đổi mật khẩu
+    </a>
+
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.AppUserId)
+                @Html.HiddenFor(m => m.GiangVienId)
+                @Html.HiddenFor(m => m.Role)
+
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.Username, new { @class = "form-label fw-bold" })
+                            @Html.TextBoxFor(m => m.Username, new { @class = "form-control", required = "required" })
+                            @Html.ValidationMessageFor(m => m.Username, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.Email, new { @class = "form-label fw-bold" })
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", required = "required" })
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                        </div>
+
+                        @if (Model.Role == "GiangVien")
+                        {
+                            <div class="mb-3">
+                                @Html.LabelFor(m => m.HoVaTen, new { @class = "form-label fw-bold" })
+                                @Html.TextBoxFor(m => m.HoVaTen, new { @class = "form-control", required = "required" })
+                                @Html.ValidationMessageFor(m => m.HoVaTen, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="mb-3">
+                                @Html.LabelFor(m => m.SoDienThoai, new { @class = "form-label fw-bold" })
+                                @Html.TextBoxFor(m => m.SoDienThoai, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.SoDienThoai, "", new { @class = "text-danger" })
+                            </div>
+                        }
+                    </div>
+
+                    <div class="col-md-6">
+                        @if (Model.Role == "GiangVien")
+                        {
+                            <div class="mb-3">
+                                @Html.LabelFor(m => m.NgaySinh, new { @class = "form-label fw-bold" })
+                                @Html.TextBoxFor(m => m.NgaySinh, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", required = "required" })
+                                @Html.ValidationMessageFor(m => m.NgaySinh, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="mb-3">
+                                @Html.LabelFor(m => m.ChuyenMon, new { @class = "form-label fw-bold" })
+                                @Html.TextBoxFor(m => m.ChuyenMon, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.ChuyenMon, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="mb-3">
+                                @Html.LabelFor(m => m.HocHam, new { @class = "form-label fw-bold" })
+                                @Html.TextBoxFor(m => m.HocHam, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.HocHam, "", new { @class = "text-danger" })
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-success btn-lg text-white">
+                        <i class="fa-solid fa-pen-to-square me-1"></i> Lưu thay đổi
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>

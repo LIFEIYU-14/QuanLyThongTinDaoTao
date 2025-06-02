@@ -1,0 +1,165 @@
+﻿@model List<QuanLyThongTinDaoTao.ModelsHelper.HocVienThongKeViewModel>
+
+@{
+    ViewBag.Title = "THỐNG KÊ HỌC VIÊN";
+    Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
+}
+
+<div class="container-xxl py-5">
+    <div class="text-center mb-4">
+        <h3><i class="fas fa-user-graduate me-2"></i>@ViewBag.Title</h3>
+    </div>
+
+    <div class="bg-light rounded shadow-sm px-4 py-3">
+        <form id="filterForm" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label for="khoaHocId">Khóa học</label>
+                @Html.DropDownList("khoaHocId", (SelectList)ViewBag.KhoaHocList, "Chọn khóa học", new { @class = "form-control" })
+            </div>
+            <div class="col-md-3">
+                <label for="startDate">Từ ngày</label>
+                <input type="date" id="startDate" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label for="endDate">Đến ngày</label>
+                <input type="date" id="endDate" class="form-control" />
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button id="btnExportExcel" type="button" class="btn btn-success w-100">
+                    <i class="fas fa-file-excel me-1"></i> Xuất Excel
+                </button>
+            </div>
+        </form>
+
+        <div id="result" class="table-responsive mt-4">
+            <div class="alert alert-info">Vui lòng chọn khóa học để xem thống kê.</div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        // Hàm setup phân trang
+        function setupPagination() {
+            const rowsPerPage = 2;
+            let currentPage = 1;
+
+            function renderPagination() {
+                const rows = $('#hocVienTable tbody tr');
+                const totalRows = rows.length;
+                const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+                rows.hide();
+
+                const startIndex = (currentPage - 1) * rowsPerPage;
+                const endIndex = startIndex + rowsPerPage;
+                rows.slice(startIndex, endIndex).show();
+
+                let paginationHtml = '';
+
+                paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" data-page="1">Trang đầu</a></li>`;
+
+                paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" data-page="${currentPage - 1}">Trước</a></li>`;
+
+                for (let i = 1; i <= totalPages; i++) {
+                    paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
+                }
+
+                paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" data-page="${currentPage + 1}">Sau</a></li>`;
+
+                paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" data-page="${totalPages}">Trang cuối</a></li>`;
+
+                $('#hocVienTableWrapper .pagination').html(paginationHtml);
+            }
+
+            function changePage(page) {
+                const rows = $('#hocVienTable tbody tr');
+                const totalRows = rows.length;
+                const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+                if (page < 1) page = 1;
+                if (page > totalPages) page = totalPages;
+
+                currentPage = page;
+                renderPagination();
+            }
+
+            // Bắt sự kiện click phân trang (delegate)
+            $('#hocVienTableWrapper').off('click', '.page-link').on('click', '.page-link', function (e) {
+                e.preventDefault();
+                const page = parseInt($(this).data('page'));
+                if (!isNaN(page)) {
+                    changePage(page);
+                }
+            });
+
+            // Khởi tạo trang đầu tiên
+            changePage(1);
+        }
+
+        // Hàm load dữ liệu ajax
+        function loadHocVienData() {
+            var khoaHocId = $('#khoaHocId').val();
+            var startDate = $('#startDate').val();
+            var endDate = $('#endDate').val();
+
+            if (!khoaHocId) {
+                $('#result').html('<div class="alert alert-info">Vui lòng chọn khóa học để xem thống kê.</div>');
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("GetHocVienByKhoaHoc", "ThongKeHV")',
+                type: 'GET',
+                data: { khoaHocId: khoaHocId, startDate: startDate, endDate: endDate },
+                beforeSend: function () {
+                    $('#result').html('<div class="text-center">Đang tải dữ liệu...</div>');
+                },
+                success: function (data) {
+                    $('#result').html(data);
+                    setupPagination(); // Gọi phân trang sau khi load xong dữ liệu
+                },
+                error: function () {
+                    $('#result').html('<div class="alert alert-danger">Lỗi khi tải dữ liệu!</div>');
+                }
+            });
+        }
+
+        // Bắt sự kiện onchange trên các input lọc
+        $('#khoaHocId, #startDate, #endDate').change(function () {
+            loadHocVienData();
+        });
+
+        // Nút Xuất Excel
+        $('#btnExportExcel').click(function () {
+            var khoaHocId = $('#khoaHocId').val();
+            var startDate = $('#startDate').val();
+            var endDate = $('#endDate').val();
+
+            if (!khoaHocId) {
+                alert("Vui lòng chọn khóa học.");
+                return;
+            }
+
+            var url = '@Url.Action("ExportHocVienByKhoaHoc", "ThongKeHV")' +
+                '?khoaHocId=' + khoaHocId +
+                '&startDate=' + startDate +
+                '&endDate=' + endDate;
+
+            window.location.href = url;
+        });
+
+        // Load lần đầu nếu đã chọn khóa học
+        if ($('#khoaHocId').val()) {
+            loadHocVienData();
+        }
+    });
+</script>

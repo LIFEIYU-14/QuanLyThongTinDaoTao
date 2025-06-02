@@ -23,6 +23,12 @@ namespace QuanLyThongTinDaoTao.Identity
                 AllowOnlyAlphanumericUserNames = false,
                 RequireUniqueEmail = true
             };
+            // Thêm phần cấu hình UserTokenProvider
+            if (options.DataProtectionProvider != null)
+            {
+                manager.UserTokenProvider =
+                    new DataProtectorTokenProvider<AppUser>(options.DataProtectionProvider.Create("ASP.NET Identity"));
+            }
             return manager;
         }
     }

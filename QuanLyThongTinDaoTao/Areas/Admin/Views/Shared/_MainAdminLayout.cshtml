@@ -71,7 +71,7 @@
                         @User.Identity.GetUserName()  <!-- Hiển thị tên đăng nhập -->
                     </a>
                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                        <a class="dropdown-item" href="@Url.Action("ThongTinTaiKhoan", "TaiKhoan", new { area = "Admin" })">
+                        <a class="dropdown-item" href="@Url.Action("Index", "ThongTinTaiKhoan", new { area = "Admin" })">
                             <i class="fas fa-user-circle me-2"></i> Tài khoản
                         </a>
                         <form action="@Url.Action("DangXuat", "Login", new { area = "Admin" })" method="post" class="dropdown-item p-0 m-0">
@@ -141,7 +141,7 @@
                                 <ul class="dropdown-menu bg-light border-0" aria-labelledby="dropdownHocVien">
                                     <li><a class="dropdown-item" href="@Url.Action("Index", "HocVien")">Danh sách Học Viên</a></li>
                                     <li><a class="dropdown-item" href="@Url.Action("Create", "HocVien")">Thêm Học Viên</a></li>
-                                    <li><a class="dropdown-item" href="@Url.Action("BaoCaoHocVien", "ThongKeHocVien")"><i class="fas fa-chart-line me-2"></i>Thống Kê Học Viên</a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("BaoCaoHocVien", "ThongKeHV")"><i class="fas fa-chart-line me-2"></i>Thống Kê Học Viên</a></li>
                                 </ul>
                             </div>
 
@@ -169,9 +169,12 @@
                             <a href="@Url.Action("Index", "DiemDanhGiangVien")" class="nav-item nav-link">
                                 <i class="fas fa-check-circle me-2"></i>Điểm danh Giảng Viên
                             </a>
-                        
+
                             <a href="@Url.Action("QuanLyHocTapTheoKhoaHoc", "QuanLyHocTap")" class="nav-item nav-link">
                                 <i class="fas fa-check-circle me-2"></i>Quản lý học tập
+                            </a>
+                            <a href="@Url.Action("Index", "AdminAccount")" class="nav-item nav-link">
+                                <i class="fas fa-check-circle me-2"></i>Quản lý ND quản trị
                             </a>
                         }
 

@@ -5,13 +5,18 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>Login</title>
-
-    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="~/Style/css/style.css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="~/Style/css/style.css" />
+    <style>
+        /* Ẩn form quên mật khẩu lúc đầu */
+        #forgot-password-form {
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <section class="ftco-section">
@@ -33,38 +38,53 @@
                             @Html.AntiForgeryToken()
 
                             <div class="form-group">
-                                @Html.LabelFor(m => m.TaiKhoanOrEmail, htmlAttributes: new { @class = "control-label" })
-                                @Html.TextBoxFor(m => m.TaiKhoanOrEmail, new { @class = "form-control rounded-left", placeholder = "Username or Email" })
+                                @Html.LabelFor(m => m.TaiKhoanOrEmail)
+                                @Html.TextBoxFor(m => m.TaiKhoanOrEmail, new { @class = "form-control", placeholder = "Username or Email" })
                                 @Html.ValidationMessageFor(m => m.TaiKhoanOrEmail, "", new { @class = "text-danger" })
                             </div>
 
                             <div class="form-group">
-                                @Html.LabelFor(m => m.MatKhau, htmlAttributes: new { @class = "control-label" })
-                                @Html.PasswordFor(m => m.MatKhau, new { @class = "form-control rounded-left", placeholder = "Password" })
+                                @Html.LabelFor(m => m.MatKhau)
+                                @Html.PasswordFor(m => m.MatKhau, new { @class = "form-control", placeholder = "Password" })
                                 @Html.ValidationMessageFor(m => m.MatKhau, "", new { @class = "text-danger" })
                             </div>
-
-                            @*<div class="form-group d-md-flex">
-                                <div class="w-50">
-                                    <label class="checkbox-wrap checkbox-primary">
-                                        Remember Me
-                                        <input type="checkbox" checked />
-                                        <span class="checkmark"></span>
-                                    </label>
-                                </div>
-                                <div class="w-50 text-md-right">
-                                    <a href="#">Forgot Password</a>
-                                </div>
-                            </div>*@
-
                             <div class="form-group">
                                 <button type="submit" class="btn btn-primary rounded submit p-3 px-5">ĐĂNG NHẬP</button>
                             </div>
                         }
+                        <div class="text-center me-2">
+                            <a href="#" id="show-forgot-password" class="text-decoration-none p-3">Quên mật khẩu?</a>
+                        </div>
+
                     </div>
+
                 </div>
+
+                @using (Html.BeginForm("QuenMatKhau", "Login", FormMethod.Post, new { area = "Admin", id = "forgot-password-form" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group mt-3">
+                        <label for="EmailForgot">Nhập email để nhận lại mật khẩu</label>
+                        <input type="email" name="email" class="form-control" id="EmailForgot" placeholder="Email của bạn" required />
+                    </div>
+                    <div class="form-group text-end">
+                        <button type="submit" class="btn btn-warning">Gửi mật khẩu</button>
+                        <button type="button" id="cancel-forgot" class="btn btn-secondary ms-2">Hủy</button>
+                    </div>
+                }
             </div>
         </div>
     </section>
+    <script>
+        document.getElementById('show-forgot-password').addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector('.login-form').style.display = 'none';
+            document.getElementById('forgot-password-form').style.display = 'block';
+        });
+        document.getElementById('cancel-forgot').addEventListener('click', function () {
+            document.getElementById('forgot-password-form').style.display = 'none';
+            document.querySelector('.login-form').style.display = 'block';
+        });
+    </script>
 </body>
 </html>

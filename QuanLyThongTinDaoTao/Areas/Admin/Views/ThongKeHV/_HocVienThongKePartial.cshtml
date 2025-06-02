@@ -1,0 +1,46 @@
+﻿@model List<QuanLyThongTinDaoTao.ModelsHelper.HocVienThongKeViewModel>
+
+<div id="hocVienTableWrapper">
+    <table class="table table-bordered table-hover" id="hocVienTable">
+        <thead class="thead-light">
+            <tr>
+                <th>STT</th>
+                <th>Mã HV</th>
+                <th>Họ và Tên</th>
+                <th>Ngày Sinh</th>
+                <th>SĐT</th>
+                <th>Email</th>
+                <th>Cơ Quan Làm Việc</th>
+                <th>Số lớp đã ĐK</th>
+                <th>Tổng số buổi học</th>
+                <th>Số buổi đi học</th>
+                <th>Số buổi vắng</th>
+                <th>Tỉ lệ điểm danh (%)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                var item = Model[i];
+                <tr>
+                    <td>@(i + 1)</td>
+                    <td>@item.MaHocVien</td>
+                    <td>@item.HoVaTen</td>
+                    <td>@item.NgaySinh.ToString("dd/MM/yyyy")</td>
+                    <td>@item.SoDienThoai</td>
+                    <td>@item.Email</td>
+                    <td>@item.CoQuanLamViec</td>
+                    <td>@item.SoLopDaDangKy</td>
+                    <td>@item.TongSoBuoi</td>
+                    <td>@item.SoBuoiDiHoc</td>
+                    <td>@item.SoBuoiVang</td>
+                    <td>@item.TiLeDiemDanh.ToString("F2")%</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <!-- Pagination controls -->
+    <nav>
+        <ul class="pagination justify-content-center"></ul>
+    </nav>
+</div>

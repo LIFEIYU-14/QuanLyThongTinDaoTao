@@ -250,6 +250,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Areas\Admin\AdminAreaRegistration.cs" />
+    <Compile Include="Areas\Admin\Controllers\AdminAccountController.cs" />
     <Compile Include="Areas\Admin\Controllers\BuoiHocController.cs" />
     <Compile Include="Areas\Admin\Controllers\DiemDanhGiangVienController.cs" />
     <Compile Include="Areas\Admin\Controllers\DiemDanhHocVienController.cs" />
@@ -263,6 +264,7 @@
     <Compile Include="Areas\Admin\Controllers\ThongKeController.cs" />
     <Compile Include="Areas\Admin\Controllers\ThongKeGVController.cs" />
     <Compile Include="Areas\Admin\Controllers\ThongKeHVController.cs" />
+    <Compile Include="Areas\Admin\Controllers\ThongTinTaiKhoanController.cs" />
     <Compile Include="Controllers\CoursesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LopHocChieuSinhController.cs" />
@@ -303,12 +305,16 @@
       <DependentUpon>202505281515483_ChungChiHocVien.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="ModelsHelper\AdminAccountViewModel.cs" />
+    <Compile Include="ModelsHelper\ChangePasswordViewModel.cs" />
     <Compile Include="ModelsHelper\ChungChiViewModel.cs" />
     <Compile Include="ModelsHelper\DangKyHocRequest.cs" />
     <Compile Include="ModelsHelper\HocVienHocTapViewModel.cs" />
+    <Compile Include="ModelsHelper\HocVienThongKeViewModel.cs" />
     <Compile Include="ModelsHelper\LopHocDetailsViewModel.cs" />
     <Compile Include="ModelsHelper\LopHocThongKeViewModel.cs" />
     <Compile Include="ModelsHelper\ThongKeGiangVienViewModel.cs" />
+    <Compile Include="ModelsHelper\ThongTinTaiKhoanViewModel.cs" />
     <Compile Include="ModelsHelper\VerifyOtpRequest.cs" />
     <Compile Include="Models\AppUser.cs" />
     <Compile Include="Models\Attachment.cs" />
@@ -524,6 +530,14 @@
     <Content Include="Areas\Admin\Views\GiangVien\Details.cshtml" />
     <Content Include="Areas\Admin\Views\QuanLyHocTap\QuanLyHocTapTheoKhoaHoc.cshtml" />
     <Content Include="Areas\Admin\Views\ThongKeGV\BaoCaoGiangVien.cshtml" />
+    <Content Include="Areas\Admin\Views\AdminAccount\Index.cshtml" />
+    <Content Include="Areas\Admin\Views\AdminAccount\Create.cshtml" />
+    <Content Include="Areas\Admin\Views\Login\QuenMatKhau.cshtml" />
+    <Content Include="Areas\Admin\Views\ThongTinTaiKhoan\Index.cshtml" />
+    <Content Include="Areas\Admin\Views\ThongTinTaiKhoan\Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\ThongTinTaiKhoan\ChangePassword.cshtml" />
+    <Content Include="Areas\Admin\Views\ThongKeHV\BaoCaoHocVien.cshtml" />
+    <Content Include="Areas\Admin\Views\ThongKeHV\_HocVienThongKePartial.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -561,7 +575,6 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Areas\Admin\Data\" />
-    <Folder Include="Areas\Admin\Views\ThongKeHV\" />
     <Folder Include="Upload\BuoiHoc\" />
     <Folder Include="Upload\KhoaHoc\" />
     <Folder Include="Upload\LopHoc\" />
