@@ -243,6 +243,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="APIControllers\ChungChiApiController.cs" />
     <Compile Include="APIControllers\DangKyLopHocController.cs" />
     <Compile Include="APIControllers\LopHocChieuSinhController.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -498,13 +499,11 @@
     <Content Include="Areas\Admin\Views\KhoaHoc\Edit.cshtml" />
     <Content Include="Areas\Admin\Views\LopHoc\Index.cshtml" />
     <Content Include="Areas\Admin\Views\LopHoc\Create.cshtml" />
-    <Content Include="Areas\Admin\Views\KhoaHoc\DanhSachLopHoc.cshtml" />
     <Content Include="Areas\Admin\Views\LopHoc\Details.cshtml" />
     <Content Include="Areas\Admin\Views\BuoiHoc\Index.cshtml" />
     <Content Include="Areas\Admin\Views\LopHoc\Edit.cshtml" />
     <Content Include="Areas\Admin\Views\BuoiHoc\Create.cshtml" />
     <Content Include="Areas\Admin\Views\BuoiHoc\Edit.cshtml" />
-    <Content Include="Areas\Admin\Views\LopHoc\DanhSachBuoiHoc.cshtml" />
     <Content Include="Areas\Admin\Views\HocVien\Index.cshtml" />
     <Content Include="Areas\Admin\Views\HocVien\Create.cshtml" />
     <Content Include="Areas\Admin\Views\GiangVien\Index.cshtml" />
@@ -519,8 +518,6 @@
     <Content Include="Areas\Admin\Views\DiemDanhHocVien\_BuoiHocEmpty.cshtml" />
     <Content Include="Areas\Admin\Views\BuoiHoc\DanhSachHocVien.cshtml" />
     <Content Include="Areas\Admin\Views\BuoiHoc\_BuoiHocPartial.cshtml" />
-    <Content Include="Areas\Admin\Views\PhanQuyen\Index.cshtml" />
-    <Content Include="Areas\Admin\Views\PhanQuyen\Edit.cshtml" />
     <Content Include="Areas\Admin\Views\Login\DangNhap.cshtml" />
     <Content Include="Areas\Admin\Views\DiemDanhHocVien\DanhSachBuoiDayGV.cshtml" />
     <Content Include="Areas\Admin\Views\HocVien\Details.cshtml" />
@@ -578,6 +575,7 @@
     <Folder Include="Upload\BuoiHoc\" />
     <Folder Include="Upload\KhoaHoc\" />
     <Folder Include="Upload\LopHoc\" />
+    <Folder Include="Views\ChungChiApi\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />

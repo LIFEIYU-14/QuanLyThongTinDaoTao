@@ -52,18 +52,7 @@
         <div class="collapse navbar-collapse" id="navbarSearch">
             <!-- Wrapper để gom cả tìm kiếm và thông tin tài khoản gần nhau -->
             <div class="d-flex align-items-center mx-lg-auto" style="max-width: 700px; width: 100%;">
-                @*Form tìm kiếm
-                    <form class="d-flex flex-grow-1 me-3">
-                        <div class="input-group">
-                            <input type="search" class="form-control border-0" placeholder="🔍 Tìm kiếm..."
-                                   aria-label="Search" value="@ViewBag.Search">
-                            <button class="btn btn-primary" type="submit">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                    </form>*@
-
-                <!-- User Dropdown (cạnh thanh tìm kiếm) -->
+              
                 <div class="dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="userDropdown"
                        data-bs-toggle="dropdown" aria-expanded="false">
@@ -182,8 +171,8 @@
                         else if (role == "GiangVien")
                         {
                             <a href="@Url.Action("Index", "HomeAdmin")" class="nav-item nav-link">
-                                <i class="fa fa-tachometer-alt me-2"></i>Trang chủ
-                            </a>
+                                <i class="fas fa-chart-line me-2"></i>Trang chủ
+</a>
                             <a href="@Url.Action("DanhSachBuoiDay", "DiemDanhHocVien")" class="nav-item nav-link">
                                 <i class="fas fa-calendar-alt me-2"></i>Lịch Dạy Của Tôi
                             </a>

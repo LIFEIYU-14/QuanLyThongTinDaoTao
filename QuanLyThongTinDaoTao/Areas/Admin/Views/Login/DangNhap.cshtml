@@ -29,52 +29,57 @@
             <div class="row justify-content-center">
                 <div class="col-md-6 col-lg-5">
                     <div class="login-wrap p-4 p-md-5">
-                        <div class="icon d-flex align-items-center justify-content-center">
+                        <div class="icon d-flex align-items-center justify-content-center mb-3">
                             <span class="fa fa-user-o"></span>
                         </div>
 
+                        <!-- FORM ĐĂNG NHẬP -->
                         @using (Html.BeginForm("DangNhap", "Login", FormMethod.Post, new { @class = "login-form" }))
                         {
                             @Html.AntiForgeryToken()
 
-                            <div class="form-group">
+                            <div class="form-group mb-3">
                                 @Html.LabelFor(m => m.TaiKhoanOrEmail)
                                 @Html.TextBoxFor(m => m.TaiKhoanOrEmail, new { @class = "form-control", placeholder = "Username or Email" })
                                 @Html.ValidationMessageFor(m => m.TaiKhoanOrEmail, "", new { @class = "text-danger" })
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group mb-3">
                                 @Html.LabelFor(m => m.MatKhau)
                                 @Html.PasswordFor(m => m.MatKhau, new { @class = "form-control", placeholder = "Password" })
                                 @Html.ValidationMessageFor(m => m.MatKhau, "", new { @class = "text-danger" })
                             </div>
+
                             <div class="form-group">
-                                <button type="submit" class="btn btn-primary rounded submit p-3 px-5">ĐĂNG NHẬP</button>
+                                <button type="submit" class="btn btn-primary rounded submit p-3 px-5 mt-3">ĐĂNG NHẬP</button>
+                            </div>
+
+                            <div class="text-center mt-3">
+                                <a href="#" id="show-forgot-password" class="text-decoration-none" style="color:#007bff; cursor:pointer;">
+                                    Quên mật khẩu?
+                                </a>
                             </div>
                         }
-                        <div class="text-center me-2">
-                            <a href="#" id="show-forgot-password" class="text-decoration-none p-3">Quên mật khẩu?</a>
-                        </div>
 
+                        <!-- FORM QUÊN MẬT KHẨU -->
+                        @using (Html.BeginForm("QuenMatKhau", "Login", FormMethod.Post, new { area = "Admin", id = "forgot-password-form" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class="form-group mt-3">
+                                <label for="EmailForgot">Nhập email để nhận lại mật khẩu</label>
+                                <input type="email" name="email" class="form-control" id="EmailForgot" placeholder="Email của bạn" required />
+                            </div>
+                            <div class="form-group text-end">
+                                <button type="submit" class="btn btn-warning">Gửi mật khẩu</button>
+                                <button type="button" id="cancel-forgot" class="btn btn-secondary ms-2">Hủy</button>
+                            </div>
+                        }
                     </div>
-
                 </div>
-
-                @using (Html.BeginForm("QuenMatKhau", "Login", FormMethod.Post, new { area = "Admin", id = "forgot-password-form" }))
-                {
-                    @Html.AntiForgeryToken()
-                    <div class="form-group mt-3">
-                        <label for="EmailForgot">Nhập email để nhận lại mật khẩu</label>
-                        <input type="email" name="email" class="form-control" id="EmailForgot" placeholder="Email của bạn" required />
-                    </div>
-                    <div class="form-group text-end">
-                        <button type="submit" class="btn btn-warning">Gửi mật khẩu</button>
-                        <button type="button" id="cancel-forgot" class="btn btn-secondary ms-2">Hủy</button>
-                    </div>
-                }
             </div>
         </div>
     </section>
+
     <script>
         document.getElementById('show-forgot-password').addEventListener('click', function (e) {
             e.preventDefault();

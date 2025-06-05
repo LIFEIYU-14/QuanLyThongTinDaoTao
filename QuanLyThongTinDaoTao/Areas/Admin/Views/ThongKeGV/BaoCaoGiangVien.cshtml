@@ -37,7 +37,6 @@
                         <th>Số buổi dạy</th>
                         <th>Số buổi vắng</th>
                         <th>Tỷ lệ chuyên cần (%)</th>
-                        <th>Lớp giảng dạy</th>
                     </tr>
                 </thead>
                 <tbody class="text-center">
@@ -48,14 +47,7 @@
                             <td>@gv.SoBuoiDay</td>
                             <td>@gv.SoBuoiVang</td>
                             <td>@gv.TyLeChuyenCan</td>
-                            <td>
-                                <ul>
-                                    @foreach (var lop in gv.LopHocThamGia)
-                                    {
-                                        <li>@lop</li>
-                                    }
-                                </ul>
-                            </td>
+                    
                         </tr>
                     }
                 </tbody>

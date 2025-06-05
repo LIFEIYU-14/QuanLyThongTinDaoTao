@@ -140,7 +140,15 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                     dateRangeText = $"Đến ngày {endDate.Value:dd/MM/yyyy}";
 
                 worksheet.Cells["A1"].Value = "Thống kê học viên";
+                worksheet.Cells["A1:M1"].Merge = true;
+                worksheet.Cells["A1"].Style.Font.Bold = true;
+                worksheet.Cells["A1"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+
                 worksheet.Cells["A2"].Value = dateRangeText;
+                worksheet.Cells["A2:M2"].Merge = true;
+                worksheet.Cells["A2"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                worksheet.Cells["A2"].Style.Font.Bold = true;
+
 
                 worksheet.Cells["A3"].Value = "STT";
                 worksheet.Cells["B3"].Value = "Mã HV";

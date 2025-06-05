@@ -49,7 +49,6 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                         TyLeChuyenCan = group.Count() > 0
                             ? Math.Round((double)soBuoiCoMat * 100 / group.Count(), 2)
                             : 0,
-                        LopHocThamGia = group.Select(g => g.BuoiHoc.LopHoc.TenLopHoc).Distinct().ToList()
                     };
                 }).ToList();
 
@@ -88,7 +87,6 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                         SoBuoiCoMat = soBuoiCoMat,
                         SoBuoiVang = group.Count() - soBuoiCoMat,
                         TyLeChuyenCan = group.Count() > 0 ? Math.Round((double)soBuoiCoMat * 100 / group.Count(), 2) : 0,
-                        LopHocThamGia = group.Select(g => g.BuoiHoc.LopHoc.TenLopHoc).Distinct().ToList()
                     };
                 }).ToList();
 
@@ -126,7 +124,6 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                     sheet.Cells[row, 2].Value = gv.SoBuoiCoMat;
                     sheet.Cells[row, 3].Value = gv.SoBuoiVang;
                     sheet.Cells[row, 4].Value = gv.TyLeChuyenCan;
-                    sheet.Cells[row, 5].Value = string.Join(", ", gv.LopHocThamGia);
                     row++;
                 }
 

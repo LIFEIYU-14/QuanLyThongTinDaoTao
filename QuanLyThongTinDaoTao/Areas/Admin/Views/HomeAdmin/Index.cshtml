@@ -32,7 +32,7 @@
             </div>
             <div class="col-md-4 mb-4">
                 <div class="card shadow p-3">
-                    <h5 class="text-center">Thống kê lớp học theo trạng thái</h5>
+                    <h5 class="text-center">Thống kê điểm danh theo trạng thái</h5>
                     <canvas id="pieChart"></canvas>
                 </div>
             </div>
@@ -56,6 +56,18 @@
                     data: @Html.Raw(ViewBag.MonthData),
                     backgroundColor: 'rgba(54, 162, 235, 0.7)',
                     yAxisID: 'y'
+                },
+                {
+                    label: 'Điểm danh HV (số lượt)',
+                    data: [], // sẽ cập nhật sau
+                    backgroundColor: 'rgba(40, 167, 69, 0.7)',
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Điểm danh GV (số lượt)',
+                    data: [], // sẽ cập nhật sau
+                    backgroundColor: 'rgba(220, 53, 69, 0.7)',
+                    yAxisID: 'y'
                 }
             ]
         },
@@ -66,36 +78,23 @@
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Số lượt đăng ký'
-                    }
-                },
-                y1: {
-                    beginAtZero: true,
-                    position: 'right',
-                    ticks: {
-                        callback: function (value) {
-                            return value + '%';
-                        }
-                    },
-                    title: {
-                        display: true,
-                        text: 'Tỉ lệ điểm danh (%)'
-                    },
-                    grid: {
-                        drawOnChartArea: false
+                        text: 'Số lượt'
                     }
                 }
             }
         }
     });
 
+    // Biến global để lưu giá trị gốc cho tooltip pieChart
+    let rawPieValues = [];
+
     let pieChart = new Chart(pieCtx, {
         type: 'pie',
         data: {
-            labels: @Html.Raw(ViewBag.StatusLabels),
+            labels: ['Đăng ký học', 'Điểm danh HV', 'Điểm danh GV'],
             datasets: [{
-                data: @Html.Raw(ViewBag.StatusData),
-                backgroundColor: ['#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8']
+                data: [], // sẽ cập nhật sau
+                backgroundColor: ['#007bff', '#28a745', '#dc3545']
             }]
         },
         options: {
@@ -103,38 +102,48 @@
             plugins: {
                 legend: {
                     position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+                            let index = context.dataIndex;
+                            let rawVal = rawPieValues[index] !== undefined ? rawPieValues[index].toFixed(2) : '0.00';
+                            let percent = context.parsed.toFixed(2);
+                            return `${label}: ${percent}% (Thực: ${rawVal}%)`;
+                        }
+                    }
                 }
             }
         }
     });
 
-    function updateBarChart(months, registrationData, hvPercent, gvPercent) {
+    function updateCharts(months, registrationData, attendanceStats) {
+        // Cập nhật bar chart với số đếm điểm danh HV, GV
         barChart.data.labels = months;
-        barChart.data.datasets = [
-            {
-                label: 'Lượt đăng ký',
-                data: registrationData,
-                backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                yAxisID: 'y'
-            },
-            {
-                label: 'Tỉ lệ điểm danh HV (%)',
-                data: hvPercent,
-                backgroundColor: 'rgba(40, 167, 69, 0.7)',
-                yAxisID: 'y1'
-            },
-            {
-                label: 'Tỉ lệ điểm danh GV (%)',
-                data: gvPercent,
-                backgroundColor: 'rgba(220, 53, 69, 0.7)',
-                yAxisID: 'y1'
-            }
-        ];
+        barChart.data.datasets[0].data = registrationData;
+        barChart.data.datasets[1].data = attendanceStats.soLuongDiemDanhHV;
+        barChart.data.datasets[2].data = attendanceStats.soLuongDiemDanhGV;
         barChart.update();
+
+        // Tính trung bình % điểm danh HV, GV
+        let avgTiLeHV = attendanceStats.tiLeDiemDanhHV.length > 0
+            ? attendanceStats.tiLeDiemDanhHV.reduce((a,b) => a+b, 0) / attendanceStats.tiLeDiemDanhHV.length
+            : 0;
+        let avgTiLeGV = attendanceStats.tiLeDiemDanhGV.length > 0
+            ? attendanceStats.tiLeDiemDanhGV.reduce((a,b) => a+b, 0) / attendanceStats.tiLeDiemDanhGV.length
+            : 0;
+
+        rawPieValues = [attendanceStats.tiLeDangKy, avgTiLeHV, avgTiLeGV];
+
+        let total = rawPieValues.reduce((a,b) => a+b, 0);
+        let normalizedValues = total > 0 ? rawPieValues.map(v => (v / total) * 100) : [0,0,0];
+
+        pieChart.data.datasets[0].data = normalizedValues;
+        pieChart.update();
     }
 
     function loadStats(khoaHocId, lopHocId) {
-        // Convert empty string to null to indicate "Tất cả"
         const khId = khoaHocId || null;
         const lhId = lopHocId || null;
 
@@ -144,7 +153,7 @@
         ).done(function (res1, res2) {
             const registration = res1[0];
             const attendance = res2[0];
-            updateBarChart(registration.labels, registration.data, attendance.tiLeDiemDanhHV, attendance.tiLeDiemDanhGV);
+            updateCharts(registration.labels, registration.data, attendance);
         });
     }
 
@@ -172,8 +181,8 @@
         const lopHocId = $(this).val();
         loadStats(khoaHocId, lopHocId);
     });
+
     $(document).ready(function () {
         loadStats(null, null);
     });
-
 </script>

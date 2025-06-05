@@ -108,9 +108,6 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 soLuongDangKyTheoThang = data // Giữ lại nếu cần dùng cho mục đích khác
             }, JsonRequestBehavior.AllowGet);
         }
-
-
-
         [HttpPost]
         public JsonResult GetAttendanceStats(Guid? khoaHocId, Guid? lopHocId)
         {
@@ -137,7 +134,6 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 .GroupBy(b => b.NgayHoc.Month)
                 .ToList();
 
-            // Lấy danh sách học viên có liên quan
             var dangKyQuery = db.DangKyHocs.AsQueryable();
             if (lopHocId.HasValue)
             {
@@ -152,13 +148,17 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 dangKyQuery = dangKyQuery.Where(d => lopIds.Contains(d.LopHocId));
             }
 
-            // Nếu không có filter thì lấy tất cả học viên đăng ký
             var hocVienIds = dangKyQuery.Any()
                 ? dangKyQuery.Select(d => d.HocVienId).Distinct().ToList()
                 : db.DangKyHocs.Select(d => d.HocVienId).Distinct().ToList();
 
-            var tileHV = new List<double>();
-            var tileGV = new List<double>();
+            var soLuongHV = hocVienIds.Count;
+
+            var soLuongDiemDanhHV = new List<int>();
+            var soLuongDiemDanhGV = new List<int>();
+
+            var tiLeDiemDanhHV = new List<double>();
+            var tiLeDiemDanhGV = new List<double>();
 
             foreach (int thang in Enumerable.Range(1, 12))
             {
@@ -166,28 +166,42 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                     .Select(b => b.BuoiHocId)
                     .ToList() ?? new List<Guid>();
 
-                // === HV ===
-                int totalHV = hocVienIds.Count * buoiIds.Count;
+                int totalHV = soLuongHV * buoiIds.Count;
                 int diemDanhHV = db.DiemDanhs_HVs
                     .Count(dd => buoiIds.Contains(dd.BuoiHocId) && dd.TrangThai == DiemDanh_HV.TrangThaiDiemDanhHV.CoMat);
-                double tile1 = totalHV > 0 ? (double)diemDanhHV / totalHV * 100 : 0;
-                tileHV.Add(Math.Round(tile1, 2));
 
-                // === GV ===
+                soLuongDiemDanhHV.Add(diemDanhHV);
+
                 int totalGV = db.GiangVien_BuoiHoc.Count(gb => buoiIds.Contains(gb.BuoiHocId));
-                int diemDanhGV = db.DiemDanhs_GVs
-                    .Count(dd => buoiIds.Contains(dd.BuoiHocId) && dd.TrangThai == DiemDanh_GV.TrangThaiDiemDanhGV.CoMat);
-                double tile2 = totalGV > 0 ? (double)diemDanhGV / totalGV * 100 : 0;
-                tileGV.Add(Math.Round(tile2, 2));
+                int diemDanhGV = (from dd in db.DiemDanhs_GVs
+                                  join gb in db.GiangVien_BuoiHoc on new { dd.BuoiHocId, dd.GiangVienId } equals new { gb.BuoiHocId, gb.GiangVienId }
+                                  where buoiIds.Contains(dd.BuoiHocId)
+                                        && dd.TrangThai == DiemDanh_GV.TrangThaiDiemDanhGV.CoMat
+                                  select dd).Count();
+
+                soLuongDiemDanhGV.Add(diemDanhGV);
+
+                double tileHV = totalHV > 0 ? (double)diemDanhHV / totalHV * 100 : 0;
+                double tileGV = totalGV > 0 ? (double)diemDanhGV / totalGV * 100 : 0;
+
+                tiLeDiemDanhHV.Add(Math.Round(tileHV, 2));
+                tiLeDiemDanhGV.Add(Math.Round(tileGV, 2));
             }
+
+            // Tính % đăng ký học trên tổng học viên đăng ký trong năm (cho pie chart)
+            var totalDangKyTrongNam = dangKyQuery.Count();
+            double tiLeDangKy = soLuongHV > 0 ? (double)totalDangKyTrongNam / (soLuongHV * 12) * 100 : 0; // có thể điều chỉnh nếu cần
 
             return Json(new
             {
-                tiLeDiemDanhHV = tileHV,
-                tiLeDiemDanhGV = tileGV
+                soLuongDiemDanhHV = soLuongDiemDanhHV,
+                soLuongDiemDanhGV = soLuongDiemDanhGV,
+                tiLeDiemDanhHV = tiLeDiemDanhHV,
+                tiLeDiemDanhGV = tiLeDiemDanhGV,
+                tiLeDangKy = Math.Round(tiLeDangKy, 2),
+                soLuongDangKy = totalDangKyTrongNam
             }, JsonRequestBehavior.AllowGet);
         }
-
 
     }
 }
