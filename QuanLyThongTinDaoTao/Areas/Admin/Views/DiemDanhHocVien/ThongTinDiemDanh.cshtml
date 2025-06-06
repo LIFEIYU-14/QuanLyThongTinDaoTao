@@ -146,93 +146,38 @@
 
     <!-- Quét QR -->
     <div class="bg-light rounded p-4 mb-4">
-        <h5><i class="fas fa-qrcode me-2"></i> Quét QR để điểm danh</h5>
+        <div class="d-flex align-items-center gap-3 mb-3">
+            <h5 class="mb-0"><i class="fas fa-qrcode me-2"></i> Quét QR để điểm danh</h5>
+            <button id="toggleScanBtn" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-toggle-on"></i> Tắt quét mã
+            </button>
+        </div>
         <div id="reader" style="width: 100%; max-width: 400px;"></div>
         <div class="mt-2">
             <span id="qrResultMessage" class="fw-bold text-primary"></span>
         </div>
     </div>
+
+
 </div>
 
 <!-- Scripts -->
 <script src="https://unpkg.com/html5-qrcode"></script>
 
+<script src="https://unpkg.com/html5-qrcode"></script>
+
 <script>
-    $(function () {
-        // Học viên
-        $(document).on('click', '.btn-diemdanh', function () {
-            let id = $(this).data('hocvien-id');
-            $.post('@Url.Action("DiemDanhHocVien")', { hocVienId: id, buoiHocId: '@buoiHoc.BuoiHocId' }, function (res) {
-                if (res.success) location.reload();
-                else alert(res.message);
-            });
-        });
+    let html5QrcodeScanner;
+    let scannerActive = true;
 
-        $(document).on('click', '.btn-huydiemdanh', function () {
-            let id = $(this).data('hocvien-id');
-            $.post('@Url.Action("HuyDiemDanhHocVien")', { hocVienId: id, buoiHocId: '@buoiHoc.BuoiHocId' }, function (res) {
-                if (res.success) location.reload();
-                else alert(res.message);
-            });
-        });
-
-        // Giảng viên
-        $(document).on('click', '.btn-diemdanh-gv', function () {
-            let id = $(this).data('giangvien-id');
-            $.post('@Url.Action("DiemDanhGiangVien")', { giangVienId: id, buoiHocId: '@buoiHoc.BuoiHocId' }, function (res) {
-                if (res.success) location.reload();
-                else alert(res.message);
-            });
-        });
-
-        $(document).on('click', '.btn-huydiemdanh-gv', function () {
-            let id = $(this).data('giangvien-id');
-            $.post('@Url.Action("HuyDiemDanhGiangVien")', { giangVienId: id, buoiHocId: '@buoiHoc.BuoiHocId' }, function (res) {
-                if (res.success) location.reload();
-                else alert(res.message);
-            });
-        });
-    });
-
-    // Phân trang
-    document.addEventListener("DOMContentLoaded", function () {
-        const rowsPerPage = 10;
-        const tableRows = document.querySelectorAll(".hocvien-row");
-        const totalRows = tableRows.length;
-        const totalPages = Math.ceil(totalRows / rowsPerPage);
-        const pagination = document.getElementById("pagination");
-
-        function showPage(page) {
-            tableRows.forEach((row, index) => {
-                row.style.display = (index >= (page - 1) * rowsPerPage && index < page * rowsPerPage) ? "" : "none";
-            });
-
-            pagination.innerHTML = "";
-            for (let i = 1; i <= totalPages; i++) {
-                const li = document.createElement("li");
-                li.className = "page-item" + (i === page ? " active" : "");
-                li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
-                li.addEventListener("click", function (e) {
-                    e.preventDefault();
-                    showPage(i);
-                });
-                pagination.appendChild(li);
-            }
-        }
-
-        showPage(1);
-    });
-
-    // Quét QR điểm danh
     document.addEventListener("DOMContentLoaded", function () {
         const resultEl = document.getElementById("qrResultMessage");
+        const toggleBtn = document.getElementById("toggleScanBtn");
 
         function onScanSuccess(decodedText) {
             try {
                 const parsed = JSON.parse(decodedText);
-                let payload = {
-                    buoiHocId: '@buoiHoc.BuoiHocId'
-                };
+                let payload = { buoiHocId: '@buoiHoc.BuoiHocId' };
 
                 if (parsed.HocVienId)
                     payload.HocVienId = parsed.HocVienId;
@@ -257,14 +202,28 @@
                         }
                     });
 
-                html5QrcodeScanner.clear(); // Dừng quét sau 1 lần thành công
+                html5QrcodeScanner.clear(); // Dừng sau khi quét thành công
+                scannerActive = false;
+                toggleBtn.innerHTML = '<i class="fas fa-toggle-off"></i> Bật quét mã';
             } catch {
                 resultEl.className = "text-danger";
                 resultEl.innerText = "❌ QR không hợp lệ!";
             }
         }
 
-        const html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+        html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
         html5QrcodeScanner.render(onScanSuccess);
+
+        toggleBtn.addEventListener("click", function () {
+            if (scannerActive) {
+                html5QrcodeScanner.clear();
+                scannerActive = false;
+                toggleBtn.innerHTML = '<i class="fas fa-toggle-off"></i> Bật quét mã';
+            } else {
+                html5QrcodeScanner.render(onScanSuccess);
+                scannerActive = true;
+                toggleBtn.innerHTML = '<i class="fas fa-toggle-on"></i> Tắt quét mã';
+            }
+        });
     });
 </script>

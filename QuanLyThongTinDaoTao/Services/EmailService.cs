@@ -134,7 +134,6 @@ namespace QuanLyThongTinDaoTao.Services
                         smtp.Credentials = new NetworkCredential(smtpUser, smtpPass);
                         smtp.EnableSsl = true;
 
-                        // Gửi mail đồng bộ (vì .NET Framework 4.8 không hỗ trợ async hoàn toàn với SmtpClient)
                         smtp.Send(mail);
                     }
                 }

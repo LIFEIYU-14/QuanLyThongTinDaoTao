@@ -27,12 +27,21 @@
             <h5 class="mb-3">Tra cứu bằng mã QR</h5>
 
             <div class="bg-light rounded p-4 mb-4">
-                <h5><i class="fas fa-qrcode me-2"></i> Quét mã QR</h5>
-                <div id="reader" style="width: 100%; max-width: 400px;"></div>
-                <div class="mt-2">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <h5 class="mb-0"><i class="fas fa-qrcode me-2"></i> Quét mã QR</h5>
+                    <button id="toggleScanBtn" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-toggle-on"></i> Tắt quét mã
+                    </button>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <div id="reader" style="width: 100%; max-width: 400px;"></div>
+                </div>
+                <div class="mt-2 text-center">
                     <span id="qrResultMessage" class="fw-bold text-primary"></span>
                 </div>
             </div>
+
+
 
             @if (ViewBag.Error != null)
             {
@@ -99,6 +108,7 @@
                 onScanSuccess
             );
             isScanning = true;
+            updateToggleButton();
         }
     };
 
@@ -107,7 +117,21 @@
             html5QrCode.stop().then(() => {
                 html5QrCode.clear();
                 isScanning = false;
+                updateToggleButton();
             }).catch(err => console.error("Không thể dừng quét QR", err));
+        }
+    };
+
+    const updateToggleButton = () => {
+        const btn = document.getElementById("toggleScanBtn");
+        if (isScanning) {
+            btn.innerHTML = '<i class="fas fa-toggle-on"></i> Tắt quét mã';
+            btn.classList.remove("btn-outline-danger");
+            btn.classList.add("btn-outline-primary");
+        } else {
+            btn.innerHTML = '<i class="fas fa-toggle-off"></i> Bật quét mã';
+            btn.classList.remove("btn-outline-primary");
+            btn.classList.add("btn-outline-danger");
         }
     };
 
@@ -120,7 +144,7 @@
         fetch('/TraCuuLichHoc/QuetQR', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ qrData: qrData }) // qrData là JSON string từ mã QR
+            body: JSON.stringify({ qrData: qrData })
         })
             .then(res => res.json())
             .then(data => {
@@ -128,7 +152,6 @@
                 if (data.success) {
                     resultEl.className = "text-success";
                     resultEl.innerText = "✅ " + data.message;
-
                     if (data.hocVienId) {
                         window.location.href = '/TraCuuLichHoc/IndexTheoId?id=' + encodeURIComponent(data.hocVienId);
                     }
@@ -139,9 +162,13 @@
             });
     }
 
-    // Tự động khởi động quét QR khi trang tải
     document.addEventListener("DOMContentLoaded", function () {
-        startQRScanner();
+        document.getElementById("toggleScanBtn").addEventListener("click", function () {
+            if (isScanning) stopQRScanner();
+            else startQRScanner();
+        });
+        startQRScanner(); // Khởi động mặc định
     });
 </script>
+
 

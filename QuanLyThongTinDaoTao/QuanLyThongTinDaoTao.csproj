@@ -270,6 +270,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LopHocChieuSinhController.cs" />
     <Compile Include="Controllers\TraCuuChungChiController.cs" />
+    <Compile Include="Controllers\TraCuuController.cs" />
     <Compile Include="Controllers\TraCuuLichHocController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -575,7 +576,6 @@
     <Folder Include="Upload\BuoiHoc\" />
     <Folder Include="Upload\KhoaHoc\" />
     <Folder Include="Upload\LopHoc\" />
-    <Folder Include="Views\ChungChiApi\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />

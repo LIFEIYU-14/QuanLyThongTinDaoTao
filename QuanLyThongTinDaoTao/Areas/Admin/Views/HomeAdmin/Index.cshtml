@@ -32,7 +32,7 @@
             </div>
             <div class="col-md-4 mb-4">
                 <div class="card shadow p-3">
-                    <h5 class="text-center">Thống kê điểm danh theo trạng thái</h5>
+                    <h5 class="text-center">Tỷ lệ điểm danh trung bình</h5> <!-- Sửa tiêu đề -->
                     <canvas id="pieChart"></canvas>
                 </div>
             </div>
@@ -88,13 +88,16 @@
     // Biến global để lưu giá trị gốc cho tooltip pieChart
     let rawPieValues = [];
 
+    // ... (phần bar chart giữ nguyên) ...
+
+    // Khởi tạo pie chart chỉ với 2 phần tử
     let pieChart = new Chart(pieCtx, {
         type: 'pie',
         data: {
-            labels: ['Đăng ký học', 'Điểm danh HV', 'Điểm danh GV'],
+            labels: ['Điểm danh HV', 'Điểm danh GV'],
             datasets: [{
                 data: [], // sẽ cập nhật sau
-                backgroundColor: ['#007bff', '#28a745', '#dc3545']
+                backgroundColor: ['#28a745', '#dc3545'] // xanh lá & đỏ
             }]
         },
         options: {
@@ -105,18 +108,41 @@
                 },
                 tooltip: {
                     callbacks: {
-                        label: function(context) {
+                        label: function (context) {
                             let label = context.label || '';
-                            let index = context.dataIndex;
-                            let rawVal = rawPieValues[index] !== undefined ? rawPieValues[index].toFixed(2) : '0.00';
-                            let percent = context.parsed.toFixed(2);
-                            return `${label}: ${percent}% (Thực: ${rawVal}%)`;
+                            let value = context.parsed || 0;
+                            return `${label}: ${value.toFixed(2)}%`;
                         }
                     }
                 }
             }
         }
     });
+
+
+    function updateCharts(months, registrationData, attendanceStats) {
+        // ... (phần bar chart giữ nguyên) ...
+
+        // Tính trung bình % điểm danh HV, GV
+        let avgTiLeHV = attendanceStats.tiLeDiemDanhHV.length > 0
+            ? attendanceStats.tiLeDiemDanhHV.reduce((a, b) => a + b, 0) / attendanceStats.tiLeDiemDanhHV.length
+            : 0;
+
+        let avgTiLeGV = attendanceStats.tiLeDiemDanhGV.length > 0
+            ? attendanceStats.tiLeDiemDanhGV.reduce((a, b) => a + b, 0) / attendanceStats.tiLeDiemDanhGV.length
+            : 0;
+
+        // Cập nhật dữ liệu biểu đồ tròn
+        let rawPieValues = [avgTiLeHV, avgTiLeGV];
+        let total = rawPieValues.reduce((a, b) => a + b, 0);
+        let normalizedValues = total > 0 ? rawPieValues.map(v => (v / total) * 100) : [0, 0];
+
+        pieChart.data.datasets[0].data = normalizedValues;
+        pieChart.update();
+
+    }
+
+
 
     function updateCharts(months, registrationData, attendanceStats) {
         // Cập nhật bar chart với số đếm điểm danh HV, GV
@@ -128,20 +154,22 @@
 
         // Tính trung bình % điểm danh HV, GV
         let avgTiLeHV = attendanceStats.tiLeDiemDanhHV.length > 0
-            ? attendanceStats.tiLeDiemDanhHV.reduce((a,b) => a+b, 0) / attendanceStats.tiLeDiemDanhHV.length
+            ? attendanceStats.tiLeDiemDanhHV.reduce((a, b) => a + b, 0) / attendanceStats.tiLeDiemDanhHV.length
             : 0;
         let avgTiLeGV = attendanceStats.tiLeDiemDanhGV.length > 0
-            ? attendanceStats.tiLeDiemDanhGV.reduce((a,b) => a+b, 0) / attendanceStats.tiLeDiemDanhGV.length
+            ? attendanceStats.tiLeDiemDanhGV.reduce((a, b) => a + b, 0) / attendanceStats.tiLeDiemDanhGV.length
             : 0;
 
-        rawPieValues = [attendanceStats.tiLeDangKy, avgTiLeHV, avgTiLeGV];
+        // ✅ Chỉ dùng 2 phần tử cho biểu đồ tròn
+        rawPieValues = [avgTiLeHV, avgTiLeGV];
 
-        let total = rawPieValues.reduce((a,b) => a+b, 0);
-        let normalizedValues = total > 0 ? rawPieValues.map(v => (v / total) * 100) : [0,0,0];
+        let total = rawPieValues.reduce((a, b) => a + b, 0);
+        let normalizedValues = total > 0 ? rawPieValues.map(v => (v / total) * 100) : [0, 0];
 
         pieChart.data.datasets[0].data = normalizedValues;
         pieChart.update();
     }
+
 
     function loadStats(khoaHocId, lopHocId) {
         const khId = khoaHocId || null;

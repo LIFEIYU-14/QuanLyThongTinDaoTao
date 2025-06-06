@@ -25,11 +25,20 @@
             <hr />
             <h5 class="mb-3">Hoặc quét mã QR</h5>
             <div class="bg-white p-4">
-                <div id="reader" style="width: 100%; max-width: 400px;" class="mx-auto"></div>
+                <div class="d-flex justify-content-center align-items-center gap-3 mb-3">
+                    <h5 class="mb-0"><i class="fas fa-qrcode me-2"></i> Quét mã QR</h5>
+                    <button id="toggleScanBtn" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-toggle-on"></i> Tắt quét mã
+                    </button>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <div id="reader" style="width: 100%; max-width: 400px;"></div>
+                </div>
                 <div class="mt-2 text-center">
                     <span id="qrResultMessage" class="fw-bold text-primary"></span>
                 </div>
             </div>
+
 
             <hr />
 
@@ -96,6 +105,7 @@
                 onScanSuccess
             );
             isScanning = true;
+            updateToggleButton();
         }
     }
 
@@ -104,7 +114,21 @@
             html5QrCode.stop().then(() => {
                 html5QrCode.clear();
                 isScanning = false;
-            });
+                updateToggleButton();
+            }).catch(err => console.error("Không thể dừng quét QR", err));
+        }
+    }
+
+    function updateToggleButton() {
+        const btn = document.getElementById("toggleScanBtn");
+        if (isScanning) {
+            btn.innerHTML = '<i class="fas fa-toggle-on"></i> Tắt quét mã';
+            btn.classList.remove("btn-outline-danger");
+            btn.classList.add("btn-outline-primary");
+        } else {
+            btn.innerHTML = '<i class="fas fa-toggle-off"></i> Bật quét mã';
+            btn.classList.remove("btn-outline-primary");
+            btn.classList.add("btn-outline-danger");
         }
     }
 
@@ -116,7 +140,7 @@
         })
             .then(response => response.json())
             .then(data => {
-                let msg = document.getElementById("qrResultMessage");
+                const msg = document.getElementById("qrResultMessage");
                 if (data.success) {
                     msg.className = "text-success fw-bold";
                     msg.innerText = data.message;
@@ -129,5 +153,13 @@
         stopQRScanner();
     }
 
-    document.addEventListener("DOMContentLoaded", startQRScanner);
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("toggleScanBtn").addEventListener("click", function () {
+            if (isScanning) stopQRScanner();
+            else startQRScanner();
+        });
+
+        startQRScanner(); // Bắt đầu mặc định khi vào trang
+    });
 </script>
+

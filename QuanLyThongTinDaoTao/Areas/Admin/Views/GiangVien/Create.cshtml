@@ -5,104 +5,82 @@
     Layout = "~/Areas/Admin/Views/Shared/_MainAdminLayout.cshtml";
 }
 
-<div class="container mt-5">
-    <div class="card shadow-lg">
-        <div class="card-header bg-primary text-white text-center">
-            <h3><i class="fa-solid fa-user-plus"></i> Thêm Giảng Viên</h3>
-        </div>
-        <div class="card-body">
-            @using (Html.BeginForm("Create", "GiangVien", FormMethod.Post, new { @class = "form-horizontal" }))
+<div class="container py-4">
+    <h3 class="fw-bold mb-3">Thêm giảng viên mới</h3>
+
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb bg-info bg-opacity-25 px-3 py-2 rounded">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "HomeAdmin")">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "GiangVien")">Giảng viên</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Thêm giảng viên</li>
+        </ol>
+    </nav>
+
+    <a href="@Url.Action("Index", "GiangVien")" class="btn btn-primary mb-3">
+        <i class="fas fa-arrow-left me-1"></i> Về danh sách
+    </a>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+            @using (Html.BeginForm("Create", "GiangVien", FormMethod.Post))
             {
                 @Html.AntiForgeryToken()
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        @Html.LabelFor(model => model.HoVaTen, "Họ và Tên", new { @class = "form-label" })
-                        <span class="text-danger">*</span>
-                        @Html.TextBoxFor(model => model.HoVaTen, new { @class = "form-control", placeholder = "Nhập họ và tên", required = "required" })
-                        @Html.ValidationMessageFor(model => model.HoVaTen, "", new { @class = "text-danger" })
+
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.HoVaTen, new { @class = "form-label fw-bold" })
+                            <span class="text-danger">*</span>
+                            @Html.TextBoxFor(m => m.HoVaTen, new { @class = "form-control", placeholder = "Nhập họ và tên", required = "required" })
+                            @Html.ValidationMessageFor(m => m.HoVaTen, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.Email, new { @class = "form-label fw-bold" })
+                            <span class="text-danger">*</span>
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", type = "email", placeholder = "Nhập email", required = "required" })
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.SoDienThoai, new { @class = "form-label fw-bold" })
+                            <span class="text-danger">*</span>
+                            @Html.TextBoxFor(m => m.SoDienThoai, new { @class = "form-control", type = "tel", placeholder = "Nhập số điện thoại", required = "required" })
+                            @Html.ValidationMessageFor(m => m.SoDienThoai, "", new { @class = "text-danger" })
+                        </div>
                     </div>
 
-                    <div class="col-md-6 mb-3">
-                        @Html.LabelFor(model => model.NgaySinh, "Ngày Sinh", new { @class = "form-label" })
-                        <span class="text-danger">*</span>
-                        @Html.TextBoxFor(model => model.NgaySinh, new { @class = "form-control", type = "date", required = "required" })
-                        @Html.ValidationMessageFor(model => model.NgaySinh, "", new { @class = "text-danger" })
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.NgaySinh, new { @class = "form-label fw-bold" })
+                            <span class="text-danger">*</span>
+                            @Html.TextBoxFor(m => m.NgaySinh, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", required = "required" })
+                            @Html.ValidationMessageFor(m => m.NgaySinh, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.ChuyenMon, new { @class = "form-label fw-bold" })
+                            <span class="text-danger">*</span>
+                            @Html.TextBoxFor(m => m.ChuyenMon, new { @class = "form-control", placeholder = "Nhập chuyên môn", required = "required" })
+                            @Html.ValidationMessageFor(m => m.ChuyenMon, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.HocHam, new { @class = "form-label fw-bold" })
+                            <span class="text-danger">*</span>
+                            @Html.TextBoxFor(m => m.HocHam, new { @class = "form-control", placeholder = "Nhập học hàm", required = "required" })
+                            @Html.ValidationMessageFor(m => m.HocHam, "", new { @class = "text-danger" })
+                        </div>
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        @Html.LabelFor(model => model.ChuyenMon, "Chuyên Môn", new { @class = "form-label" })
-                        <span class="text-danger">*</span>
-                        @Html.TextBoxFor(model => model.ChuyenMon, new { @class = "form-control", placeholder = "Nhập chuyên môn" })
-                        @Html.ValidationMessageFor(model => model.ChuyenMon, "", new { @class = "text-danger" })
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        @Html.LabelFor(model => model.HocHam, "Học Hàm", new { @class = "form-label" })
-                        <span class="text-danger">*</span>
-                        @Html.TextBoxFor(model => model.HocHam, new { @class = "form-control", placeholder = "Nhập học hàm" })
-                        @Html.ValidationMessageFor(model => model.HocHam, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        @Html.LabelFor(model => model.Email, "Email", new { @class = "form-label" })
-                        <span class="text-danger">*</span>
-                        @Html.TextBoxFor(model => model.Email, new { @class = "form-control", type = "email", placeholder = "Nhập email", required = "required" })
-                        @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        @Html.LabelFor(model => model.SoDienThoai, "Số Điện Thoại", new { @class = "form-label" })
-                        <span class="text-danger">*</span>
-                        @Html.TextBoxFor(model => model.SoDienThoai, new { @class = "form-control", type = "tel", placeholder = "Nhập số điện thoại", required = "required" })
-                        @Html.ValidationMessageFor(model => model.SoDienThoai, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-
-                <div class="text-center">
-                    <button type="submit" class="btn btn-success me-2 btn-lg">
-                        <i class="fa-solid fa-circle-plus"></i> Thêm Giảng Viên
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="fa-solid fa-circle-plus me-1"></i> Thêm giảng viên
                     </button>
-                    <a href="@Url.Action("Index")" class="btn btn-secondary btn-lg">
-                        <i class="fas fa-arrow-left me-1"></i> Quay lại
-                    </a>
                 </div>
             }
         </div>
     </div>
 </div>
-<style>
-    .form-label {
-        font-weight: bold;
-    }
 
-    .form-control {
-        padding: 0.75rem;
-        font-size: 1rem;
-    }
-
-    .btn-lg {
-        padding: 0.5rem 1.5rem;
-        font-size: 1.125rem;
-    }
-
-    .card-header {
-        font-size: 1.5rem;
-    }
-
-    .text-danger {
-        font-size: 0.875rem;
-    }
-
-    .row {
-        margin-bottom: 1.5rem;
-    }
-
-    .container {
-        max-width: 800px;
-        margin: 0 auto;
-    }
-</style>

@@ -190,7 +190,6 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
 
             // Tính % đăng ký học trên tổng học viên đăng ký trong năm (cho pie chart)
             var totalDangKyTrongNam = dangKyQuery.Count();
-            double tiLeDangKy = soLuongHV > 0 ? (double)totalDangKyTrongNam / (soLuongHV * 12) * 100 : 0; // có thể điều chỉnh nếu cần
 
             return Json(new
             {
@@ -198,7 +197,6 @@ namespace QuanLyThongTinDaoTao.Areas.Admin.Controllers
                 soLuongDiemDanhGV = soLuongDiemDanhGV,
                 tiLeDiemDanhHV = tiLeDiemDanhHV,
                 tiLeDiemDanhGV = tiLeDiemDanhGV,
-                tiLeDangKy = Math.Round(tiLeDangKy, 2),
                 soLuongDangKy = totalDangKyTrongNam
             }, JsonRequestBehavior.AllowGet);
         }

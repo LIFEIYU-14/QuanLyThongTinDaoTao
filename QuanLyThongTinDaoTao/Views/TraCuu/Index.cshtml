@@ -19,7 +19,6 @@
                             <th>Ngày Kết Thúc</th>
                             <th>Số Lượng Tối Đa</th>
                             <th>Khoá Học</th>
-                            <th>Hành Động</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -56,11 +55,7 @@
                             <td>${ngayKetThuc}</td>
                             <td>${item.SoLuongToiDa}</td>
                             <td>${item.KhoaHoc}</td>
-                            <td>
-                                <a href="/Courses/Register?lopHocId=${item.LopHocId}" class="btn btn-sm btn-success">
-                                    <i class="fas fa-user-plus"></i> Đăng Ký
-                                </a>
-                            </td>
+                         
                         </tr>`;
                     tbody.append(row);
                 });
